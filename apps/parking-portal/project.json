@@ -8,9 +8,7 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/parking-portal",
         "browser": "apps/parking-portal/src/main.ts",
@@ -21,9 +19,7 @@
             "input": "apps/parking-portal/public"
           }
         ],
-        "styles": [
-          "apps/parking-portal/src/styles.css"
-        ]
+        "styles": ["apps/parking-portal/src/styles.css"]
       },
       "configurations": {
         "production": {
@@ -60,7 +56,10 @@
           "buildTarget": "parking-portal:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "options": {
+        "proxyConfig": "apps/parking-portal/proxy.conf.json"
+      }
     },
     "lint": {
       "executor": "@nx/eslint:lint"
