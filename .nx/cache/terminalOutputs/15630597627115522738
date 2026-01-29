@@ -1,0 +1,79 @@
+
+[2m> [22m[2mnx run[22m @org/api:build:development
+
+> webpack-cli build --node-env=development
+
+webpack compiled [1m[32msuccessfully[39m[22m (34cd235b8e7b07b9)
+
+[2m[32m———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————[39m[22m
+
+[0m[7m[1m[32m NX [39m[22m[27m[0m  [32mSuccessfully ran target [1mbuild[22m for project @org/api[39m
+
+
+[1m[31mDebugger listening on ws://localhost:9229/7bf8cdcc-e8a5-4f09-8dfa-bfcba225cd1d[39m[22m
+[1m[31mDebugger listening on ws://localhost:9229/7bf8cdcc-e8a5-4f09-8dfa-bfcba225cd1d[39m[22m
+[1m[31mFor help, see: https://nodejs.org/en/docs/inspector[39m[22m
+[1m[31m[39m[22m
+
+[7m[1m[36m NX [39m[22m[27m [1mFile change detected. Restarting...[22m
+
+
+[7m[1m[36m NX [39m[22m[27m [1mFile change detected. Restarting...[22m
+
+[32m[Nest] 29341  - [39m01/29/2026, 2:47:47 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 29341  - [39m01/29/2026, 2:47:47 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 29341  - [39m01/29/2026, 2:47:47 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/api}:[39m[38;5;3m +2ms[39m
+[32m[Nest] 29341  - [39m01/29/2026, 2:47:47 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 29341  - [39m01/29/2026, 2:47:47 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +1ms[39m
+[32m[Nest] 29341  - [39m01/29/2026, 2:47:47 PM [32m    LOG[39m [32m🚀 Application is running on: http://localhost:3000/api[39m
+
+[2m> [22m[2mnx run[22m @org/api:build:development
+
+> webpack-cli build --node-env=development
+
+webpack compiled [1m[32msuccessfully[39m[22m (34cd235b8e7b07b9)
+
+[2m[32m———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————[39m[22m
+
+[0m[7m[1m[32m NX [39m[22m[27m[0m  [32mSuccessfully ran target [1mbuild[22m for project @org/api[39m
+
+
+[1m[31mDebugger listening on ws://localhost:9229/567bef52-4bc0-4f33-a603-7db638988fd7[39m[22m
+[1m[31mDebugger listening on ws://localhost:9229/567bef52-4bc0-4f33-a603-7db638988fd7[39m[22m
+[1m[31mFor help, see: https://nodejs.org/en/docs/inspector[39m[22m
+[1m[31m[39m[22m
+
+[7m[1m[36m NX [39m[22m[27m [1mFile change detected. Restarting...[22m
+
+
+[7m[1m[36m NX [39m[22m[27m [1mFile change detected. Restarting...[22m
+
+[32m[Nest] 29407  - [39m01/29/2026, 2:47:48 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 29407  - [39m01/29/2026, 2:47:48 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 29407  - [39m01/29/2026, 2:47:48 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/api}:[39m[38;5;3m +2ms[39m
+[32m[Nest] 29407  - [39m01/29/2026, 2:47:48 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 29407  - [39m01/29/2026, 2:47:48 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +1ms[39m
+[32m[Nest] 29407  - [39m01/29/2026, 2:47:48 PM [32m    LOG[39m [32m🚀 Application is running on: http://localhost:3000/api[39m
+
+[2m> [22m[2mnx run[22m @org/api:build:development  [2m[existing outputs match the cache, left as is][22m
+
+> webpack-cli build --node-env=development
+
+webpack compiled [1m[32msuccessfully[39m[22m (34cd235b8e7b07b9)
+
+[2m[32m———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————[39m[22m
+
+[0m[7m[1m[32m NX [39m[22m[27m[0m  [32mSuccessfully ran target [1mbuild[22m for project @org/api[39m
+
+[2mNx read the output from the cache instead of running the command for 1 out of 1 tasks.[22m
+
+[1m[31mDebugger listening on ws://localhost:9229/8e1865c5-2d4c-4656-9c0b-3fe154eb84ae[39m[22m
+[1m[31mDebugger listening on ws://localhost:9229/8e1865c5-2d4c-4656-9c0b-3fe154eb84ae[39m[22m
+[1m[31mFor help, see: https://nodejs.org/en/docs/inspector[39m[22m
+[1m[31m[39m[22m
+[32m[Nest] 29473  - [39m01/29/2026, 2:47:49 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 29473  - [39m01/29/2026, 2:47:49 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 29473  - [39m01/29/2026, 2:47:49 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/api}:[39m[38;5;3m +2ms[39m
+[32m[Nest] 29473  - [39m01/29/2026, 2:47:49 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 29473  - [39m01/29/2026, 2:47:49 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +1ms[39m
+[32m[Nest] 29473  - [39m01/29/2026, 2:47:49 PM [32m    LOG[39m [32m🚀 Application is running on: http://localhost:3000/api[39m

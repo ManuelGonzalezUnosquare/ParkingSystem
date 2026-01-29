@@ -1,0 +1,8 @@
+{
+  "name": "@org/parking-portal-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "parking-portal-e2e"
+  }
+}
