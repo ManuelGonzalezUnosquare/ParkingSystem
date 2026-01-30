@@ -1,8 +1,9 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
-import { Building } from "./building.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "./_base.entity";
+import { Building } from "./building.entity";
 import { Role } from "./role.entity";
 import { Vehicle } from "./vehicle.entity";
+import { UserStatusEnum } from "@org/shared-models";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -23,7 +24,7 @@ export class User extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: ["ACTIVE", "INACTIVE", "SUSPENDED"],
+    enum: UserStatusEnum,
     default: "ACTIVE",
   })
   status: string;
