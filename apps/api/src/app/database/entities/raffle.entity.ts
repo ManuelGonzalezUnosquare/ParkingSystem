@@ -6,7 +6,7 @@ import { BaseEntity } from "./_base.entity";
 @Entity("raffles")
 export class Raffle extends BaseEntity {
   @Column({ type: "varchar", length: 100 })
-  name: string; // Ej: "Sorteo Mensual - Marzo 2026"
+  name: string;
 
   @Column({ type: "datetime" })
   drawDate: Date;

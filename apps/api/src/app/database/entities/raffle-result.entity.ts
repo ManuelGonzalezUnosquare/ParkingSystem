@@ -3,6 +3,7 @@ import { Raffle } from "./raffle.entity";
 import { User } from "./user.entity";
 import { ParkingSlot } from "./parking-slot.entity";
 import { BaseEntity } from "./_base.entity";
+import { Vehicle } from "./vehicle.entity";
 
 @Entity("raffle_results")
 export class RaffleResult extends BaseEntity {
@@ -14,10 +15,14 @@ export class RaffleResult extends BaseEntity {
   @JoinColumn({ name: "user_id" })
   user: User;
 
+  @ManyToOne(() => Vehicle)
+  @JoinColumn({ name: "vehicle_id" })
+  vehicle: Vehicle;
+
   @ManyToOne(() => ParkingSlot)
   @JoinColumn({ name: "slot_id" })
   slot: ParkingSlot;
 
   @Column({ type: "int" })
-  scoreAtDraw: number; // Guardamos el score que tenía el usuario al momento de ganar
+  scoreAtDraw: number;
 }

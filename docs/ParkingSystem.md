@@ -155,3 +155,47 @@ The raffle is building-scoped and follows a **Weighted Shuffle Algorithm** to en
     - Winners: Reset `priorityScore` and create `ParkingAssignmentHistory`.
     - Losers: Increment `priorityScore`.
 5.  **Logging**: Records are added to `RaffleHistory` and `RaffleParticipation` for transparency.
+
+## 6. Vehicle Management & Raffle Logic (Current Scope)
+
+### 6.1 Resident Vehicle Policy
+
+To maintain a balance between system scalability and project scope (PoC), the following business rules have been established:
+
+- **Relationship**: The database maintains a **One-to-Many (1:N)** relationship between `User` and `Vehicle`.
+- **Current Constraint**: For the initial phase, each user will manage only **one active vehicle**.
+- **Scalability**: The system is pre-architected to allow multiple vehicles in future phases without schema migrations.
+- **Data Integrity**: If a user updates their vehicle's license plate or description, the historical link in past raffles remains consistent via the `vehicle_id` foreign key.
+
+### 6.2 Raffle Result Attribution
+
+Each record in the `raffle_results` table now explicitly stores:
+
+1. **User**: Who won.
+2. **Parking Slot**: Which space was assigned.
+3. **Vehicle**: Which specific vehicle is authorized to occupy that slot during the period.
+
+---
+
+## 7. Automation & System Triggers
+
+### 7.1 Building-Slot Automation (Subscriber)
+
+To eliminate manual data entry, the system implements an **Entity Subscriber** at the database level.
+
+| Trigger Event                | Action                    | Logic                                                                                                                                    |
+| :--------------------------- | :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| **`afterInsert` (Building)** | Automatic Slot Generation | When a new `Building` is created with a `totalSlots` value, the system automatically generates `N` records in the `parking_slots` table. |
+
+**Naming Convention for Automated Slots:**
+
+- Slots are labeled using the pattern `S-###` (e.g., `S-001`, `S-002`, `S-010`).
+- All automated slots are set to `isAvailable: true` by default.
+
+---
+
+## 8. Updated Entity Relationship Diagram (Conceptual)
+
+- **User** (1) ----> (N) **Vehicle**
+- **Building** (1) ----> (N) **ParkingSlot**
+- **RaffleResult** (N) ----> (1) **User** / (1) **ParkingSlot** / (1) **Vehicle**

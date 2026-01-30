@@ -3,17 +3,19 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+
+import { DatabaseSeederService } from "./database/seeder.service";
+import { BuildingSubscriber } from "./subscribers/building.subscriber";
+import { Role } from "./database/entities/role.entity";
+import { User } from "./database/entities/user.entity";
+import { Building } from "./database/entities/building.entity";
 import {
-  Building,
   ParkingSlot,
   PasswordResetToken,
   Raffle,
   RaffleResult,
-  Role,
-  User,
   Vehicle,
 } from "./database/entities";
-import { DatabaseSeederService } from "./database/seeder.service";
 
 @Module({
   imports: [
@@ -40,21 +42,21 @@ import { DatabaseSeederService } from "./database/seeder.service";
           autoLoadEntities: true,
           synchronize: true,
           entities: [
-            Building,
-            ParkingSlot,
-            Raffle,
-            RaffleResult,
             User,
-            Vehicle,
+            Building,
             Role,
+            Vehicle,
             PasswordResetToken,
+            Raffle,
+            ParkingSlot,
+            RaffleResult,
           ],
         };
       },
     }),
-    TypeOrmModule.forFeature([Role, User]),
+    TypeOrmModule.forFeature([Role, User, Building]),
   ],
   controllers: [AppController],
-  providers: [AppService, DatabaseSeederService],
+  providers: [AppService, BuildingSubscriber, DatabaseSeederService],
 })
 export class AppModule {}

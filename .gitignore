@@ -67,4 +67,5 @@ __screenshots__/
 vitest.config.*.timestamp*
 
 apps/api/dist/*
+libs/shared-models/dist/*
 .env
