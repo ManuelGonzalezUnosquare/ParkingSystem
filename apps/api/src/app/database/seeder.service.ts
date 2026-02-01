@@ -3,20 +3,46 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { Building, Role, User } from "./entities";
+import { ConfigService } from "@nestjs/config";
+import { RoleEnum } from "@org/shared-models";
 
 @Injectable()
 export class DatabaseSeederService implements OnApplicationBootstrap {
   private readonly logger = new Logger(DatabaseSeederService.name);
 
-  private readonly fakePassword: string = "Admin1234!";
+  private readonly rootUserInfo = {
+    email: "root@user.com",
+    password: "1234!",
+  };
+  private readonly adminUserInfo = {
+    email: "admin@user.com",
+    password: "abcd!",
+  };
   constructor(
     @InjectRepository(Role)
     private readonly roleRepo: Repository<Role>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     @InjectRepository(Building)
-    private readonly buildingRepo: Repository<Building>
-  ) {}
+    private readonly buildingRepo: Repository<Building>,
+    private readonly configService: ConfigService
+  ) {
+    this.rootUserInfo = {
+      email:
+        configService.get<string>("ROOT_USER_EMAIL") ?? this.rootUserInfo.email,
+      password:
+        configService.get<string>("ROOT_USER_PWD") ??
+        this.rootUserInfo.password,
+    };
+    this.adminUserInfo = {
+      email:
+        configService.get<string>("ADMIN_USER_EMAIL") ??
+        this.adminUserInfo.email,
+      password:
+        configService.get<string>("ADMIN_USER_PWD") ??
+        this.adminUserInfo.password,
+    };
+  }
 
   async onApplicationBootstrap() {
     this.logger.log("Running Database Seeder...");
@@ -33,12 +59,15 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
   //required seeds
   private async seedRoles() {
     const roles = [
-      { name: "ROOT", description: "Super Admin - Access to all buildings" },
       {
-        name: "ADMIN",
+        name: RoleEnum.ROOT,
+        description: "Super Admin - Access to all buildings",
+      },
+      {
+        name: RoleEnum.ADMIN,
         description: "Building Admin - Access to specific building",
       },
-      { name: "USER", description: "Common User - Resident/Employee" },
+      { name: RoleEnum.USER, description: "Common User - Resident/Employee" },
     ];
 
     for (const roleData of roles) {
@@ -53,25 +82,26 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
   }
 
   private async seedRootUser() {
-    const rootEmail = "root@unosquare.com"; // Puedes sacar esto de un .env
     const rootExists = await this.userRepo.findOne({
-      where: { email: rootEmail },
+      where: { email: this.rootUserInfo.email },
     });
 
     if (!rootExists) {
-      const rootRole = await this.roleRepo.findOne({ where: { name: "ROOT" } });
+      const rootRole = await this.roleRepo.findOne({
+        where: { name: RoleEnum.ROOT },
+      });
 
-      const hashedPassword = await bcrypt.hash(this.fakePassword, 10);
+      const hashedPassword = await bcrypt.hash(this.rootUserInfo.password, 10);
 
       const rootUser = this.userRepo.create({
         firstName: "System",
         lastName: "Root",
-        email: rootEmail,
+        email: this.rootUserInfo.email,
         password: hashedPassword,
         role: rootRole,
         status: "ACTIVE",
         priorityScore: 0,
-        building: null, // Root no pertenece a un edificio específico
+        building: null, // Not building for root
       });
 
       await this.userRepo.save(rootUser);
@@ -83,16 +113,15 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
   //testing seeds
   private async seedAdminUser(building: Building) {
-    const adminEmail = "admin@unosquare.com";
     const adminExists = await this.userRepo.findOne({
-      where: { email: adminEmail },
+      where: { email: this.adminUserInfo.email },
     });
 
     if (!adminExists) {
       const adminRole = await this.roleRepo.findOne({
-        where: { name: "ADMIN" },
+        where: { name: RoleEnum.ADMIN },
       });
-      const hashedPassword = await bcrypt.hash(this.fakePassword, 10);
+      const hashedPassword = await bcrypt.hash(this.adminUserInfo.password, 10);
 
       const adminUser = this.userRepo.create({
         firstName: "Building",

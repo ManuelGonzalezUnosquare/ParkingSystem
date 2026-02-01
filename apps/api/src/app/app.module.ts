@@ -16,6 +16,7 @@ import {
   RaffleResult,
   Vehicle,
 } from "./database/entities";
+import { UsersModule } from "./modules";
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import {
       },
     }),
     TypeOrmModule.forFeature([Role, User, Building]),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, BuildingSubscriber, DatabaseSeederService],

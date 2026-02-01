@@ -8,5 +8,9 @@
   "types": "./src/index.ts",
   "dependencies": {
     "tslib": "^2.3.0"
+  },
+  "peerDependencies": {
+    "class-validator": "*",
+    "class-transformer": "*"
   }
 }

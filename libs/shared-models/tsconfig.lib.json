@@ -9,7 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*.ts"],
   "references": [],

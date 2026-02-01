@@ -25,7 +25,7 @@ export class User extends BaseEntity {
   @Column({
     type: "enum",
     enum: UserStatusEnum,
-    default: "ACTIVE",
+    default: UserStatusEnum.ACTIVE,
   })
   status: string;
 

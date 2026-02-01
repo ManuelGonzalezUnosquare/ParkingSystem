@@ -15,7 +15,6 @@ export class BuildingSubscriber
   private readonly logger = new Logger(BuildingSubscriber.name);
 
   constructor(private readonly dataSource: DataSource) {
-    // Register this subscriber into the TypeORM DataSource
     this.logger.log("========================== subscriber constryuctor");
     this.dataSource.subscribers.push(this);
   }
