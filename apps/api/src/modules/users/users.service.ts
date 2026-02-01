@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -7,7 +8,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateUserDto } from "@org/shared-models";
 import { Repository } from "typeorm";
-import { User } from "../../database/entities";
+import { User } from "../../database/entities/user.entity";
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,9 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<User> {
     this.logger.log(`Attempting to create user with email: ${dto.email}`);
+    if (await this.userRepository.exists({ where: { email: dto.email } })) {
+      throw new ConflictException("User with this email already exists");
+    }
 
     try {
       const newUser = this.userRepository.create(dto);

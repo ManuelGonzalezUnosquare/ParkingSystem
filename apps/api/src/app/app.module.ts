@@ -3,20 +3,19 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-
-import { DatabaseSeederService } from "./database/seeder.service";
-import { BuildingSubscriber } from "./subscribers/building.subscriber";
-import { Role } from "./database/entities/role.entity";
-import { User } from "./database/entities/user.entity";
-import { Building } from "./database/entities/building.entity";
 import {
-  ParkingSlot,
+  User,
+  Building,
+  Role,
+  Vehicle,
   PasswordResetToken,
   Raffle,
+  ParkingSlot,
   RaffleResult,
-  Vehicle,
-} from "./database/entities";
-import { UsersModule } from "./modules";
+} from "../database/entities";
+import { DatabaseSeederService } from "../database/seeder.service";
+import { UsersModule, BuildingsModule } from "../modules";
+import { BuildingSubscriber } from "../subscribers/building.subscriber";
 
 @Module({
   imports: [
@@ -55,8 +54,9 @@ import { UsersModule } from "./modules";
         };
       },
     }),
-    TypeOrmModule.forFeature([Role, User, Building]),
+    TypeOrmModule.forFeature([Building, Role, User]),
     UsersModule,
+    BuildingsModule,
   ],
   controllers: [AppController],
   providers: [AppService, BuildingSubscriber, DatabaseSeederService],

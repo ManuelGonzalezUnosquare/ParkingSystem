@@ -126,7 +126,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       const adminUser = this.userRepo.create({
         firstName: "Building",
         lastName: "Manager",
-        email: adminEmail,
+        email: this.adminUserInfo.email,
         password: hashedPassword,
         role: adminRole,
         status: "ACTIVE",
