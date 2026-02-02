@@ -1,10 +1,10 @@
-import { Injectable, OnApplicationBootstrap, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import * as bcrypt from "bcrypt";
-import { Building, Role, User } from "./entities";
+import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
 import { RoleEnum } from "@org/shared-models";
+import { Repository } from "typeorm";
+import { CryptoService } from "../modules/utils/services";
+import { Building, Role, User } from "./entities";
 
 @Injectable()
 export class DatabaseSeederService implements OnApplicationBootstrap {
@@ -25,7 +25,8 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     private readonly userRepo: Repository<User>,
     @InjectRepository(Building)
     private readonly buildingRepo: Repository<Building>,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly cryptoService: CryptoService
   ) {
     this.rootUserInfo = {
       email:
@@ -91,7 +92,9 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
         where: { name: RoleEnum.ROOT },
       });
 
-      const hashedPassword = await bcrypt.hash(this.rootUserInfo.password, 10);
+      const hashedPassword = await this.cryptoService.hash(
+        this.rootUserInfo.password
+      );
 
       const rootUser = this.userRepo.create({
         firstName: "System",
@@ -119,7 +122,9 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       const adminRole = await this.roleRepo.findOne({
         where: { name: RoleEnum.ADMIN },
       });
-      const hashedPassword = await bcrypt.hash(this.adminUserInfo.password, 10);
+      const hashedPassword = await this.cryptoService.hash(
+        this.adminUserInfo.password
+      );
 
       const adminUser = this.userRepo.create({
         firstName: "Building",

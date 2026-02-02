@@ -12,7 +12,7 @@ import {
   Vehicle,
 } from "../database/entities";
 import { DatabaseSeederService } from "../database/seeder.service";
-import { BuildingsModule, UsersModule } from "../modules";
+import { BuildingsModule, UsersModule, UtilsModule } from "../modules";
 import { BuildingSubscriber } from "../subscribers/building.subscriber";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
