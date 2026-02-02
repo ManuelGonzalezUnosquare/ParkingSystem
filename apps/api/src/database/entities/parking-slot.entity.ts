@@ -1,6 +1,8 @@
-import { Entity, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from "typeorm";
 import { Building } from "./building.entity";
 import { BaseEntity } from "./_base.entity";
+import { ApiProperty } from "@nestjs/swagger";
+import { Vehicle } from "./vehicle.entity";
 
 @Entity("parking_slots")
 export class ParkingSlot extends BaseEntity {
@@ -13,4 +15,8 @@ export class ParkingSlot extends BaseEntity {
   @ManyToOne(() => Building, (building) => building.slots)
   @JoinColumn({ name: "building_id" })
   building: Building;
+
+  @OneToOne(() => Vehicle, (vehicle) => vehicle.slot, { nullable: true })
+  @ApiProperty({ type: () => Vehicle, nullable: true })
+  vehicle: Vehicle | null;
 }

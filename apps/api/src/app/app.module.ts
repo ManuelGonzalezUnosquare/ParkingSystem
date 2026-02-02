@@ -12,7 +12,12 @@ import {
   Vehicle,
 } from "../database/entities";
 import { DatabaseSeederService } from "../database/seeder.service";
-import { BuildingsModule, UsersModule, UtilsModule } from "../modules";
+import {
+  BuildingsModule,
+  SlotsModule,
+  UsersModule,
+  UtilsModule,
+} from "../modules";
 import { BuildingSubscriber } from "../subscribers/building.subscriber";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -57,6 +62,7 @@ import { AppService } from "./app.service";
     TypeOrmModule.forFeature([Building, Role, User]),
     UsersModule,
     BuildingsModule,
+    SlotsModule,
     UtilsModule,
   ],
   controllers: [AppController],
