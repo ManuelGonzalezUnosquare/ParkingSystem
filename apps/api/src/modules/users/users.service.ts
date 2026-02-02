@@ -109,7 +109,7 @@ export class UsersService {
     }
 
     try {
-      await this.userRepository.softDelete(user);
+      await this.userRepository.softDelete(user.id);
       this.logger.log(`User ID: ${publicId} successfully removed`);
     } catch (error) {
       this.logger.error(
