@@ -14,7 +14,7 @@ export const createMockRepository = (): MockRepository =>
     save: jest.fn(),
     create: jest.fn().mockImplementation((dto) => dto),
     update: jest.fn(),
-    delete: jest.fn(),
+    softDelete: jest.fn(),
     exists: jest.fn(),
     count: jest.fn(),
     createQueryBuilder: jest.fn().mockReturnValue({

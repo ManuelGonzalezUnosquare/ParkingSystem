@@ -9,6 +9,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CreateUserDto } from "@org/shared-models";
 import { Repository } from "typeorm";
 import { User } from "../../database/entities/user.entity";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UsersService {
@@ -26,7 +27,11 @@ export class UsersService {
     }
 
     try {
-      const newUser = this.userRepository.create(dto);
+      const hashedPassword = await bcrypt.hash(dto.password, 10);
+      const newUser = this.userRepository.create({
+        ...dto,
+        password: hashedPassword,
+      });
       const savedUser = await this.userRepository.save(newUser);
 
       this.logger.log(`User successfully created with ID: ${savedUser.id}`);
@@ -103,7 +108,7 @@ export class UsersService {
     }
 
     try {
-      await this.userRepository.remove(user);
+      await this.userRepository.softDelete(user);
       this.logger.log(`User ID: ${publicId} successfully removed`);
     } catch (error) {
       this.logger.error(
