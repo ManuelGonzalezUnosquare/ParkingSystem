@@ -4,13 +4,17 @@ import { User } from "../../database/entities/user.entity";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
 import { createMockRepository } from "../../test/mocks/repositories/repository.mock";
+import {
+  createMockCryptoService,
+  MockCryptoService,
+} from "../../test/mocks/services/crypto-service.mock";
+import { CryptoService } from "../utils/services";
 
 describe("UsersController", () => {
   let controller: UsersController;
 
+  let cryptoService: MockCryptoService;
   let service: UsersService;
-
-  // Mock del repositorio
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,15 +22,19 @@ describe("UsersController", () => {
       providers: [
         UsersService,
         {
-          // Aquí le decimos a Nest: "Cuando alguien pida el repo de UserEntity, dale mi mock"
           provide: getRepositoryToken(User),
           useValue: createMockRepository(),
+        },
+        {
+          provide: CryptoService,
+          useValue: createMockCryptoService(),
         },
       ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);
+    cryptoService = module.get<MockCryptoService>(CryptoService);
   });
 
   it("should be defined", () => {

@@ -105,9 +105,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       });
 
       await this.userRepo.save(rootUser);
-      this.logger.log(
-        "Default Root User created (root@unosquare.com / Admin123!)"
-      );
+      this.logger.log(`Default Root User created (${this.rootUserInfo.email})`);
     }
   }
 
@@ -136,7 +134,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
       await this.userRepo.save(adminUser);
       this.logger.log(
-        `Admin user created for building '${building.name}' (admin@unosquare.com).`
+        `Admin user created for building '${building.name}' (${this.adminUserInfo.email}).`
       );
     }
   }

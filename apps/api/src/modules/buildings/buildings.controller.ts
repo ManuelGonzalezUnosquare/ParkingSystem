@@ -49,8 +49,6 @@ export class BuildingsController {
     @Param("publicId", new ParseUUIDPipe()) publicId: string,
     @Body() updateBuildingDto: UpdateBuildingDto
   ) {
-    // Nota: El método update en el servicio lo implementaremos
-    // siguiendo la lógica del de Users
     return this.buildingsService.update(publicId, updateBuildingDto);
   }
 

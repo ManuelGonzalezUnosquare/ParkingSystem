@@ -1,21 +1,21 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import {
-  User,
   Building,
-  Role,
-  Vehicle,
+  ParkingSlot,
   PasswordResetToken,
   Raffle,
-  ParkingSlot,
   RaffleResult,
+  Role,
+  User,
+  Vehicle,
 } from "../database/entities";
 import { DatabaseSeederService } from "../database/seeder.service";
-import { UsersModule, BuildingsModule } from "../modules";
+import { BuildingsModule, UsersModule } from "../modules";
 import { BuildingSubscriber } from "../subscribers/building.subscriber";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
 
 @Module({
   imports: [
@@ -57,6 +57,7 @@ import { BuildingSubscriber } from "../subscribers/building.subscriber";
     TypeOrmModule.forFeature([Building, Role, User]),
     UsersModule,
     BuildingsModule,
+    UtilsModule,
   ],
   controllers: [AppController],
   providers: [AppService, BuildingSubscriber, DatabaseSeederService],

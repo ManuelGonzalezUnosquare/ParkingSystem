@@ -1,8 +1,3 @@
-jest.mock("bcrypt", () => ({
-  hash: jest.fn().mockResolvedValue("hashed_password_123"),
-  genSalt: jest.fn().mockResolvedValue("salt_123"),
-}));
-import * as bcrypt from "bcrypt";
 import {
   ConflictException,
   InternalServerErrorException,
@@ -17,10 +12,16 @@ import {
   MockRepository,
 } from "../../test/mocks/repositories/repository.mock";
 import { UsersService } from "./users.service";
+import { CryptoService } from "../utils/services";
+import {
+  createMockCryptoService,
+  MockCryptoService,
+} from "../../test/mocks/services/crypto-service.mock";
 
 describe("UsersService", () => {
   let service: UsersService;
   let repository: MockRepository<User>;
+  let cryptoService: MockCryptoService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,11 +31,16 @@ describe("UsersService", () => {
           provide: getRepositoryToken(User),
           useValue: createMockRepository(),
         },
+        {
+          provide: CryptoService,
+          useValue: createMockCryptoService(),
+        },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     repository = module.get<MockRepository<User>>(getRepositoryToken(User));
+    cryptoService = module.get<MockCryptoService>(CryptoService);
   });
 
   it("should be defined", () => {
@@ -133,10 +139,12 @@ describe("UsersService", () => {
     });
 
     it("should successfully create a user with a hashed password", async () => {
-      const rawPassword = "password123";
+      const rawPassword = "hashed_password_123";
+      const hashedPassword = "hashed_password_abc";
       const dtoWithRawPassword = { ...createUserDto, password: rawPassword };
 
       repository.exists.mockResolvedValue(false);
+      cryptoService.hash.mockResolvedValue(hashedPassword);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       repository.create.mockImplementation((data: any) => ({ id: 1, ...data }));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -144,15 +152,14 @@ describe("UsersService", () => {
 
       const result = await service.create(dtoWithRawPassword);
 
-      expect(bcrypt.hash).toHaveBeenCalledWith(rawPassword, 10);
+      expect(cryptoService.hash).toHaveBeenCalledWith(rawPassword);
 
-      expect(repository.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          password: "hashed_password_123",
-        })
-      );
+      expect(repository.create).toHaveBeenCalledWith({
+        ...dtoWithRawPassword,
+        password: hashedPassword,
+      });
 
-      expect(result.password).toBe("hashed_password_123");
+      expect(result.password).toBe(hashedPassword);
     });
 
     it("should throw InternalServerErrorException if save fails unexpectedly", async () => {
