@@ -11,6 +11,9 @@ export class Building extends BaseEntity {
   @Column({ type: "int", default: 0 })
   totalSlots: number;
 
+  @Column()
+  address: string;
+
   @OneToMany(() => User, (user) => user.building)
   users: User[];
 

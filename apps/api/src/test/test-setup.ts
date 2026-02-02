@@ -15,3 +15,11 @@ jest.mock("../database/entities/parking-slot.entity", () => ({
 jest.mock("../database/entities/parking-slot.entity", () => ({
   ParkingSlot: class ParkingSlot {},
 }));
+
+jest.mock("../database/entities/raffle.entity.ts", () => ({
+  Raffle: class Raffle {},
+}));
+
+jest.mock("../database/entities/raffle-result.entity.ts", () => ({
+  RaffleResult: class RaffleResult {},
+}));

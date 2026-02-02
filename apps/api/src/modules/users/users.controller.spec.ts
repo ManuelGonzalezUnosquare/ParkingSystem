@@ -3,6 +3,7 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { User } from "../../database/entities/user.entity";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
+import { createMockRepository } from "../../test/mocks/repositories/repository.mock";
 
 describe("UsersController", () => {
   let controller: UsersController;
@@ -10,13 +11,6 @@ describe("UsersController", () => {
   let service: UsersService;
 
   // Mock del repositorio
-  const mockUserRepository = {
-    find: jest.fn(),
-    findOneBy: jest.fn(),
-    create: jest.fn(),
-    save: jest.fn(),
-    exists: jest.fn(),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,7 +20,7 @@ describe("UsersController", () => {
         {
           // Aquí le decimos a Nest: "Cuando alguien pida el repo de UserEntity, dale mi mock"
           provide: getRepositoryToken(User),
-          useValue: mockUserRepository,
+          useValue: createMockRepository(),
         },
       ],
     }).compile();
