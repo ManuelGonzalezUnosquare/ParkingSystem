@@ -4,6 +4,7 @@ import { Building } from "./building.entity";
 import { Role } from "./role.entity";
 import { Vehicle } from "./vehicle.entity";
 import { UserStatusEnum } from "@org/shared-models";
+import { Exclude } from "class-transformer";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -16,7 +17,8 @@ export class User extends BaseEntity {
   @Column({ type: "varchar", length: 150, unique: true })
   email: string;
 
-  @Column({ type: "varchar", length: 255, select: false })
+  @Exclude()
+  @Column({ type: "varchar", length: 255 })
   password: string;
 
   @Column({ type: "int", default: 0 })

@@ -13,6 +13,7 @@ import {
 } from "../database/entities";
 import { DatabaseSeederService } from "../database/seeder.service";
 import {
+  AuthModule,
   BuildingsModule,
   SlotsModule,
   UsersModule,
@@ -39,9 +40,9 @@ import { AppService } from "./app.service";
         console.log("Tentando conexión a DB con:", dbConfig);
         return {
           type: "mysql",
-          host: config.get<string>("DB_HOST"),
+          host: dbConfig.host,
           port: parseInt(config.get<string>("DB_PORT", "3307"), 10),
-          username: config.get<string>("DB_USER"),
+          username: dbConfig.user,
           password: config.get<string>("DB_PASSWORD"),
           database: config.get<string>("DB_NAME"),
           autoLoadEntities: true,
@@ -60,6 +61,7 @@ import { AppService } from "./app.service";
       },
     }),
     TypeOrmModule.forFeature([Building, Role, User]),
+    AuthModule,
     UsersModule,
     BuildingsModule,
     SlotsModule,

@@ -103,6 +103,29 @@ describe("UsersService", () => {
     });
   });
 
+  describe("findOneByEmail", () => {
+    it("should return a user if found", async () => {
+      const mockUser = { id: 1, publicId: "uuid-123", email: "test@test.com" };
+      repository.findOne.mockResolvedValue(mockUser);
+
+      const result = await service.findOneByEmail("test@test.com");
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { email: "test@test.com" },
+        relations: ["role"],
+      });
+      expect(result).toEqual(mockUser);
+    });
+
+    it("should return null and log warning if user not found", async () => {
+      repository.findOne.mockResolvedValue(null);
+
+      const result = await service.findOneByEmail("non-existent");
+
+      expect(result).toBeNull();
+    });
+  });
+
   describe("create", () => {
     const createUserDto = {
       email: "new@test.com",
@@ -231,7 +254,7 @@ describe("UsersService", () => {
       await service.remove(publicId);
 
       expect(repository.findOneBy).toHaveBeenCalledWith({ publicId });
-      expect(repository.softDelete).toHaveBeenCalledWith(existingUser);
+      expect(repository.softDelete).toHaveBeenCalledWith(existingUser.id);
     });
 
     it("should throw NotFoundException if user to remove does not exist", async () => {

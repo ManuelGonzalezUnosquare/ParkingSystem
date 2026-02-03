@@ -71,6 +71,13 @@ export class UsersService {
 
     return user;
   }
+  async findOneByEmail(email: string): Promise<User | null> {
+    const result = await this.userRepository.findOne({
+      where: { email },
+      relations: ["role"],
+    });
+    return result;
+  }
 
   async update(
     publicId: string,
