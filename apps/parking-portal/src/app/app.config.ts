@@ -11,7 +11,7 @@ import {
 } from "@angular/common/http";
 
 import { providePrimeNG } from "primeng/config";
-import Aura from "@primeuix/themes/aura";
+import { MyPreset } from "./preset";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,8 +19,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes, withComponentInputBinding()),
     provideHttpClient(withFetch(), withInterceptors([])),
     providePrimeNG({
+      inputVariant: "filled",
       theme: {
-        preset: Aura,
+        preset: MyPreset,
         options: {
           darkModeSelector: "none",
           cssLayer: {

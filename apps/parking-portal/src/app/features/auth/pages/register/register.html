@@ -1,1 +1,107 @@
-<p>register works!</p>
+<!-- header -->
+<div class="flex flex-wrap justify-between items-start gap-3 mb-6">
+  <div class="flex gap-1 items-center w-full">
+    <h1 class="text-slate-900 text-3xl font-black leading-tight tracking-tight">
+      Join the Parking Portal
+    </h1>
+    <p-tag value="Resident" icon="pi pi-user" severity="info" />
+  </div>
+  <p class="text-slate-500 text-base font-normal">Resident Registration</p>
+</div>
+
+<form #formDirective="ngForm" [formGroup]="form" class="px-8 pb-10 space-y-5">
+  <!-- fName -->
+  <div class="form-control">
+    <label class="form-label" for="fName">First Name</label>
+    <input
+      autocomplete="fName"
+      fluid
+      formControlName="firstName"
+      id="fName"
+      pInputText
+      placeholder="e.g. John"
+      tabindex="1"
+    />
+  </div>
+  <!-- lName -->
+  <div class="form-control">
+    <label class="form-label" for="lName">Last Name</label>
+    <input
+      autocomplete="lName"
+      fluid
+      formControlName="lastName"
+      id="lName"
+      pInputText
+      placeholder="e.g. Doe"
+    />
+  </div>
+  <!-- email -->
+  <div class="form-control">
+    <label class="form-label" for="email">Email</label>
+    <input
+      autocomplete="email"
+      fluid
+      formControlName="email"
+      id="email"
+      pInputText
+      type="email"
+      placeholder="e.g. your@email.com"
+    />
+  </div>
+  <!-- building unit -->
+  <div class="form-control">
+    <label class="form-label" for="bUnit">Building</label>
+    <input
+      autocomplete="bUnit"
+      fluid
+      formControlName="buildingUnit"
+      id="bUnit"
+      pInputText
+      placeholder="e.g. A-402"
+    />
+  </div>
+  <!-- password -->
+  <div class="form-control">
+    <label class="form-label" for="password">Password</label>
+    <input
+      autocomplete="off"
+      fluid
+      formControlName="password"
+      id="password"
+      pInputText
+      placeholder="********"
+      type="password"
+    />
+  </div>
+  <!-- confirm password -->
+  <div class="form-control">
+    <label class="form-label" for="confirmPassword">Confirm Password</label>
+    <input
+      autocomplete="off"
+      fluid
+      formControlName="confirmPassword"
+      id="confirmPassword"
+      pInputText
+      placeholder="********"
+      type="password"
+    />
+  </div>
+  <!-- options -->
+  <div class="pt-5">
+    <p-button
+      fluid
+      label="Create resident account"
+      type="submit"
+      severity="primary"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+    />
+  </div>
+</form>
+
+<div class="bg-slate-50 p-2 text-center border-t border-slate-100">
+  <p class="text-slate-600 text-sm flex gap-2 items-center justify-center">
+    Already have an account?
+    <p-button label="Register" fluid link [routerLink]="['/auth/login']" />
+  </p>
+</div>
