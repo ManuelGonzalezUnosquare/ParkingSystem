@@ -22,7 +22,6 @@ export class AuthService {
    */
   async validateUser(email: string, pass: string): Promise<Partial<User>> {
     const user = await this.userService.findOneByEmail(email);
-
     if (!user) {
       throw new UnauthorizedException("Invalid credentials");
     }
@@ -45,7 +44,7 @@ export class AuthService {
     const payload = {
       email: user.email,
       sub: user.publicId,
-      role: user.role?.publicId,
+      role: user.role?.name,
       buildingId: user.building?.publicId,
     };
 
@@ -54,7 +53,7 @@ export class AuthService {
       user: {
         id: user.publicId!,
         email: user.email!,
-        role: user.role!.publicId!,
+        role: user.role!.name!,
         buildingId: user.building?.publicId,
       },
     };

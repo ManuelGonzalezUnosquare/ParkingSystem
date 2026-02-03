@@ -9,19 +9,25 @@ import {
   Post,
 } from "@nestjs/common";
 import { BuildingsService } from "./buildings.service";
-import { CreateBuildingDto, UpdateBuildingDto } from "@org/shared-models";
+import {
+  CreateBuildingDto,
+  RoleEnum,
+  UpdateBuildingDto,
+} from "@org/shared-models";
 import {
   ApiOperation,
   ApiCreatedResponse,
   ApiConflictResponse,
 } from "@nestjs/swagger";
 import { Building } from "../../database/entities";
+import { Roles } from "../../common/decorators";
 
 @Controller("buildings")
 export class BuildingsController {
   constructor(private readonly buildingsService: BuildingsService) {}
 
   @Post()
+  @Roles(RoleEnum.ROOT)
   @ApiOperation({ summary: "Create a new building and generate its slots" })
   @ApiCreatedResponse({
     description: "The building has been successfully created.",
@@ -35,16 +41,19 @@ export class BuildingsController {
   }
 
   @Get()
+  @Roles(RoleEnum.ROOT)
   findAll() {
     return this.buildingsService.findAll();
   }
 
   @Get(":publicId")
+  @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   findOne(@Param("publicId", new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.findOneByPublicId(publicId);
   }
 
   @Patch(":publicId")
+  @Roles(RoleEnum.ROOT)
   update(
     @Param("publicId", new ParseUUIDPipe()) publicId: string,
     @Body() updateBuildingDto: UpdateBuildingDto
@@ -53,6 +62,7 @@ export class BuildingsController {
   }
 
   @Delete(":publicId")
+  @Roles(RoleEnum.ROOT)
   remove(@Param("publicId", new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.remove(publicId);
   }

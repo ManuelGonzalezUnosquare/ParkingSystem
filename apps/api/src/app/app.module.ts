@@ -22,6 +22,8 @@ import {
 import { BuildingSubscriber } from "../subscribers/building.subscriber";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { APP_GUARD } from "@nestjs/core";
+import { JwtAuthGuard, RolesGuard } from "../modules/auth/guards";
 
 @Module({
   imports: [
@@ -68,6 +70,18 @@ import { AppService } from "./app.service";
     UtilsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, BuildingSubscriber, DatabaseSeederService],
+  providers: [
+    AppService,
+    BuildingSubscriber,
+    DatabaseSeederService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

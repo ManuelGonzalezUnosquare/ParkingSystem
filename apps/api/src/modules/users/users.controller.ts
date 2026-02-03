@@ -12,6 +12,8 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "@org/shared-models";
+import { CurrentUser } from "../../common/decorators";
+import { User } from "../../database/entities";
 
 @Controller("users")
 export class UsersController {
@@ -19,7 +21,8 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+    console.log("user", user);
     return this.usersService.create(createUserDto);
   }
 
