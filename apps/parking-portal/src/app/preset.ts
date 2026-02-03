@@ -16,4 +16,11 @@ export const MyPreset = definePreset(Aura, {
       "900": "#00122f",
     },
   },
+  components: {
+    inputtext: {
+      root: {
+        placeholderColor: "var(--p-surface-400)",
+      },
+    },
+  },
 });
