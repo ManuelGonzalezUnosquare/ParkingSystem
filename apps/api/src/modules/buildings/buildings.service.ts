@@ -4,11 +4,11 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Building } from "../../database/entities";
-import { CreateBuildingDto } from "./dtos/create-building.dto";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Building } from '../../database/entities';
+import { CreateBuildingDto } from './dtos/create-building.dto';
 
 @Injectable()
 export class BuildingsService {
@@ -16,7 +16,7 @@ export class BuildingsService {
 
   constructor(
     @InjectRepository(Building)
-    private readonly buildingRepository: Repository<Building>
+    private readonly buildingRepository: Repository<Building>,
   ) {}
 
   async create(dto: CreateBuildingDto): Promise<Building> {
@@ -27,7 +27,7 @@ export class BuildingsService {
     });
     if (existing) {
       throw new ConflictException(
-        `Building with name "${dto.name}" already exists`
+        `Building with name "${dto.name}" already exists`,
       );
     }
 
@@ -36,13 +36,13 @@ export class BuildingsService {
       return await this.buildingRepository.save(newBuilding);
     } catch (error) {
       this.logger.error(`Error creating building: ${error.message}`);
-      throw new InternalServerErrorException("Failed to create building");
+      throw new InternalServerErrorException('Failed to create building');
     }
   }
 
   async update(
     publicId: string,
-    updateData: Partial<CreateBuildingDto>
+    updateData: Partial<CreateBuildingDto>,
   ): Promise<Building> {
     this.logger.log(`Attempting to update building ID: ${publicId}`);
 
@@ -61,9 +61,9 @@ export class BuildingsService {
       return saved;
     } catch (error) {
       this.logger.error(
-        `Error updating building ID: ${publicId} - ${error.message}`
+        `Error updating building ID: ${publicId} - ${error.message}`,
       );
-      throw new InternalServerErrorException("Error updating building record");
+      throw new InternalServerErrorException('Error updating building record');
     }
   }
 
@@ -89,13 +89,13 @@ export class BuildingsService {
     }
 
     try {
-      await this.buildingRepository.softDelete(building);
+      await this.buildingRepository.softDelete({ publicId });
       this.logger.log(`building ID: ${publicId} successfully removed`);
     } catch (error) {
       this.logger.error(
-        `Failed to remove building ID: ${publicId} - ${error.message}`
+        `Failed to remove building ID: ${publicId} - ${error.message}`,
       );
-      throw new InternalServerErrorException("Could not remove building");
+      throw new InternalServerErrorException('Could not remove building');
     }
   }
 }

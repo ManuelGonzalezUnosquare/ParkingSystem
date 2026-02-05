@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { SessionService } from '../../core/services';
 import { AuthStore } from '../auth/auth.store';
 import { Navbar, Sidebar } from './components';
+import { BuildingStore } from '../buildings/building.store';
 
 @Component({
   selector: 'app-main-layout',
@@ -13,4 +14,5 @@ import { Navbar, Sidebar } from './components';
 export class MainLayout {
   authStore = inject(AuthStore);
   sessionService = inject(SessionService);
+  buildingStore = inject(BuildingStore);
 }

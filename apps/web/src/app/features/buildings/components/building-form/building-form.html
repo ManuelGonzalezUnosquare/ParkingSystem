@@ -1,0 +1,53 @@
+<form [formGroup]="form" (submit)="doSubmit()" class="space-y-5">
+  <!-- name -->
+  <div class="form-control">
+    <label class="form-label" for="name">Name</label>
+    <input
+      fluid
+      formControlName="name"
+      id="name"
+      pInputText
+      placeholder="Clock tower west"
+      [invalid]="form.controls.name.invalid && form.controls.name.touched"
+    />
+  </div>
+  <!-- address -->
+  <div class="form-control">
+    <label class="form-label" for="address">Address</label>
+    <input
+      fluid
+      formControlName="address"
+      id="address"
+      pInputText
+      placeholder="123 Main Street"
+      [invalid]="form.controls.address.invalid && form.controls.address.touched"
+    />
+  </div>
+  <!-- slots number -->
+  <div class="form-control">
+    <label class="form-label" for="totSlots">Available slots</label>
+    <p-inputnumber
+      inputId="totSlots"
+      fluid
+      formControlName="totalSlots"
+      id="totSlots"
+      [invalid]="form.controls.totalSlots.invalid && form.controls.totalSlots.touched"
+    />
+  </div>
+
+  <div class="mt-10 flex gap-3 items-center justify-end">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      (click)="doCancel()"
+      [disabled]="store.isLoading()"
+    />
+    <p-button
+      label="Submit"
+      type="submit"
+      class="w-30"
+      fluid
+      [loading]="store.isLoading()"
+    />
+  </div>
+</form>

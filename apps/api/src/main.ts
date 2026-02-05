@@ -10,7 +10,9 @@ import { TransformInterceptor } from './common/interceptors';
 import { GlobalExceptionFilter } from './common/filters';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 

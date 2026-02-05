@@ -20,6 +20,7 @@ import { of, pipe, switchMap, tap } from 'rxjs';
 import {
   ApiResponse,
   ILogin,
+  RoleEnum,
   SessionModel,
   UserModel,
 } from '@parking-system/libs';
@@ -51,6 +52,9 @@ export const AuthStore = signalStore(
     }),
     isAuthenticated: computed(() => {
       return !!store.token();
+    }),
+    isRootUser: computed(() => {
+      return store.user()?.role?.name === RoleEnum.ROOT;
     }),
   })),
   withMethods((store) => ({

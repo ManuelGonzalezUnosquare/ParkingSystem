@@ -40,3 +40,28 @@
     color: red;
   }
 }
+
+.p-datatable {
+  border-width: 1px;
+
+  border-radius: 10px;
+  border-color: var(--color-slate-200);
+  box-shadow: var(--shadow-md);
+}
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: var(--color-slate-50);
+  border-bottom-style: var(--tw-border-style);
+  border-left: 0px;
+  border-right: 0px;
+  border-color: var(--color-slate-200);
+  color: var(--color-slate-500);
+}
+
+.p-datatable .p-datatable-thead > tr :first-child {
+  border-left: 1px;
+  border-top-left-radius: 10px;
+}
+.p-datatable .p-datatable-thead > tr :last-child {
+  border-right: 1px;
+  border-top-right-radius: 10px;
+}

@@ -37,7 +37,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         : exceptionResponse;
 
     // Log the error for the backend team
-    this.logger.error(`Status: ${status} Error: ${JSON.stringify(message)}`);
+    this.logger.error(
+      `Http Status: ${status} Error: ${JSON.stringify(message)}`,
+      (exception as Error).stack,
+    );
+    console.log(
+      `Http Status: ${status} Error: ${JSON.stringify(message)}`,
+      (exception as Error).stack,
+    );
 
     const errorResponse: ApiResponse<null> = {
       data: null,

@@ -17,12 +17,7 @@
   </p>
 </div>
 
-<form
-  #formDirective="ngForm"
-  class="px-8 pb-10 space-y-5"
-  [formGroup]="form"
-  (submit)="doSubmit()"
->
+<form class="px-8 pb-10 space-y-5" [formGroup]="form" (submit)="doSubmit()">
   <!-- email -->
   <div class="form-control">
     <label class="form-label" for="email">Email</label>
@@ -35,7 +30,7 @@
       placeholder="my-user@test.com"
       tabindex="1"
       type="email"
-      [invalid]="form.controls.email.invalid && formDirective.submitted"
+      [invalid]="form.controls.email.invalid"
     />
   </div>
   <!-- password -->

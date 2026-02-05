@@ -42,8 +42,8 @@ export class SessionService {
       },
       {
         label: 'Buildings',
-        icon: 'pi pi-users',
-        routerLink: '/admin/users',
+        icon: 'pi pi-building',
+        routerLink: '/app/buildings',
         allowedRoles: [RoleEnum.ROOT],
       },
       {
@@ -67,9 +67,7 @@ export class SessionService {
       },
     ];
 
-    const resItems = this.filterRecursive(menuConfig, role);
-    console.log('resItems:', resItems);
-    return resItems;
+    return this.filterRecursive(menuConfig, role);
   }
 
   private filterRecursive(items: MyItem[], role: string): MenuItem[] {

@@ -14,7 +14,17 @@ export const appRoutes: Route[] = [
     canActivate: [authGuard, roleGuard],
     data: { roles: [RoleEnum.ROOT, RoleEnum.ADMIN] },
     component: MainLayout,
-    children: [],
+    children: [
+      {
+        path: 'buildings',
+        canActivate: [roleGuard],
+        data: { roles: [RoleEnum.ROOT] },
+        loadChildren: () =>
+          import('./features/buildings/building.routes').then(
+            (m) => m.BUILDING_ROUTES,
+          ),
+      },
+    ],
   },
   {
     path: '',
