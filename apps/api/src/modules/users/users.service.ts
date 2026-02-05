@@ -4,12 +4,12 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { User } from "../../database/entities/user.entity";
-import { CryptoService } from "../utils/services";
-import { CreateUserDto } from "../auth/dtos/create-user.dto";
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../../database/entities/user.entity';
+import { CryptoService } from '../utils/services';
+import { CreateUserDto } from '../auth/dtos/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,13 +18,13 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly cryptoService: CryptoService
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
     this.logger.log(`Attempting to create user with email: ${dto.email}`);
     if (await this.userRepository.exists({ where: { email: dto.email } })) {
-      throw new ConflictException("User with this email already exists");
+      throw new ConflictException('User with this email already exists');
     }
 
     try {
@@ -41,13 +41,13 @@ export class UsersService {
       this.logger.error(`Failed to create user: ${error.message}`, error.stack);
 
       throw new InternalServerErrorException(
-        "An unexpected error occurred during user creation"
+        'An unexpected error occurred during user creation',
       );
     }
   }
 
   async findAll(): Promise<User[]> {
-    this.logger.log("Fetching all active users");
+    this.logger.log('Fetching all active users');
     return await this.userRepository.find();
   }
 
@@ -63,7 +63,11 @@ export class UsersService {
   }
   async findOneByPublicId(publicId: string): Promise<User | null> {
     this.logger.log(`Searching for user with ID: ${publicId}`);
-    const user = await this.userRepository.findOneBy({ publicId });
+
+    const user = await this.userRepository.findOne({
+      where: { publicId },
+      relations: ['role'],
+    });
 
     if (!user) {
       this.logger.warn(`User with ID: ${publicId} not found`);
@@ -74,14 +78,14 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<User | null> {
     const result = await this.userRepository.findOne({
       where: { email },
-      relations: ["role"],
+      relations: ['role'],
     });
     return result;
   }
 
   async update(
     publicId: string,
-    updateData: Partial<CreateUserDto>
+    updateData: Partial<CreateUserDto>,
   ): Promise<User> {
     this.logger.log(`Attempting to update user ID: ${publicId}`);
 
@@ -100,9 +104,9 @@ export class UsersService {
       return saved;
     } catch (error) {
       this.logger.error(
-        `Error updating user ID: ${publicId} - ${error.message}`
+        `Error updating user ID: ${publicId} - ${error.message}`,
       );
-      throw new InternalServerErrorException("Error updating user record");
+      throw new InternalServerErrorException('Error updating user record');
     }
   }
 
@@ -120,9 +124,9 @@ export class UsersService {
       this.logger.log(`User ID: ${publicId} successfully removed`);
     } catch (error) {
       this.logger.error(
-        `Failed to remove user ID: ${publicId} - ${error.message}`
+        `Failed to remove user ID: ${publicId} - ${error.message}`,
       );
-      throw new InternalServerErrorException("Could not remove user");
+      throw new InternalServerErrorException('Could not remove user');
     }
   }
 }

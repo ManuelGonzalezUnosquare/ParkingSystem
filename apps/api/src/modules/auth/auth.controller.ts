@@ -32,6 +32,6 @@ export class AuthController {
 
   @Get('me')
   async getMe(@CurrentUser() user: User) {
-    return { data: user }; // El decorador que creamos ya tiene la info del token
+    return user; // El decorador que creamos ya tiene la info del token
   }
 }
