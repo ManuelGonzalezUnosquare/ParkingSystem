@@ -23,10 +23,9 @@ import {
   SessionModel,
   UserModel,
 } from '@parking-system/libs';
-import { SessionService } from '../../core/services';
+import { AUTH_CONSTANTS } from '../../core/constants';
 import { AuthService } from './auth.service';
 
-// 1. Core Auth State
 interface AuthState {
   user: UserModel | null;
   token: string | null;
@@ -34,7 +33,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem('token'), // Initial sync
+  token: localStorage.getItem(AUTH_CONSTANTS.TOKEN_STORAGE_KEY), // Initial sync
 };
 
 export const AuthStore = signalStore(
@@ -45,15 +44,15 @@ export const AuthStore = signalStore(
   withCallState(),
   withProps(() => ({
     _authService: inject(AuthService),
-    _sessionService: inject(SessionService),
   })),
-
   withComputed((store) => ({
     isLoading: computed(() => {
       return store.callState() === 'loading';
     }),
+    isAuthenticated: computed(() => {
+      return !!store.token();
+    }),
   })),
-
   withMethods((store) => ({
     login: rxMethod<ILogin>(
       pipe(
@@ -62,7 +61,10 @@ export const AuthStore = signalStore(
           store._authService.login(credentials).pipe(
             tapResponse({
               next: (res: ApiResponse<SessionModel>) => {
-                store._sessionService.loadSession(res.data.access_token);
+                localStorage.setItem(
+                  AUTH_CONSTANTS.TOKEN_STORAGE_KEY,
+                  res.data.access_token,
+                );
                 patchState(store, {
                   token: res.data.access_token,
                   user: res.data.user,
@@ -72,24 +74,21 @@ export const AuthStore = signalStore(
                 const errorMessage = err.error?.message || 'Login failed';
                 patchState(store, { callState: { error: errorMessage } });
               },
+              complete: () => {
+                console.log('ENTRO AL COMPLETE DEL LOGIN');
+                patchState(store, { callState: 'loaded' });
+              },
             }),
           ),
         ),
       ),
     ),
-    logout: () => {
-      store._sessionService.logout();
-      patchState(store, { user: null, token: null });
-    },
     initializeAuth: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { callState: 'loading' })),
         switchMap(() => {
-          let token = store.token() || store._sessionService.token();
-          if (!token) {
-            store._sessionService.loadSession();
-            token = store._sessionService.token();
-          }
+          const token = store.token();
+
           if (!token) {
             patchState(store, { callState: 'loaded' });
             return of(null);
@@ -98,11 +97,9 @@ export const AuthStore = signalStore(
           return store._authService.getCurrentUser().pipe(
             tapResponse({
               next: (res: ApiResponse<UserModel>) => {
-                patchState(store, { user: res.data });
-                patchState(store, { callState: 'loaded' });
+                patchState(store, { user: res.data, callState: 'loaded' });
               },
               error: (err: any) => {
-                store._sessionService.logout();
                 const errorMessage = err.error?.message || 'Login failed';
                 patchState(store, { callState: { error: errorMessage } });
                 return of(null);
@@ -112,6 +109,14 @@ export const AuthStore = signalStore(
         }),
       ),
     ),
+    logout: () => {
+      localStorage.removeItem(AUTH_CONSTANTS.TOKEN_STORAGE_KEY);
+      patchState(store, {
+        user: null,
+        token: null,
+        callState: 'loaded',
+      });
+    },
   })),
   withHooks({
     onInit(store) {

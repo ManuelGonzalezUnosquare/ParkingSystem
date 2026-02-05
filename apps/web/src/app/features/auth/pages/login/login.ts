@@ -29,11 +29,11 @@ export class Login {
   readonly router = inject(Router);
   readonly store = inject(AuthStore);
   readonly form = new FormGroup<ILoginForm>({
-    email: new FormControl('', {
+    email: new FormControl('root@test.com', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),
-    password: new FormControl('', {
+    password: new FormControl('1234567', {
       nonNullable: true,
       validators: [Validators.required],
     }),
