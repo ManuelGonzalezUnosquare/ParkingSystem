@@ -111,11 +111,7 @@ export const AuthStore = signalStore(
     ),
     logout: () => {
       localStorage.removeItem(AUTH_CONSTANTS.TOKEN_STORAGE_KEY);
-      patchState(store, {
-        user: null,
-        token: null,
-        callState: 'loaded',
-      });
+      store.resetState();
     },
   })),
   withHooks({
