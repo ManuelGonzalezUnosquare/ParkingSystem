@@ -42,7 +42,7 @@ export class Login {
   constructor() {
     effect(() => {
       if (this.store.token()) {
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/app');
       }
     });
   }

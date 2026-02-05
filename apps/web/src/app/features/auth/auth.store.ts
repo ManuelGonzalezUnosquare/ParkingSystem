@@ -3,11 +3,12 @@ import {
   withDevtools,
   withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
+  withComputed,
   withHooks,
   withMethods,
   withProps,
@@ -16,13 +17,14 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { of, pipe, switchMap, tap } from 'rxjs';
 
-import { AuthService } from './auth.service';
 import {
-  UserModel,
-  ILogin,
   ApiResponse,
+  ILogin,
   SessionModel,
+  UserModel,
 } from '@parking-system/libs';
+import { SessionService } from '../../core/services';
+import { AuthService } from './auth.service';
 
 // 1. Core Auth State
 interface AuthState {
@@ -43,7 +45,15 @@ export const AuthStore = signalStore(
   withCallState(),
   withProps(() => ({
     _authService: inject(AuthService),
+    _sessionService: inject(SessionService),
   })),
+
+  withComputed((store) => ({
+    isLoading: computed(() => {
+      return store.callState() === 'loading';
+    }),
+  })),
+
   withMethods((store) => ({
     login: rxMethod<ILogin>(
       pipe(
@@ -52,7 +62,7 @@ export const AuthStore = signalStore(
           store._authService.login(credentials).pipe(
             tapResponse({
               next: (res: ApiResponse<SessionModel>) => {
-                localStorage.setItem('token', res.data.access_token);
+                store._sessionService.loadSession(res.data.access_token);
                 patchState(store, {
                   token: res.data.access_token,
                   user: res.data.user,
@@ -68,22 +78,31 @@ export const AuthStore = signalStore(
       ),
     ),
     logout: () => {
-      localStorage.removeItem('token');
+      store._sessionService.logout();
       patchState(store, { user: null, token: null });
     },
     initializeAuth: rxMethod<void>(
       pipe(
+        tap(() => patchState(store, { callState: 'loading' })),
         switchMap(() => {
-          const token = localStorage.getItem('token');
-          if (!token) return of(null);
+          let token = store.token() || store._sessionService.token();
+          if (!token) {
+            store._sessionService.loadSession();
+            token = store._sessionService.token();
+          }
+          if (!token) {
+            patchState(store, { callState: 'loaded' });
+            return of(null);
+          }
 
           return store._authService.getCurrentUser().pipe(
             tapResponse({
               next: (res: ApiResponse<UserModel>) => {
                 patchState(store, { user: res.data });
+                patchState(store, { callState: 'loaded' });
               },
               error: (err: any) => {
-                localStorage.removeItem('token');
+                store._sessionService.logout();
                 const errorMessage = err.error?.message || 'Login failed';
                 patchState(store, { callState: { error: errorMessage } });
                 return of(null);

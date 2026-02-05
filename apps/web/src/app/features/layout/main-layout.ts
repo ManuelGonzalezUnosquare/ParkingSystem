@@ -1,14 +1,16 @@
-import { Component, inject } from "@angular/core";
-import { Navbar, Sidebar } from "./components";
-import { RouterOutlet } from "@angular/router";
-import { AuthStore } from "../auth/auth.store";
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SessionService } from '../../core/services';
+import { AuthStore } from '../auth/auth.store';
+import { Navbar, Sidebar } from './components';
 
 @Component({
-  selector: "app-main-layout",
+  selector: 'app-main-layout',
   imports: [Sidebar, Navbar, RouterOutlet],
-  templateUrl: "./main-layout.html",
-  styleUrl: "./main-layout.css",
+  templateUrl: './main-layout.html',
+  styleUrl: './main-layout.css',
 })
 export class MainLayout {
   authStore = inject(AuthStore);
+  sessionService = inject(SessionService);
 }

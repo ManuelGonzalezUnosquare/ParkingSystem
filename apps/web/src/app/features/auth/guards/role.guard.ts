@@ -1,20 +1,30 @@
-import { inject } from "@angular/core";
-import { CanActivateFn, Router } from "@angular/router";
-import { AuthStore } from "../auth.store";
+import { computed, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { CanActivateFn, Router } from '@angular/router';
+import { filter, map, take } from 'rxjs';
+import { AuthStore } from '../auth.store';
 
 export const roleGuard: CanActivateFn = (route, state) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
+  const expectedRoles = route.data['roles'] as Array<string>;
+  const authStatus = computed(() => ({
+    isLoading: authStore.isLoading(),
+    user: authStore.user(),
+    token: authStore.token(),
+  }));
 
-  // Obtenemos los roles permitidos desde la configuración de la ruta
-  const expectedRoles = route.data["roles"] as Array<string>;
-  const userRole = authStore.user()?.role.name;
+  return toObservable(authStatus).pipe(
+    filter(({ isLoading, token }) => !isLoading || !token),
+    take(1),
+    map(({ user, token }) => {
+      const uRole = user?.role?.name;
+      if (token && expectedRoles.includes(uRole ?? '')) {
+        return true;
+      }
 
-  if (authStore.token() && expectedRoles.includes(userRole ?? "")) {
-    return true;
-  }
-
-  // Si no tiene el rol, lo mandamos a una página de "No autorizado" o al dashboard
-  router.navigate(["/unauthorized"]);
-  return false;
+      router.navigate(['/unauthorized']);
+      return false;
+    }),
+  );
 };

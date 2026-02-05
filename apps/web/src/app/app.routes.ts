@@ -10,7 +10,7 @@ export const appRoutes: Route[] = [
       import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
-    path: '',
+    path: 'app',
     canActivate: [authGuard, roleGuard],
     data: { roles: [RoleEnum.ROOT, RoleEnum.ADMIN] },
     component: MainLayout,
@@ -18,7 +18,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: '',
-    redirectTo: 'auth/login',
+    redirectTo: 'app',
     pathMatch: 'full',
   },
   {
