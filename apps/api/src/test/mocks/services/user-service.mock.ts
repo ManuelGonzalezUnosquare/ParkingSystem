@@ -2,7 +2,7 @@ import { jest } from "@jest/globals";
 import { UsersService } from "../../../modules/users/users.service";
 
 export type MockUserService = {
-  [P in keyof UsersService]: jest.Mock<any, any>;
+  [P in keyof UsersService]: jest.Mock<any>;
 };
 
 export const createMockUserService = (): MockUserService => ({

@@ -6,10 +6,10 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateUserDto } from "@org/shared-models";
 import { Repository } from "typeorm";
 import { User } from "../../database/entities/user.entity";
 import { CryptoService } from "../utils/services";
+import { CreateUserDto } from "../auth/dtos/create-user.dto";
 
 @Injectable()
 export class UsersService {

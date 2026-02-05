@@ -3,7 +3,7 @@ import { jest } from "@jest/globals";
 import { Repository } from "typeorm";
 
 export type MockRepository<T = any> = {
-  [P in keyof Repository<T>]: jest.Mock<any, any>;
+  [P in keyof Repository<T>]: jest.Mock<any>;
 };
 
 export const createMockRepository = (): MockRepository =>

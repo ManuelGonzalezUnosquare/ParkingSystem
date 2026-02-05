@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Building } from "../../database/entities";
-import { CreateBuildingDto, UpdateBuildingDto } from "@org/shared-models";
+import { CreateBuildingDto } from "./dtos/create-building.dto";
 
 @Injectable()
 export class BuildingsService {
@@ -42,7 +42,7 @@ export class BuildingsService {
 
   async update(
     publicId: string,
-    updateData: Partial<UpdateBuildingDto>
+    updateData: Partial<CreateBuildingDto>
   ): Promise<Building> {
     this.logger.log(`Attempting to update building ID: ${publicId}`);
 

@@ -1,0 +1,80 @@
+<!-- Welcome Header -->
+<div class="pt-10 pb-6 px-8 text-center">
+  <div class="flex justify-center mb-4">
+    <span class="material-symbols-outlined text-primary text-5xl"
+      >PLAS Portal</span
+    >
+  </div>
+  <h1
+    class="text-[#0d141c] dark:text-white tracking-light text-[32px] font-bold leading-tight pb-2"
+  >
+    Welcome back
+  </h1>
+  <p
+    class="text-[#4b739b] dark:text-slate-400 text-base font-normal leading-normal"
+  >
+    Sign in to your account to manage your parking allocation.
+  </p>
+</div>
+
+<form
+  #formDirective="ngForm"
+  class="px-8 pb-10 space-y-5"
+  [formGroup]="form"
+  (submit)="doSubmit()"
+>
+  <!-- email -->
+  <div class="form-control">
+    <label class="form-label" for="email">Email</label>
+    <input
+      autocomplete="email"
+      fluid
+      formControlName="email"
+      id="email"
+      pInputText
+      placeholder="my-user@test.com"
+      tabindex="1"
+      type="email"
+      [invalid]="form.controls.email.invalid && formDirective.submitted"
+    />
+  </div>
+  <!-- password -->
+  <div class="form-control">
+    <label class="form-label" for="password">Password</label>
+    <input
+      autocomplete="off"
+      fluid
+      formControlName="password"
+      id="password"
+      pInputText
+      placeholder="********"
+      type="password"
+    />
+  </div>
+  <!-- pass recovery -->
+  <div class="flex justify-end pb-2">
+    <a
+      class="p-0 text-sm text-gray-400"
+      pButton
+      rel="noopener noreferrer"
+      severity="info"
+      text
+      [routerLink]="['/auth/password-recovery']"
+    >
+      <span pButtonLabel>Forgot password!</span>
+    </a>
+  </div>
+  <!-- options -->
+  <p-button fluid label="Entrar" type="submit" severity="primary" />
+  <pre>{{form.value | json}}</pre>
+</form>
+
+<div class="relative flex items-center py-3">
+  <div class="grow border-t border-gray-300"></div>
+  <span class="shrink mx-4 text-gray-400 text-sm">New to PLAS?</span>
+  <div class="grow border-t border-gray-300"></div>
+</div>
+
+<p-button label="Register" fluid link [routerLink]="['/auth/register']" />
+
+<!-- Footer Info -->

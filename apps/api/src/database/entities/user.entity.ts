@@ -1,44 +1,51 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { BaseEntity } from "./_base.entity";
-import { Building } from "./building.entity";
-import { Role } from "./role.entity";
-import { Vehicle } from "./vehicle.entity";
-import { UserStatusEnum } from "@org/shared-models";
-import { Exclude } from "class-transformer";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Relation,
+} from 'typeorm';
+import { BaseEntity } from './_base.entity';
+import { Building } from './building.entity';
+import { Role } from './role.entity';
+import { Vehicle } from './vehicle.entity';
+import { Exclude } from 'class-transformer';
+import { UserStatusEnum } from '@parking-system/libs';
 
-@Entity("users")
+@Entity('users')
 export class User extends BaseEntity {
-  @Column({ type: "varchar", length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   firstName: string;
 
-  @Column({ type: "varchar", length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   lastName: string;
 
-  @Column({ type: "varchar", length: 150, unique: true })
+  @Column({ type: 'varchar', length: 150, unique: true })
   email: string;
 
   @Exclude()
-  @Column({ type: "varchar", length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @Column({ type: "int", default: 0 })
+  @Column({ type: 'int', default: 0 })
   priorityScore: number;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: UserStatusEnum,
     default: UserStatusEnum.ACTIVE,
   })
   status: string;
 
   @ManyToOne(() => Role, (role) => role.users)
-  @JoinColumn({ name: "role_id" })
+  @JoinColumn({ name: 'role_id' })
   role: Role;
 
   @ManyToOne(() => Building, (building) => building.users, { nullable: true })
-  @JoinColumn({ name: "building_id" })
+  @JoinColumn({ name: 'building_id' })
   building: Building; // NULL if ROOT
 
   @OneToMany(() => Vehicle, (vehicle) => vehicle.user)
-  vehicles: Vehicle[];
+  vehicles: Relation<Vehicle>[];
 }

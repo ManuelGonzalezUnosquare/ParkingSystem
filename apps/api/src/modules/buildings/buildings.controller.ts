@@ -7,34 +7,31 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-} from "@nestjs/common";
-import { BuildingsService } from "./buildings.service";
-import {
-  CreateBuildingDto,
-  RoleEnum,
-  UpdateBuildingDto,
-} from "@org/shared-models";
+} from '@nestjs/common';
+import { BuildingsService } from './buildings.service';
+import { RoleEnum } from '@parking-system/libs';
 import {
   ApiOperation,
   ApiCreatedResponse,
   ApiConflictResponse,
-} from "@nestjs/swagger";
-import { Building } from "../../database/entities";
-import { Roles } from "../../common/decorators";
+} from '@nestjs/swagger';
+import { Building } from '../../database/entities';
+import { Roles } from '../../common/decorators';
+import { CreateBuildingDto } from './dtos/create-building.dto';
 
-@Controller("buildings")
+@Controller('buildings')
 export class BuildingsController {
   constructor(private readonly buildingsService: BuildingsService) {}
 
   @Post()
   @Roles(RoleEnum.ROOT)
-  @ApiOperation({ summary: "Create a new building and generate its slots" })
+  @ApiOperation({ summary: 'Create a new building and generate its slots' })
   @ApiCreatedResponse({
-    description: "The building has been successfully created.",
+    description: 'The building has been successfully created.',
     type: Building,
   })
   @ApiConflictResponse({
-    description: "A building with this name already exists.",
+    description: 'A building with this name already exists.',
   })
   create(@Body() createBuildingDto: CreateBuildingDto) {
     return this.buildingsService.create(createBuildingDto);
@@ -46,24 +43,24 @@ export class BuildingsController {
     return this.buildingsService.findAll();
   }
 
-  @Get(":publicId")
+  @Get(':publicId')
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  findOne(@Param("publicId", new ParseUUIDPipe()) publicId: string) {
+  findOne(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.findOneByPublicId(publicId);
   }
 
-  @Patch(":publicId")
+  @Patch(':publicId')
   @Roles(RoleEnum.ROOT)
   update(
-    @Param("publicId", new ParseUUIDPipe()) publicId: string,
-    @Body() updateBuildingDto: UpdateBuildingDto
+    @Param('publicId', new ParseUUIDPipe()) publicId: string,
+    @Body() updateBuildingDto: CreateBuildingDto,
   ) {
     return this.buildingsService.update(publicId, updateBuildingDto);
   }
 
-  @Delete(":publicId")
+  @Delete(':publicId')
   @Roles(RoleEnum.ROOT)
-  remove(@Param("publicId", new ParseUUIDPipe()) publicId: string) {
+  remove(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.remove(publicId);
   }
 }

@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany } from "typeorm";
+import { Entity, Column, OneToMany, type Relation } from "typeorm";
 import { BaseEntity } from "./_base.entity";
 import { User } from "./user.entity";
 import { ParkingSlot } from "./parking-slot.entity";
@@ -18,5 +18,5 @@ export class Building extends BaseEntity {
   users: User[];
 
   @OneToMany(() => ParkingSlot, (slot) => slot.building)
-  slots: ParkingSlot[];
+  slots: Relation<ParkingSlot[]>;
 }

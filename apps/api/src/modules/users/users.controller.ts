@@ -10,10 +10,8 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
+import { CreateUserDto } from "../auth/dtos/create-user.dto";
 import { UsersService } from "./users.service";
-import { CreateUserDto } from "@org/shared-models";
-import { CurrentUser } from "../../common/decorators";
-import { User } from "../../database/entities";
 
 @Controller("users")
 export class UsersController {
@@ -21,8 +19,7 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
-    console.log("user", user);
+  create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 

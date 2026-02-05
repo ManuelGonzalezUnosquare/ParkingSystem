@@ -3,10 +3,10 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-} from "@nestjs/common";
-import { ApiResponse } from "@org/shared-models";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+} from '@nestjs/common';
+import { ApiResponse } from '@parking-system/libs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class TransformInterceptor<T>
@@ -14,7 +14,7 @@ export class TransformInterceptor<T>
 {
   intercept(
     context: ExecutionContext,
-    next: CallHandler
+    next: CallHandler,
   ): Observable<ApiResponse<T>> {
     return next.handle().pipe(
       map((data) => {
@@ -25,10 +25,10 @@ export class TransformInterceptor<T>
         return {
           data: result ?? (Array.isArray(result) ? [] : {}),
           meta,
-          message: data?.message || "Request successful",
+          message: data?.message || 'Request successful',
           statusCode: context.switchToHttp().getResponse().statusCode,
         };
-      })
+      }),
     );
   }
 }

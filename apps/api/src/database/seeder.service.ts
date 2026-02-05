@@ -1,22 +1,22 @@
-import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { InjectRepository } from "@nestjs/typeorm";
-import { RoleEnum } from "@org/shared-models";
-import { Repository } from "typeorm";
-import { CryptoService } from "../modules/utils/services";
-import { Building, Role, User } from "./entities";
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CryptoService } from '../modules/utils/services';
+import { Building, Role, User } from './entities';
+import { RoleEnum } from '@parking-system/libs';
 
 @Injectable()
 export class DatabaseSeederService implements OnApplicationBootstrap {
   private readonly logger = new Logger(DatabaseSeederService.name);
 
   private readonly rootUserInfo = {
-    email: "root@user.com",
-    password: "1234!",
+    email: 'root@user.com',
+    password: '1234!',
   };
   private readonly adminUserInfo = {
-    email: "admin@user.com",
-    password: "abcd!",
+    email: 'admin@user.com',
+    password: 'abcd!',
   };
   constructor(
     @InjectRepository(Role)
@@ -26,27 +26,27 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     @InjectRepository(Building)
     private readonly buildingRepo: Repository<Building>,
     private readonly configService: ConfigService,
-    private readonly cryptoService: CryptoService
+    private readonly cryptoService: CryptoService,
   ) {
     this.rootUserInfo = {
       email:
-        configService.get<string>("ROOT_USER_EMAIL") ?? this.rootUserInfo.email,
+        configService.get<string>('ROOT_USER_EMAIL') ?? this.rootUserInfo.email,
       password:
-        configService.get<string>("ROOT_USER_PWD") ??
+        configService.get<string>('ROOT_USER_PWD') ??
         this.rootUserInfo.password,
     };
     this.adminUserInfo = {
       email:
-        configService.get<string>("ADMIN_USER_EMAIL") ??
+        configService.get<string>('ADMIN_USER_EMAIL') ??
         this.adminUserInfo.email,
       password:
-        configService.get<string>("ADMIN_USER_PWD") ??
+        configService.get<string>('ADMIN_USER_PWD') ??
         this.adminUserInfo.password,
     };
   }
 
   async onApplicationBootstrap() {
-    this.logger.log("Running Database Seeder...");
+    this.logger.log('Running Database Seeder...');
     await this.seedRoles();
     await this.seedRootUser();
 
@@ -54,7 +54,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     if (testBuilding) {
       await this.seedAdminUser(testBuilding);
     }
-    this.logger.log("Seeding completed.");
+    this.logger.log('Seeding completed.');
   }
 
   //required seeds
@@ -62,13 +62,13 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     const roles = [
       {
         name: RoleEnum.ROOT,
-        description: "Super Admin - Access to all buildings",
+        description: 'Super Admin - Access to all buildings',
       },
       {
         name: RoleEnum.ADMIN,
-        description: "Building Admin - Access to specific building",
+        description: 'Building Admin - Access to specific building',
       },
-      { name: RoleEnum.USER, description: "Common User - Resident/Employee" },
+      { name: RoleEnum.USER, description: 'Common User - Resident/Employee' },
     ];
 
     for (const roleData of roles) {
@@ -93,16 +93,16 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       });
 
       const hashedPassword = await this.cryptoService.hash(
-        this.rootUserInfo.password
+        this.rootUserInfo.password,
       );
 
       const rootUser = this.userRepo.create({
-        firstName: "System",
-        lastName: "Root",
+        firstName: 'System',
+        lastName: 'Root',
         email: this.rootUserInfo.email,
         password: hashedPassword,
         role: rootRole,
-        status: "ACTIVE",
+        status: 'ACTIVE',
         priorityScore: 0,
         building: null, // Not building for root
       });
@@ -123,29 +123,29 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
         where: { name: RoleEnum.ADMIN },
       });
       const hashedPassword = await this.cryptoService.hash(
-        this.adminUserInfo.password
+        this.adminUserInfo.password,
       );
 
       const adminUser = this.userRepo.create({
-        firstName: "Building",
-        lastName: "Manager",
+        firstName: 'Building',
+        lastName: 'Manager',
         email: this.adminUserInfo.email,
         password: hashedPassword,
         role: adminRole,
-        status: "ACTIVE",
+        status: 'ACTIVE',
         priorityScore: 0,
         building: building, // Linked to the test building
       });
 
       await this.userRepo.save(adminUser);
       this.logger.log(
-        `Admin user created for building '${building.name}' (${this.adminUserInfo.email}).`
+        `Admin user created for building '${building.name}' (${this.adminUserInfo.email}).`,
       );
     }
   }
 
   private async seedTestingBuilding() {
-    const buildingName = "Central Tower";
+    const buildingName = 'Central Tower';
     let building = await this.buildingRepo.findOne({
       where: { name: buildingName },
     });
@@ -153,7 +153,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     if (!building) {
       building = this.buildingRepo.create({
         name: buildingName,
-        address: "123 Unosquare Blvd",
+        address: '123 Unosquare Blvd',
         totalSlots: 15,
       });
 

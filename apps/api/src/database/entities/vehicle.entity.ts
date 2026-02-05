@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from "typeorm";
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+  type Relation,
+} from "typeorm";
 import { User } from "./user.entity";
 import { BaseEntity } from "./_base.entity";
 import { ParkingSlot } from "./parking-slot.entity";
@@ -14,10 +21,10 @@ export class Vehicle extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.vehicles)
   @JoinColumn({ name: "user_id" })
-  user: User;
+  user: Relation<User>;
 
   @OneToOne(() => ParkingSlot, (slot) => slot.vehicle, { nullable: true })
   @JoinColumn({ name: "slotId" })
   @ApiProperty({ type: () => ParkingSlot, nullable: true })
-  slot: ParkingSlot | null;
+  slot: Relation<ParkingSlot | null>;
 }

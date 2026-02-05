@@ -1,16 +1,22 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { UsersService } from "../users/users.service";
-import { JwtService } from "@nestjs/jwt";
-import { CryptoService } from "../utils/services";
-import { User } from "../../database/entities";
-import { Session } from "@org/shared-models";
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { User } from '../../database/entities';
+import { UsersService } from '../users/users.service';
+import { CryptoService } from '../utils/services';
+import { SessionModel } from '@parking-system/libs';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
     private jwtService: JwtService,
-    private cryptoService: CryptoService
+    private cryptoService: CryptoService,
   ) {}
 
   /**
@@ -20,10 +26,10 @@ export class AuthService {
    * @returns User object (excluding password) if valid
    * @throws UnauthorizedException if credentials don't match
    */
-  async validateUser(email: string, pass: string): Promise<Partial<User>> {
+  async validateUser(email: string, pass: string): Promise<User> {
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const isMatch = await this.cryptoService.compare(pass, user.password);
@@ -32,7 +38,7 @@ export class AuthService {
       return user;
     }
 
-    throw new UnauthorizedException("Invalid credentials");
+    throw new UnauthorizedException('Invalid credentials');
   }
 
   /**
@@ -40,7 +46,7 @@ export class AuthService {
    * @param user Validated user object
    * @returns Access token and basic user info for the frontend
    */
-  login(user: Partial<User>): Session {
+  login(user: User): SessionModel {
     const payload = {
       email: user.email,
       sub: user.publicId,
@@ -50,6 +56,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
+      user,
     };
   }
 }

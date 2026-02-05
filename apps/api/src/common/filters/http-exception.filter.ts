@@ -5,9 +5,9 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from "@nestjs/common";
-import { ApiResponse } from "@org/shared-models";
-import { Response } from "express";
+} from '@nestjs/common';
+import { ApiResponse } from '@parking-system/libs';
+import { Response } from 'express';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -27,10 +27,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const exceptionResponse =
       exception instanceof HttpException
         ? exception.getResponse()
-        : "Internal server error";
+        : 'Internal server error';
 
     const message =
-      typeof exceptionResponse === "object"
+      typeof exceptionResponse === 'object'
         ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (exceptionResponse as any).message ||
           JSON.stringify(exceptionResponse)
@@ -41,7 +41,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     const errorResponse: ApiResponse<null> = {
       data: null,
-      message: Array.isArray(message) ? message.join(", ") : message,
+      message: Array.isArray(message) ? message.join(', ') : message,
       meta: undefined,
       statusCode: response.statusCode,
     };

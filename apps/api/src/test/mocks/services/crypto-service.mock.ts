@@ -2,7 +2,7 @@ import { jest } from "@jest/globals";
 import { CryptoService } from "../../../modules/utils/services/crypto.service";
 
 export type MockCryptoService = {
-  [P in keyof CryptoService]: jest.Mock<any, any>;
+  [P in keyof CryptoService]: jest.Mock<any>;
 };
 
 export const createMockCryptoService = (): MockCryptoService => ({
