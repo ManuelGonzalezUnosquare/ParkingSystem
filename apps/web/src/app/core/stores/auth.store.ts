@@ -24,8 +24,8 @@ import {
   SessionModel,
   UserModel,
 } from '@parking-system/libs';
-import { AUTH_CONSTANTS } from '../../core/constants';
-import { AuthService } from './auth.service';
+import { AUTH_CONSTANTS } from '../constants';
+import { AuthService } from '../../features/auth/auth.service';
 
 interface AuthState {
   user: UserModel | null;

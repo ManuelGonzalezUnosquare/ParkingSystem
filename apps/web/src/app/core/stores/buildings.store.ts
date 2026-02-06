@@ -30,14 +30,14 @@ import {
   Search,
 } from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { BuildingService } from './building.service';
+import { BuildingService } from '../../features/buildings/building.service';
 
 const config = entityConfig({
   entity: type<BuildingModel>(),
   selectId: (building: BuildingModel) => building.publicId,
 });
 
-export const BuildingStore = signalStore(
+export const BuildingsStore = signalStore(
   { providedIn: 'root' },
   withDevtools('buildings'),
   withReset(),

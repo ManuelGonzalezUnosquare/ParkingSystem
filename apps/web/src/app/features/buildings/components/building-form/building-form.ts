@@ -5,13 +5,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { BuildingModel, ICreateBuilding } from '@parking-system/libs';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { BuildingStore } from '../../building.store';
 import { IBuildingForm } from './iBuilding-form';
+import { BuildingModel, ICreateBuilding } from '@parking-system/libs';
+import { BuildingsStore } from '../../../../core/stores';
 
 @Component({
   selector: 'app-building-form',
@@ -27,7 +27,7 @@ import { IBuildingForm } from './iBuilding-form';
 export class BuildingForm implements OnInit {
   private ref = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
-  store = inject(BuildingStore);
+  store = inject(BuildingsStore);
 
   building?: BuildingModel;
 

@@ -6,8 +6,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { BuildingStore } from './building.store';
 import { BuildingForm } from './components';
+import { BuildingsStore } from '../../core/stores';
 
 @Component({
   selector: 'app-buildings',
@@ -19,7 +19,7 @@ import { BuildingForm } from './components';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Buildings {
-  readonly buildingStore = inject(BuildingStore);
+  readonly buildingStore = inject(BuildingsStore);
   readonly dialogService = inject(DialogService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {

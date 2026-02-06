@@ -10,7 +10,7 @@ import { ILogin } from '@parking-system/libs';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormValidationError } from '../../../../shared/ui/form-validation-error/form-validation-error';
-import { AuthStore } from '../../auth.store';
+import { AuthStore } from '../../../../core/stores/auth.store';
 import { ILoginForm } from './login-form';
 
 @Component({

@@ -1,7 +1,7 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { RoleEnum } from '@parking-system/libs';
 import { MenuItem } from 'primeng/api';
-import { AuthStore } from '../../features/auth/auth.store';
+import { AuthStore } from '../stores/auth.store';
 import { Router } from '@angular/router';
 
 interface MyItem extends MenuItem {
