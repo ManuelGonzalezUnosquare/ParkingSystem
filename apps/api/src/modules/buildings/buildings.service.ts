@@ -6,9 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Building } from '../../database/entities';
 import { CreateBuildingDto } from './dtos/create-building.dto';
+import { paginate, PaginatedResult } from '../../common/utils';
+import { SearchDto } from '../../common/dtos';
 
 @Injectable()
 export class BuildingsService {
@@ -67,8 +69,19 @@ export class BuildingsService {
     }
   }
 
-  async findAll(): Promise<Building[]> {
-    return await this.buildingRepository.find();
+  async findAll(search: SearchDto): Promise<PaginatedResult<Building>> {
+    const { globalFilter } = search;
+
+    const queryOptions: any = {};
+
+    if (globalFilter) {
+      queryOptions.where = [
+        { name: Like(`%${globalFilter}%`) },
+        { address: Like(`%${globalFilter}%`) },
+      ];
+    }
+
+    return await paginate(this.buildingRepository, search, queryOptions);
   }
 
   async findOneByPublicId(publicId: string): Promise<Building> {

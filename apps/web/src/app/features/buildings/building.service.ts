@@ -3,6 +3,7 @@ import {
   ApiResponse,
   BuildingModel,
   ICreateBuilding,
+  Search,
 } from '@parking-system/libs';
 import { Observable } from 'rxjs';
 import { RequestService } from '../../core/services';
@@ -14,8 +15,8 @@ export class BuildingService {
   private readonly request = inject(RequestService);
   private readonly endpoint = '/api/buildings';
 
-  getAll(): Observable<ApiResponse<BuildingModel[]>> {
-    return this.request.get<BuildingModel[]>(this.endpoint);
+  getAll(dto: Search): Observable<ApiResponse<BuildingModel[]>> {
+    return this.request.get<BuildingModel[]>(this.endpoint, dto);
   }
 
   getById(id: string): Observable<ApiResponse<BuildingModel>> {

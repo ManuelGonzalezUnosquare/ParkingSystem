@@ -6,12 +6,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ILogin } from '@parking-system/libs';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { FormValidationError } from '../../../../shared/ui/form-validation-error/form-validation-error';
 import { AuthStore } from '../../auth.store';
-import { JsonPipe } from '@angular/common';
 import { ILoginForm } from './login-form';
-import { ILogin } from '@parking-system/libs';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +20,7 @@ import { ILogin } from '@parking-system/libs';
     InputTextModule,
     ButtonModule,
     RouterLink,
-    JsonPipe,
+    FormValidationError,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -29,11 +29,11 @@ export class Login {
   readonly router = inject(Router);
   readonly store = inject(AuthStore);
   readonly form = new FormGroup<ILoginForm>({
-    email: new FormControl('root@test.com', {
+    email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),
-    password: new FormControl('1234567', {
+    password: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),

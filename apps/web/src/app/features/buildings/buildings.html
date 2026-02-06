@@ -14,33 +14,35 @@
   </div>
 </header>
 
-<!-- SectionHeader -->
-<div class="mt-6">
-  <div class="flex items-center justify-between border-b border-[#cfdbe8] pb-4">
-    <h2 class="text-[#0d141c] text-2xl font-bold leading-tight tracking-tight">
-      Inventory
-    </h2>
-    <div class="flex items-center gap-2">
-      <div class="relative">
+<!-- Data Table Container -->
+<div class="pt-4">
+  <p-table
+    #dt
+    [filterDelay]="500"
+    [value]="buildingStore.entities()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="10"
+    [totalRecords]="buildingStore.pagination()?.total || 0"
+    [loading]="buildingStore.isLoading()"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings"
+    [rowsPerPageOptions]="[5, 10, 25, 50]"
+  >
+    >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center">
+        <h3 class="font-semibold">Inventory</h3>
         <input
           variant="outlined"
           id="search"
           pInputText
           placeholder="Search building..."
+          (input)="dt.filterGlobal($any($event.target).value, 'contains')"
         />
       </div>
-      <p-button
-        variant="outlined"
-        class="bg-white"
-        severity="secondary"
-        icon="pi pi-filter"
-      />
-    </div>
-  </div>
-</div>
-<!-- Data Table Container -->
-<div class="pt-4">
-  <p-table [value]="buildingStore.entities()">
+    </ng-template>
     <ng-template #header>
       <tr>
         <th class="text-xs font-semibold uppercase tracking-wider">Name</th>

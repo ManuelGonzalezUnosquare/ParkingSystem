@@ -30,7 +30,12 @@
       placeholder="my-user@test.com"
       tabindex="1"
       type="email"
-      [invalid]="form.controls.email.invalid"
+      [invalid]="form.controls.email.invalid && form.controls.email.touched"
+    />
+    <app-form-validation-error
+      [touched]="form.controls.email.touched"
+      [errors]="form.controls.email.errors"
+      label="Email"
     />
   </div>
   <!-- password -->
@@ -61,7 +66,6 @@
   </div>
   <!-- options -->
   <p-button fluid label="Entrar" type="submit" severity="primary" />
-  <pre>{{form.value | json}}</pre>
 </form>
 
 <div class="relative flex items-center py-3">

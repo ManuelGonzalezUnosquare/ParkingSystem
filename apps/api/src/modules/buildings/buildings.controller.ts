@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { BuildingsService } from './buildings.service';
 import { RoleEnum } from '@parking-system/libs';
@@ -18,6 +19,7 @@ import {
 import { Building } from '../../database/entities';
 import { Roles } from '../../common/decorators';
 import { CreateBuildingDto } from './dtos/create-building.dto';
+import { SearchDto } from '../../common/dtos';
 
 @Controller('buildings')
 export class BuildingsController {
@@ -39,8 +41,15 @@ export class BuildingsController {
 
   @Get()
   @Roles(RoleEnum.ROOT)
-  findAll() {
-    return this.buildingsService.findAll();
+  async findAll(@Query() searchDto: SearchDto) {
+    const { data, meta } = await this.buildingsService.findAll(searchDto);
+
+    return {
+      data,
+      meta,
+      message: 'Buildings retrieved successfully',
+      statusCode: 200,
+    };
   }
 
   @Get(':publicId')

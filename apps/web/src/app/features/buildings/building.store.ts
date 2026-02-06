@@ -3,16 +3,16 @@ import {
   withDevtools,
   withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { computed, effect, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
   type,
   withComputed,
-  withHooks,
   withMethods,
   withProps,
+  withState,
 } from '@ngrx/signals';
 import {
   addEntity,
@@ -23,9 +23,13 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { BuildingModel, ICreateBuilding } from '@parking-system/libs';
+import {
+  ApiPaginationMeta,
+  BuildingModel,
+  ICreateBuilding,
+  Search,
+} from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { AuthStore } from '../auth/auth.store';
 import { BuildingService } from './building.service';
 
 const config = entityConfig({
@@ -39,6 +43,9 @@ export const BuildingStore = signalStore(
   withReset(),
   withEntities(config),
   withCallState(),
+  withState({
+    pagination: null as ApiPaginationMeta | null,
+  }),
   withProps(() => ({
     _buildingService: inject(BuildingService),
   })),
@@ -49,15 +56,16 @@ export const BuildingStore = signalStore(
   })),
 
   withMethods((store) => ({
-    loadAll: rxMethod<void>(
+    loadAll: rxMethod<Search>(
       pipe(
         tap(() => patchState(store, { callState: 'loading' })),
-        switchMap(() =>
-          store._buildingService.getAll().pipe(
+        switchMap((dto) =>
+          store._buildingService.getAll(dto).pipe(
             tapResponse({
               next: (response) =>
                 patchState(store, setAllEntities(response.data, config), {
                   callState: 'loaded',
+                  pagination: response.meta,
                 }),
               error: (err: any) =>
                 patchState(store, {
@@ -122,16 +130,4 @@ export const BuildingStore = signalStore(
       }
     },
   })),
-  withHooks({
-    onInit(store) {
-      const authStore = inject(AuthStore);
-
-      effect(() => {
-        const isRootUser = authStore.isRootUser();
-        if (isRootUser) {
-          store.loadAll();
-        }
-      });
-    },
-  }),
 );

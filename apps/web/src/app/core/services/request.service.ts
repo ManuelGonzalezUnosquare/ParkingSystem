@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ApiResponse } from '@parking-system/libs';
 import { Observable } from 'rxjs';
@@ -7,8 +7,10 @@ import { Observable } from 'rxjs';
 export class RequestService {
   private readonly http = inject(HttpClient);
 
-  get<T>(url: string): Observable<ApiResponse<T>> {
-    return this.http.get<ApiResponse<T>>(url);
+  get<T>(url: string, params?: unknown): Observable<ApiResponse<T>> {
+    return this.http.get<ApiResponse<T>>(url, {
+      params: this.objectToQueryParameter(params),
+    });
   }
 
   post<T>(url: string, body: object): Observable<ApiResponse<T>> {
@@ -25,5 +27,26 @@ export class RequestService {
 
   delete<T>(url: string): Observable<ApiResponse<T>> {
     return this.http.delete<ApiResponse<T>>(url);
+  }
+
+  private objectToQueryParameter(obj: any): HttpParams {
+    let params: HttpParams = new HttpParams();
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const element = obj[key];
+        if (element !== undefined) {
+          if (Array.isArray(element)) {
+            element.forEach((item: any) => {
+              if (item !== undefined) {
+                params = params.append(key, item);
+              }
+            });
+          } else {
+            params = params.set(key, element);
+          }
+        }
+      }
+    }
+    return params;
   }
 }

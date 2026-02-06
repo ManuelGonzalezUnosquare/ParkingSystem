@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { BuildingModel } from '@parking-system/libs';
+import { BuildingModel, Search } from '@parking-system/libs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { BuildingStore } from './building.store';
 import { BuildingForm } from './components';
 
@@ -58,6 +58,17 @@ export class Buildings {
         }
       },
     });
+  }
+  onLazyLoad(event: TableLazyLoadEvent) {
+    const searchParams: Search = {
+      first: event.first ?? 0,
+      rows: event.rows ?? 10,
+      sortField: (event.sortField as string) ?? 'createdAt',
+      sortOrder: event.sortOrder ?? -1,
+      globalFilter: (event.globalFilter as string) ?? undefined,
+    };
+
+    this.buildingStore.loadAll(searchParams);
   }
 
   private openBuildingDialog(header: string, building?: BuildingModel) {
