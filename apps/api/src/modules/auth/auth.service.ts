@@ -1,3 +1,5 @@
+import { User } from '@database/entities';
+import { UsersService } from '@modules/users/users.service';
 import {
   forwardRef,
   Inject,
@@ -5,10 +7,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../../database/entities';
-import { UsersService } from '../users/users.service';
-import { CryptoService } from '../utils/services';
 import { SessionModel } from '@parking-system/libs';
+import { CryptoService } from '@utils/services';
 
 @Injectable()
 export class AuthService {

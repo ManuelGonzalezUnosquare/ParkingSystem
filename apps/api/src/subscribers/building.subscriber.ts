@@ -3,9 +3,9 @@ import {
   EventSubscriber,
   InsertEvent,
   DataSource,
-} from "typeorm";
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { Building, ParkingSlot } from "../database/entities";
+} from 'typeorm';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Building, ParkingSlot } from '@database/entities';
 
 @Injectable()
 @EventSubscriber()
@@ -15,19 +15,19 @@ export class BuildingSubscriber
   private readonly logger = new Logger(BuildingSubscriber.name);
 
   constructor(private readonly dataSource: DataSource) {
-    this.logger.log("========================== subscriber constryuctor");
+    this.logger.log('========================== subscriber constryuctor');
     this.dataSource.subscribers.push(this);
   }
 
   onModuleInit() {
     const isRegistered = this.dataSource.subscribers.some(
-      (s) => s.constructor.name === BuildingSubscriber.name
+      (s) => s.constructor.name === BuildingSubscriber.name,
     );
 
     if (!isRegistered) {
       this.dataSource.subscribers.push(this);
       this.logger.log(
-        "BuildingSubscriber explicitly registered in DataSource."
+        'BuildingSubscriber explicitly registered in DataSource.',
       );
     }
   }
@@ -50,7 +50,7 @@ export class BuildingSubscriber
 
       for (let i = 1; i <= entity.totalSlots; i++) {
         // Generate sequence: S-001, S-002, etc.
-        const slotNumber = `S-${i.toString().padStart(3, "0")}`;
+        const slotNumber = `S-${i.toString().padStart(3, '0')}`;
 
         slots.push({
           slotNumber,
@@ -64,12 +64,12 @@ export class BuildingSubscriber
         await manager.getRepository(ParkingSlot).save(slots);
 
         this.logger.log(
-          `Successfully generated ${entity.totalSlots} slots for building: ${entity.name}`
+          `Successfully generated ${entity.totalSlots} slots for building: ${entity.name}`,
         );
       } catch (error) {
         this.logger.error(
           `Failed to generate slots for building ${entity.name}`,
-          error.stack
+          error.stack,
         );
       }
     }

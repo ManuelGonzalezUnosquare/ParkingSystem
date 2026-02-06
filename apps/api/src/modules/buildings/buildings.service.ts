@@ -7,10 +7,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
-import { Building } from '../../database/entities';
 import { CreateBuildingDto } from './dtos/create-building.dto';
-import { paginate, PaginatedResult } from '../../common/utils';
-import { SearchDto } from '../../common/dtos';
+import { SearchDto } from '@common/dtos';
+import { PaginatedResult, paginate } from '@common/utils';
+import { Building } from '@database/entities';
 
 @Injectable()
 export class BuildingsService {

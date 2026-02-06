@@ -6,8 +6,8 @@ import {
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { TransformInterceptor } from './common/interceptors';
-import { GlobalExceptionFilter } from './common/filters';
+import { GlobalExceptionFilter } from '@common/filters';
+import { TransformInterceptor } from '@common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

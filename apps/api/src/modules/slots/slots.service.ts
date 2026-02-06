@@ -1,7 +1,7 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { ParkingSlot } from "../../database/entities";
+import { ParkingSlot } from '@database/entities';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class SlotsService {
@@ -9,7 +9,7 @@ export class SlotsService {
 
   constructor(
     @InjectRepository(ParkingSlot)
-    private readonly slotRepository: Repository<ParkingSlot>
+    private readonly slotRepository: Repository<ParkingSlot>,
   ) {}
 
   async findAllByBuilding(buildingPublicId: string): Promise<ParkingSlot[]> {
@@ -17,26 +17,26 @@ export class SlotsService {
 
     return await this.slotRepository.find({
       where: { building: { publicId: buildingPublicId } },
-      order: { slotNumber: "ASC" },
+      order: { slotNumber: 'ASC' },
     });
   }
 
   async findAvailableByBuilding(
-    buildingPublicId: string
+    buildingPublicId: string,
   ): Promise<ParkingSlot[]> {
     return await this.slotRepository.find({
       where: {
         building: { publicId: buildingPublicId },
         isAvailable: true,
       },
-      order: { slotNumber: "ASC" },
+      order: { slotNumber: 'ASC' },
     });
   }
 
   async findOneByPublicId(publicId: string): Promise<ParkingSlot> {
     const slot = await this.slotRepository.findOne({
       where: { publicId },
-      relations: ["building"],
+      relations: ['building'],
     });
 
     if (!slot) {

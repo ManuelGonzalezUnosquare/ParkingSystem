@@ -16,10 +16,10 @@ import {
   ApiCreatedResponse,
   ApiConflictResponse,
 } from '@nestjs/swagger';
-import { Building } from '../../database/entities';
-import { Roles } from '../../common/decorators';
 import { CreateBuildingDto } from './dtos/create-building.dto';
-import { SearchDto } from '../../common/dtos';
+import { Roles } from '@common/decorators';
+import { SearchDto } from '@common/dtos';
+import { Building } from '@database/entities';
 
 @Controller('buildings')
 export class BuildingsController {

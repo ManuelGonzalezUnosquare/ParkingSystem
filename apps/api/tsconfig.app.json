@@ -7,7 +7,15 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@parking-system/libs": ["../../libs/src/index.ts"],
+      "@common/*": ["src/common/*"],
+      "@database/*": ["src/database/*"],
+      "@modules/*": ["src/modules/*"],
+      "@utils/*": ["src/utils/*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": [
