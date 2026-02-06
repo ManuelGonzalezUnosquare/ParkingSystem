@@ -11,7 +11,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { IBuildingForm } from './iBuilding-form';
 import { BuildingModel, ICreateBuilding } from '@parking-system/libs';
-import { BuildingsStore } from '../../../../core/stores';
+import { BuildingsStore } from '@core/stores';
 
 @Component({
   selector: 'app-building-form',

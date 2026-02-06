@@ -1,9 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SessionService } from '../../core/services';
-import { AuthStore } from '../../core/stores/auth.store';
 import { Navbar, Sidebar } from './components';
-import { BuildingsStore } from '../../core/stores/buildings.store';
+import { SessionService } from '@core/services';
+import { AuthStore, BuildingsStore } from '@core/stores';
 
 @Component({
   selector: 'app-main-layout',

@@ -1,4 +1,5 @@
 import { BaseModel } from './base.model';
+import { BuildingModel } from './building.model';
 import { RoleModel } from './role.model';
 
 export interface UserModel extends BaseModel {
@@ -7,4 +8,5 @@ export interface UserModel extends BaseModel {
   status: string;
   email: string;
   role: RoleModel;
+  building: BuildingModel;
 }

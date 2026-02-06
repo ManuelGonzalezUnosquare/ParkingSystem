@@ -7,7 +7,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { BuildingForm } from './components';
-import { BuildingsStore } from '../../core/stores';
+import { BuildingsStore } from '@core/stores';
 
 @Component({
   selector: 'app-buildings',

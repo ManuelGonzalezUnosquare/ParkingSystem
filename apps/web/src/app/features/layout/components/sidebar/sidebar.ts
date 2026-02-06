@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { PanelMenuModule } from 'primeng/panelmenu';
-import { SessionService } from '../../../../core/services/session.service';
 import { MenuItem } from 'primeng/api';
+import { SessionService } from '@core/services';
 
 @Component({
   selector: 'app-sidebar',
