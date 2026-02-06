@@ -1,15 +1,16 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { AuthService } from "./auth.service";
-import { UsersService } from "../users/users.service";
+import { Test, TestingModule } from '@nestjs/testing';
+import { AuthService } from './auth.service';
+
+import { UsersService } from '@modules/users/users.service';
+import { JwtService } from '@nestjs/jwt';
 import {
+  createMockCryptoService,
   createMockUserService,
   MockUserService,
-} from "../../test/mocks/services/user-service.mock";
-import { JwtService } from "@nestjs/jwt";
-import { createMockCryptoService } from "../../test/mocks/services/crypto-service.mock";
-import { CryptoService } from "../utils/services";
+} from '@test/mocks/services';
+import { CryptoService } from '@utils/services';
 
-describe("AuthService", () => {
+describe('AuthService', () => {
   let service: AuthService;
   let userService: MockUserService;
 
@@ -38,7 +39,7 @@ describe("AuthService", () => {
     userService = module.get<MockUserService>(UsersService);
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });

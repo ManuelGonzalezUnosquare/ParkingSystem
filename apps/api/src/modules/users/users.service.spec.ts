@@ -5,18 +5,20 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../../database/entities/user.entity';
-import {
-  createMockRepository,
-  MockRepository,
-} from '../../test/mocks/repositories/repository.mock';
+
 import { UsersService } from './users.service';
-import { CryptoService } from '../utils/services';
-import {
-  createMockCryptoService,
-  MockCryptoService,
-} from '../../test/mocks/services/crypto-service.mock';
+
 import { UserStatusEnum } from '@parking-system/libs';
+import { User } from '@database/entities';
+import {
+  MockRepository,
+  createMockRepository,
+} from '@test/mocks/repositories/repository.mock';
+import {
+  MockCryptoService,
+  createMockCryptoService,
+} from '@test/mocks/services';
+import { CryptoService } from '@utils/services';
 
 describe('UsersService', () => {
   let service: UsersService;

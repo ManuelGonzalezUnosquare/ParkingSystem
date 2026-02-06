@@ -1,16 +1,16 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { User } from "../../database/entities/user.entity";
-import { UsersController } from "./users.controller";
-import { UsersService } from "./users.service";
-import { createMockRepository } from "../../test/mocks/repositories/repository.mock";
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+import { User } from '@database/entities';
+import { createMockRepository } from '@test/mocks/repositories/repository.mock';
 import {
-  createMockCryptoService,
   MockCryptoService,
-} from "../../test/mocks/services/crypto-service.mock";
-import { CryptoService } from "../utils/services";
+  createMockCryptoService,
+} from '@test/mocks/services';
+import { CryptoService } from '@utils/services';
 
-describe("UsersController", () => {
+describe('UsersController', () => {
   let controller: UsersController;
 
   let cryptoService: MockCryptoService;
@@ -37,7 +37,7 @@ describe("UsersController", () => {
     cryptoService = module.get<MockCryptoService>(CryptoService);
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 });

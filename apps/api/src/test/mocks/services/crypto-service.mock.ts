@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { CryptoService } from '../../../utils/services/crypto.service';
+import { CryptoService } from '@utils/services';
 
 export type MockCryptoService = {
   [P in keyof CryptoService]: jest.Mock<any>;
