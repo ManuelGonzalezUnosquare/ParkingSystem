@@ -60,22 +60,21 @@ export class UsersService {
       throw new BadRequestException('Target not found');
     }
 
-    const queryOptions: any = {};
-
-    if (globalFilter) {
-      queryOptions.where = [
-        { firstName: Like(`%${globalFilter}%`) },
-        { lastName: Like(`%${globalFilter}%`) },
-        { email: Like(`%${globalFilter}%`) },
-      ];
-    }
-
     const query = this.userRepository
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.role', 'role')
       .leftJoin('users.building', 'building')
-      .where(queryOptions)
-      .andWhere('building.publicId = :publicId', { publicId });
+      .where('building.publicId = :publicId', { publicId });
+
+    if (globalFilter) {
+      const queryOptions: any = [
+        { firstName: Like(`%${globalFilter}%`) },
+        { lastName: Like(`%${globalFilter}%`) },
+        { email: Like(`%${globalFilter}%`) },
+      ];
+
+      query.andWhere(queryOptions);
+    }
 
     return await paginateQuery(query, filters);
   }

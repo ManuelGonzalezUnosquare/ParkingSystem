@@ -1,3 +1,6 @@
+import { CurrentUser, Roles } from '@common/decorators';
+import { SearchBuildingDto } from '@common/dtos';
+import { User } from '@database/entities';
 import {
   Body,
   Controller,
@@ -11,12 +14,9 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { RoleEnum } from '@parking-system/libs';
 import { CreateUserDto } from '../auth/dtos/create-user.dto';
 import { UsersService } from './users.service';
-import { CurrentUser, Roles } from '@common/decorators';
-import { RoleEnum } from '@parking-system/libs';
-import { SearchBuildingDto, SearchDto } from '@common/dtos';
-import { User } from '@database/entities';
 
 @Controller('users')
 export class UsersController {
@@ -32,7 +32,6 @@ export class UsersController {
   @Get()
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   findAll(@Query() searchDto: SearchBuildingDto, @CurrentUser() user: User) {
-    console.log('user', user);
     return this.usersService.findAll(searchDto, user);
   }
 
