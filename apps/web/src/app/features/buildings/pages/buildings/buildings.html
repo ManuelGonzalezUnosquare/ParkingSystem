@@ -51,7 +51,9 @@
           Total Spots
         </th>
 
-        <th class="text-xs font-semibold uppercase tracking-wider">Acciones</th>
+        <th class="text-xs font-semibold uppercase tracking-wider text-center">
+          Acciones
+        </th>
       </tr>
     </ng-template>
     <ng-template #body let-building>
@@ -60,22 +62,29 @@
         <td class="text-sm font-medium">{{ building.address }}</td>
         <td class="text-sm font-medium">{{ building.totalSlots }}</td>
         <td>
-          <p-button
-            appAccountBtnAccess
-            icon="pi pi-pencil"
-            severity="secondary"
-            size="small"
-            text
-            (click)="update(building)"
-          />
-          <p-button
-            appAccountBtnAccess
-            icon="pi pi-trash"
-            severity="secondary"
-            size="small"
-            text
-            (click)="remove(building)"
-          />
+          <div class="text-center">
+            <p-button
+              icon="pi pi-search"
+              severity="secondary"
+              size="small"
+              text
+              [routerLink]="`${building.publicId}/details`"
+            />
+            <p-button
+              icon="pi pi-pencil"
+              severity="secondary"
+              size="small"
+              text
+              (click)="update(building)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              severity="secondary"
+              size="small"
+              text
+              (click)="remove(building)"
+            />
+          </div>
         </td>
       </tr>
     </ng-template>

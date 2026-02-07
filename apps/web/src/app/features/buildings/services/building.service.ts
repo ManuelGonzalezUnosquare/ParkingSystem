@@ -6,7 +6,7 @@ import {
   Search,
 } from '@parking-system/libs';
 import { Observable } from 'rxjs';
-import { RequestService } from '../../core/services';
+import { RequestService } from '../../../core/services';
 
 @Injectable({
   providedIn: 'root',

@@ -30,9 +30,9 @@ import {
   Search,
 } from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { BuildingService } from '../../features/buildings/building.service';
+import { BuildingService } from '../../features/buildings/services/building.service';
 
-const config = entityConfig({
+const bConfig = entityConfig({
   entity: type<BuildingModel>(),
   selectId: (building: BuildingModel) => building.publicId,
 });
@@ -41,7 +41,7 @@ export const BuildingsStore = signalStore(
   { providedIn: 'root' },
   withDevtools('buildings'),
   withReset(),
-  withEntities(config),
+  withEntities(bConfig),
   withCallState(),
   withState({
     pagination: null as ApiPaginationMeta | null,
@@ -54,7 +54,6 @@ export const BuildingsStore = signalStore(
       return store.callState() === 'loading';
     }),
   })),
-
   withMethods((store) => ({
     loadAll: rxMethod<Search>(
       pipe(
@@ -63,7 +62,7 @@ export const BuildingsStore = signalStore(
           store._buildingService.getAll(dto).pipe(
             tapResponse({
               next: (response) =>
-                patchState(store, setAllEntities(response.data, config), {
+                patchState(store, setAllEntities(response.data, bConfig), {
                   callState: 'loaded',
                   pagination: response.meta,
                 }),
@@ -84,7 +83,7 @@ export const BuildingsStore = signalStore(
         const response = await lastValueFrom(
           store._buildingService.create(dto),
         );
-        patchState(store, addEntity(response.data, config), {
+        patchState(store, addEntity(response.data, bConfig), {
           callState: 'loaded',
         });
         return true;
@@ -103,7 +102,7 @@ export const BuildingsStore = signalStore(
         );
         patchState(
           store,
-          updateEntity({ id, changes: response.data }, config),
+          updateEntity({ id, changes: response.data }, bConfig),
           {
             callState: 'loaded',
           },

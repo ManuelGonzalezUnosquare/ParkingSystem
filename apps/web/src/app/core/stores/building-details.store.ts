@@ -1,83 +1,99 @@
-import { computed, inject } from '@angular/core';
 import {
-  signalStore,
-  withState,
-  withMethods,
-  withComputed,
+  withCallState,
+  withDevtools,
+  withReset,
+} from '@angular-architects/ngrx-toolkit';
+import { computed, effect, inject } from '@angular/core';
+import { tapResponse } from '@ngrx/operators';
+import {
   patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withProps,
+  withState,
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import { tapResponse } from '@ngrx/operators';
 import { BuildingModel } from '@parking-system/libs';
+import { pipe, switchMap, tap } from 'rxjs';
+import { BuildingService } from '../../features/buildings/services/building.service';
 import { AuthStore } from './auth.store';
-import { BuildingService } from '../../features/buildings/building.service';
+import { withBuildingUsersStore } from './building-users.store';
 
-/**
- * Initial State
- */
 interface BuildingDetailState {
   building: BuildingModel | null;
-  callState: 'idle' | 'loading' | 'loaded' | { error: string };
+}
+
+interface BuildingDetailState {
+  building: BuildingModel | null;
 }
 
 export const BuildingDetailStore = signalStore(
   { providedIn: 'root' },
+  withDevtools('building-details'),
+  withReset(),
   withState<BuildingDetailState>({
     building: null,
-    callState: 'idle',
   }),
+  withCallState(),
+  withProps(() => ({
+    _authStore: inject(AuthStore),
+    _buildingService: inject(BuildingService),
+  })),
+  withComputed((store) => ({
+    canEdit: computed(() => {
+      const user = store._authStore.user();
+      const building = store.building();
+      if (!user || !building) return false;
+      return (
+        store._authStore.isRootUser() ||
+        user.building?.publicId === building.publicId
+      );
+    }),
 
-  // 1. Computed capabilities (The "Security" Layer)
-  withComputed((store) => {
-    const authStore = inject(AuthStore);
+    isAdminView: computed(() => !store._authStore.isRootUser()),
+  })),
 
-    return {
-      // Permission signals
-      canEdit: computed(() => {
-        const user = authStore.user();
-        const building = store.building();
-        if (!user || !building) return false;
-        return (
-          authStore.isRootUser() ||
-          user.building?.publicId === building.publicId
-        );
-      }),
-
-      isAdminView: computed(() => !authStore.isRootUser()),
-    };
-  }),
-
-  // 2. Core Methods (The "Data" Layer)
-  withMethods((store) => {
-    const buildingService = inject(BuildingService);
-
-    return {
-      loadById: rxMethod<string>(
-        pipe(
-          tap(() => patchState(store, { callState: 'loading' })),
-          switchMap((id) =>
-            buildingService.getById(id).pipe(
-              tapResponse({
-                next: (res) =>
-                  patchState(store, {
-                    building: res.data,
-                    callState: 'loaded',
-                  }),
-                error: (err: any) =>
-                  patchState(store, {
-                    callState: {
-                      error: err.error?.message || 'Failed to load building',
-                    },
-                  }),
-              }),
-            ),
+  withMethods((store) => ({
+    loadById: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, { callState: 'loading' })),
+        switchMap((id) =>
+          store._buildingService.getById(id).pipe(
+            tapResponse({
+              next: (res) =>
+                patchState(store, {
+                  building: res.data,
+                  callState: 'loaded',
+                }),
+              error: (err: any) =>
+                patchState(store, {
+                  callState: {
+                    error: err.error?.message || 'Failed to load building',
+                  },
+                }),
+            }),
           ),
         ),
       ),
-
-      clearContext: () =>
-        patchState(store, { building: null, callState: 'idle' }),
-    };
+    ),
+    clearContext: () =>
+      patchState(store, { building: null, callState: 'loaded' }),
+  })),
+  withBuildingUsersStore,
+  withHooks({
+    onInit(store) {
+      effect(() => {
+        const building = store.building();
+        if (building) {
+          store.loadAll({
+            first: 0,
+            rows: 10,
+            buildingId: store.building()?.publicId,
+          });
+        }
+      });
+    },
   }),
 );

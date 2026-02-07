@@ -1,7 +1,7 @@
 import { Route } from '@angular/router';
-import { MainLayout } from './features/layout/main-layout';
-import { authGuard, roleGuard } from './features/auth/guards';
+import { authGuard, roleGuard } from '@core/guards';
 import { RoleEnum } from '@parking-system/libs';
+import { MainLayout } from './features/layout/main-layout';
 
 export const appRoutes: Route[] = [
   {
@@ -18,7 +18,7 @@ export const appRoutes: Route[] = [
       {
         path: 'buildings',
         canActivate: [roleGuard],
-        data: { roles: [RoleEnum.ROOT] },
+        data: { roles: [RoleEnum.ROOT, RoleEnum.ADMIN] },
         loadChildren: () =>
           import('./features/buildings/building.routes').then(
             (m) => m.BUILDING_ROUTES,

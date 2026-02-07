@@ -1,0 +1,100 @@
+<div>
+  <!-- header -->
+  <div
+    class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8"
+  >
+    <div class="flex flex-col gap-2">
+      <h1
+        class="text-[#0d141c] text-4xl font-black leading-tight tracking-[-0.033em]"
+      >
+        {{store.building()?.name}}
+      </h1>
+      <p class="text-[#4b739b] text-base font-normal">
+        Manage parking allocations and resident data for this building.
+      </p>
+    </div>
+    <p-button label="Trigger Raffle" />
+  </div>
+
+  <!-- Resident Management Section -->
+
+  <div class="pt-4">
+    <p-table
+      #dt
+      [filterDelay]="500"
+      [value]="store.usersEntities()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="10"
+      [totalRecords]="store.pagination()?.total || 0"
+      [loading]="store.isLoading()"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings"
+      [rowsPerPageOptions]="[5, 10, 25, 50]"
+    >
+      >
+      <ng-template pTemplate="caption">
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold">Resident list</h3>
+          <p-button
+            label="Resident"
+            icon="pi pi-plus"
+            severity="secondary"
+            size="small"
+            variant="outlined"
+          />
+        </div>
+      </ng-template>
+      <ng-template #header>
+        <tr>
+          <th class="text-xs font-semibold uppercase tracking-wider">Name</th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Email</th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Role</th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Unit</th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Status</th>
+          <th
+            class="text-xs font-semibold uppercase tracking-wider text-center"
+          >
+            Acciones
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-user>
+        <tr>
+          <td class="text-sm font-medium">
+            {{ user.firstName }} {{ user.lastName }}
+          </td>
+          <td class="text-sm font-medium">{{ user.email }}</td>
+          <td class="text-sm font-medium">
+            <p-tag [value]="user.role.name" />
+          </td>
+          <td class="text-sm font-medium">S-401</td>
+          <td class="text-sm font-medium">{{user.status}}</td>
+          <td>
+            <div class="text-center">
+              <p-button
+                icon="pi pi-search"
+                severity="secondary"
+                size="small"
+                text
+              />
+              <p-button
+                icon="pi pi-pencil"
+                severity="secondary"
+                size="small"
+                text
+              />
+              <p-button
+                icon="pi pi-trash"
+                severity="secondary"
+                size="small"
+                text
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

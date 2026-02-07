@@ -1,6 +1,9 @@
+import { SearchBuildingDto } from '@common/dtos';
+import { PaginatedResult, paginateQuery } from '@common/utils';
 import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -9,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -46,9 +49,35 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<User[]> {
-    this.logger.log('Fetching all active users');
-    return await this.userRepository.find();
+  async findAll(
+    filters: SearchBuildingDto,
+    user: User,
+  ): Promise<PaginatedResult<User>> {
+    const publicId = user.building?.publicId ?? filters.buildingId;
+    const { globalFilter } = filters;
+
+    if (!publicId) {
+      throw new BadRequestException('Target not found');
+    }
+
+    const queryOptions: any = {};
+
+    if (globalFilter) {
+      queryOptions.where = [
+        { firstName: Like(`%${globalFilter}%`) },
+        { lastName: Like(`%${globalFilter}%`) },
+        { email: Like(`%${globalFilter}%`) },
+      ];
+    }
+
+    const query = this.userRepository
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.role', 'role')
+      .leftJoin('users.building', 'building')
+      .where(queryOptions)
+      .andWhere('building.publicId = :publicId', { publicId });
+
+    return await paginateQuery(query, filters);
   }
 
   async findOneById(id: number): Promise<User | null> {
@@ -66,7 +95,7 @@ export class UsersService {
 
     const user = await this.userRepository.findOne({
       where: { publicId },
-      relations: ['role'],
+      relations: ['role', 'building'],
     });
 
     if (!user) {

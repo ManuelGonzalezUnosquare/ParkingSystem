@@ -1,17 +1,24 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { BuildingsStore } from '@core/stores';
+import { BuildingForm } from '@features/buildings/components';
 import { BuildingModel, Search } from '@parking-system/libs';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { BuildingForm } from './components';
-import { BuildingsStore } from '@core/stores';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 
 @Component({
   selector: 'app-buildings',
-  imports: [TableModule, ButtonModule, InputTextModule, ConfirmDialogModule],
+  imports: [
+    TableModule,
+    ButtonModule,
+    InputTextModule,
+    ConfirmDialogModule,
+    RouterLink,
+  ],
   templateUrl: './buildings.html',
   styleUrl: './buildings.css',
   standalone: true,
