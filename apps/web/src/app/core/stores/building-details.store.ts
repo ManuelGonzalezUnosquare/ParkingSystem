@@ -22,20 +22,18 @@ import { AuthStore } from './auth.store';
 import { withBuildingUsersStore } from './building-users.store';
 
 interface BuildingDetailState {
-  building: BuildingModel | null;
+  building: BuildingModel | undefined;
 }
 
-interface BuildingDetailState {
-  building: BuildingModel | null;
-}
+const initialState: BuildingDetailState = {
+  building: undefined,
+};
 
 export const BuildingDetailStore = signalStore(
   { providedIn: 'root' },
   withDevtools('building-details'),
   withReset(),
-  withState<BuildingDetailState>({
-    building: null,
-  }),
+  withState(initialState),
   withCallState(),
   withProps(() => ({
     _authStore: inject(AuthStore),
@@ -79,7 +77,7 @@ export const BuildingDetailStore = signalStore(
       ),
     ),
     clearContext: () =>
-      patchState(store, { building: null, callState: 'loaded' }),
+      patchState(store, { building: undefined, callState: 'loaded' }),
   })),
   withBuildingUsersStore,
   withHooks({

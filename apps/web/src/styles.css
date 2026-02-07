@@ -42,11 +42,7 @@
 }
 
 .p-datatable {
-  border-width: 1px;
-
-  border-radius: 10px;
-  border-color: var(--color-slate-200);
-  box-shadow: var(--shadow-md);
+  border-width: 0px;
 }
 .p-datatable .p-datatable-thead > tr > th {
   background-color: var(--color-slate-50);

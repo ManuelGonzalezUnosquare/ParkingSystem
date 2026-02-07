@@ -20,6 +20,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   ApiPaginationMeta,
   BuildingModel,
+  RoleEnum,
   SearchBuildingUsers,
   UserModel,
 } from '@parking-system/libs';
@@ -49,6 +50,14 @@ export const withBuildingUsersStore = signalStoreFeature(
   withComputed((store) => ({
     isLoading: computed(() => {
       return store.callState() === 'loading';
+    }),
+    adminCount: computed(() => {
+      return store
+        .usersEntities()
+        .filter((f) => f.role.name === RoleEnum.ADMIN);
+    }),
+    residentCount: computed(() => {
+      return store.usersEntities().filter((f) => f.role.name === RoleEnum.USER);
     }),
   })),
   withMethods((store) => ({

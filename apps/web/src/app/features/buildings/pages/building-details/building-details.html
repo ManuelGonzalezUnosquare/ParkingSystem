@@ -16,9 +16,89 @@
     <p-button label="Trigger Raffle" />
   </div>
 
-  <!-- Resident Management Section -->
+  <!-- cards (mock) -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
+    <p-card>
+      <ng-template #title>
+        <div class="flex justify-between items-start">
+          <p
+            class="text-[#4b739b] text-sm font-medium uppercase tracking-wider"
+          >
+            Total Residents
+          </p>
+          <i class="pi pi-user text-blue-500"></i>
+        </div>
+      </ng-template>
+      <ng-template #subtitle>
+        <p
+          class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
+        >
+          {{store.residentCount().length}}
+        </p>
+      </ng-template>
+      <ng-template #footer>
+        <div class="flex gap-2 items-center text-sm font-bold">
+          <span class="text-emerald-600">+ {{store.adminCount().length}} </span>
+          <span class="text-slate-400 text-xs"> administrators</span>
+        </div>
+      </ng-template>
+    </p-card>
+    <p-card>
+      <ng-template #title>
+        <div class="flex justify-between items-start">
+          <p
+            class="text-[#4b739b] text-sm font-medium uppercase tracking-wider"
+          >
+            Total Vehicles
+          </p>
+          <i class="pi pi-car text-blue-500"></i>
+        </div>
+      </ng-template>
+      <ng-template #subtitle>
+        <p
+          class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
+        >
+          0
+        </p>
+      </ng-template>
+      <ng-template #footer>
+        <div class="flex gap-2 items-center text-sm font-bold">
+          <span class="text-emerald-600">0 </span>
+          <span class="text-slate-400 text-xs"> something</span>
+        </div>
+      </ng-template>
+    </p-card>
 
-  <div class="pt-4">
+    <p-card>
+      <ng-template #title>
+        <div class="flex justify-between items-start">
+          <p
+            class="text-[#4b739b] text-sm font-medium uppercase tracking-wider"
+          >
+            Utilization
+          </p>
+          <p class="font-bold text-sm text-blue-500 tracking-wider">80%</p>
+        </div>
+      </ng-template>
+      <ng-template #subtitle>
+        <p
+          class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
+        >
+          0
+        </p>
+      </ng-template>
+      <ng-template #footer>
+        <div class="flex gap-2 items-center text-sm font-bold">
+          <span class="text-slate-400 text-xs">
+            120 out of 1500 spots assigned</span
+          >
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- Resident Management Section -->
+  <p-card>
     <p-table
       #dt
       [filterDelay]="500"
@@ -37,13 +117,24 @@
       <ng-template pTemplate="caption">
         <div class="flex justify-between items-center">
           <h3 class="font-semibold">Resident list</h3>
-          <p-button
-            label="Resident"
-            icon="pi pi-plus"
-            severity="secondary"
-            size="small"
-            variant="outlined"
-          />
+          <div class="flex gap-2">
+            <input
+              variant="outlined"
+              id="search"
+              pInputText
+              pSize="small"
+              placeholder="Search resident..."
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+
+            <p-button
+              label="Resident"
+              icon="pi pi-plus"
+              severity="secondary"
+              size="small"
+              variant="outlined"
+            />
+          </div>
         </div>
       </ng-template>
       <ng-template #header>
@@ -96,5 +187,5 @@
         </tr>
       </ng-template>
     </p-table>
-  </div>
+  </p-card>
 </div>

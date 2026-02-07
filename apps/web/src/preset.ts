@@ -4,16 +4,17 @@ import Aura from '@primeuix/themes/aura';
 export const MyPreset = definePreset(Aura, {
   semantic: {
     primary: {
-      '50': '#e6effd',
-      '100': '#ccdefb',
-      '200': '#99bdf7',
-      '300': '#669df2',
-      '400': '#337cee',
-      '500': '#005bea',
-      '600': '#0049bb',
-      '700': '#00378c',
-      '800': '#00245e',
-      '900': '#00122f',
+      '50': '#eff9ff',
+      '100': '#daf1ff',
+      '200': '#bde7ff',
+      '300': '#90daff',
+      '400': '#5cc4fe',
+      '500': '#36a6fb',
+      '600': '#1985f0',
+      '700': '#1871dd',
+      '800': '#1a5bb3',
+      '900': '#1b4f8d',
+      '950': '#153056',
     },
   },
   components: {

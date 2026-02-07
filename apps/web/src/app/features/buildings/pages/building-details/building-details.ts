@@ -2,12 +2,14 @@ import { Component, inject, input, OnInit } from '@angular/core';
 import { BuildingDetailStore } from '@core/stores';
 import { SearchBuildingUsers } from '@parking-system/libs';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-building-details',
-  imports: [ButtonModule, TableModule, TagModule],
+  imports: [ButtonModule, TableModule, TagModule, CardModule, InputTextModule],
   templateUrl: './building-details.html',
   styleUrl: './building-details.css',
 })
