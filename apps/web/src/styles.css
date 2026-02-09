@@ -61,3 +61,14 @@
   border-right: 1px;
   border-top-right-radius: 10px;
 }
+
+.p-panelmenu-header-link.p-panelmenu-item-link-active {
+  background: var(--p-blue-100);
+  color: var(--p-blue-700);
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+}
+
+.p-panelmenu-header-link.p-panelmenu-item-link-active .p-panelmenu-header-icon {
+  color: var(--cyan-700);
+}

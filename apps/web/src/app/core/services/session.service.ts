@@ -30,34 +30,37 @@ export class SessionService {
 
   logout() {
     this.authStore.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigateByUrl('/auth/login');
   }
 
   private getFilteredMenu(role: string): MenuItem[] {
     const menuConfig: (MyItem & { allowedRoles: string[] })[] = [
       {
-        label: 'Dashboard',
+        label: 'Home',
         icon: 'pi pi-chart-bar',
         routerLink: '/app',
-        allowedRoles: [RoleEnum.ROOT],
-      },
-      {
-        label: 'Buildings',
-        icon: 'pi pi-building',
-        routerLink: '/app/buildings',
-        allowedRoles: [RoleEnum.ROOT],
+        allowedRoles: [RoleEnum.ROOT, RoleEnum.ADMIN, RoleEnum.USER],
+        routerLinkActiveOptions: {
+          exact: true,
+        },
       },
       {
         label: 'Resident List',
         icon: 'pi pi-users',
         routerLink: '/admin/users',
         allowedRoles: [RoleEnum.ADMIN],
+        routerLinkActiveOptions: {
+          exact: true,
+        },
       },
       {
         label: 'Allocation History',
         icon: 'pi pi-building',
         routerLink: '/admin/buildings',
         allowedRoles: [RoleEnum.ADMIN],
+        routerLinkActiveOptions: {
+          exact: true,
+        },
       },
       {
         label: 'Settings',

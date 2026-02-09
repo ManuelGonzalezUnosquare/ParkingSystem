@@ -117,7 +117,10 @@ export class UsersService {
 
   async findOneById(id: number): Promise<User | null> {
     this.logger.log(`Searching for user with ID: ${id}`);
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['role', 'building', 'vehicles'],
+    });
 
     if (!user) {
       this.logger.warn(`User with ID: ${id} not found`);
@@ -142,7 +145,7 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<User | null> {
     const result = await this.userRepository.findOne({
       where: { email },
-      relations: ['role'],
+      relations: ['role', 'building', 'vehicles'],
     });
     return result;
   }
