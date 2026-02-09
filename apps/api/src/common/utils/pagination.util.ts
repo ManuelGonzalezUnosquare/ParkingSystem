@@ -38,16 +38,22 @@ export async function paginateQuery<T>(
   query: SelectQueryBuilder<T>,
   searchDto: SearchDto,
 ): Promise<PaginatedResult<T>> {
-  const { first, rows, sortField, sortOrder } = searchDto;
+  const first = searchDto.first || 0;
+  const rows = searchDto.rows || 10;
+  const sortField = searchDto.sortField;
+  const sortOrder = searchDto.sortOrder === 1 ? 'ASC' : 'DESC';
 
-  const orderBy = {
-    [`${query.alias}.${sortField}`]: sortOrder === 1 ? 'ASC' : 'DESC',
-  } as any;
+  if (sortField) {
+    const orderColumn = sortField.includes('.')
+      ? sortField
+      : `${query.alias}.${sortField}`;
+
+    query.orderBy(orderColumn, sortOrder);
+  }
 
   const [entities, count] = await query
     .skip(first)
     .take(rows)
-    .orderBy(orderBy)
     .getManyAndCount();
 
   return {
@@ -55,7 +61,7 @@ export async function paginateQuery<T>(
     meta: {
       total: count,
       page: Math.floor(first / rows) + 1,
-      lastPage: Math.ceil(count / rows),
+      lastPage: Math.ceil(count / rows) || 1,
       limit: rows,
     },
   };
