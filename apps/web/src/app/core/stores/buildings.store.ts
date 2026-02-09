@@ -31,6 +31,7 @@ import {
 } from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { BuildingService } from '../../features/buildings/services/building.service';
+import { FeedbackService } from '@core/services';
 
 const bConfig = entityConfig({
   entity: type<BuildingModel>(),
@@ -48,6 +49,7 @@ export const BuildingsStore = signalStore(
   }),
   withProps(() => ({
     _buildingService: inject(BuildingService),
+    _feedbackService: inject(FeedbackService),
   })),
   withComputed((store) => ({
     isLoading: computed(() => {
@@ -86,6 +88,10 @@ export const BuildingsStore = signalStore(
         patchState(store, addEntity(response.data, bConfig), {
           callState: 'loaded',
         });
+        store._feedbackService.showSuccess(
+          'Building Created',
+          `${response.data.name} has been registered.`,
+        );
         return true;
       } catch (err: any) {
         patchState(store, {
@@ -107,6 +113,11 @@ export const BuildingsStore = signalStore(
             callState: 'loaded',
           },
         );
+        store._feedbackService.showSuccess(
+          'Building Updated',
+          `${response.data.name} has been updated.`,
+        );
+
         return true;
       } catch (err: any) {
         const errorMsg = err.error?.message || 'Update failed';

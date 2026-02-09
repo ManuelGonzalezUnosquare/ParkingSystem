@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
+import { MessageService } from 'primeng/api';
 
 export interface FeedbackMessage {
   message: string;
@@ -8,19 +9,39 @@ export interface FeedbackMessage {
 
 @Injectable({ providedIn: 'root' })
 export class FeedbackService {
-  // Usamos un signal para el mensaje actual
+  private messageService = inject(MessageService);
   private _currentFeedback = signal<FeedbackMessage | null>(null);
-
-  // Exposición pública (Solo lectura)
+  private readonly lifeTime = 5000;
   readonly currentFeedback = this._currentFeedback.asReadonly();
+  //TODO: handle sticky messages for critical errors
 
-  showError(message: string, code?: string) {
-    this._currentFeedback.set({ message, type: 'error', code });
-    // Auto-limpieza opcional después de 5 segundos
-    setTimeout(() => this.clear(), 5000);
+  showError(summary: string, detail?: string) {
+    this.messageService.add({
+      severity: 'error',
+      summary: summary || 'Error',
+      detail: detail || 'Operation failed',
+      life: this.lifeTime,
+    });
   }
 
+  showSuccess(summary: string, detail?: string) {
+    this.messageService.add({
+      severity: 'success',
+      summary: summary || 'Success',
+      detail: detail || 'Action completed successfully',
+      life: this.lifeTime,
+    });
+  }
+
+  showInfo(summary: string, detail?: string) {
+    this.messageService.add({
+      severity: 'info',
+      summary,
+      detail,
+      life: this.lifeTime,
+    });
+  }
   clear() {
-    this._currentFeedback.set(null);
+    this.messageService.clear();
   }
 }

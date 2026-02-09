@@ -41,7 +41,6 @@ import { FeedbackService } from '@core/services';
 export class ApiFeedbackComponent {
   private feedbackService = inject(FeedbackService);
 
-  // Escuchamos el signal global
   protected feedback = this.feedbackService.currentFeedback;
 
   close() {
