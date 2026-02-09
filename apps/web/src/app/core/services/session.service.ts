@@ -33,6 +33,14 @@ export class SessionService {
     this.router.navigateByUrl('/auth/login');
   }
 
+  navigateToPasswordRecoveryWithCode(code?: string) {
+    //TODO: FIX THIS WITH ENV
+    const isProd = false; //environment.isProd
+    if (code && !isProd) {
+      this.router.navigateByUrl('/auth/password-recovery' + code);
+    }
+  }
+
   private getFilteredMenu(role: string): MenuItem[] {
     const menuConfig: (MyItem & { allowedRoles: string[] })[] = [
       {

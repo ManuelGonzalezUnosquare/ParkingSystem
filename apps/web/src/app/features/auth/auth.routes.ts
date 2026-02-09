@@ -11,16 +11,18 @@ export const AUTH_ROUTES: Routes = [
         loadComponent: () => import('./pages/login/login').then((m) => m.Login),
       },
       {
-        path: 'register',
-        loadComponent: () =>
-          import('./pages/register/register').then((m) => m.Register),
-      },
-      {
         path: 'password-recovery',
         loadComponent: () =>
           import('./pages/password-recovery/password-recovery').then(
             (m) => m.PasswordRecovery,
           ),
+      },
+      {
+        path: 'password-recovery-confirm',
+        loadComponent: () =>
+          import(
+            './pages/password-recovery-confirm/password-recovery-confirm'
+          ).then((m) => m.PasswordRecoveryConfirm),
       },
     ],
   },

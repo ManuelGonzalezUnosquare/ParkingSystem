@@ -10,4 +10,5 @@ export const ERROR_MESSAGES: Record<
     `${label} cannot exceed ${args.requiredLength} characters.`,
   min: (label, args) => `${label} must be at least ${args.min}.`,
   pattern: (label) => `${label} format is invalid.`,
+  mismatch: () => `Password and Confirm Password are different values.`,
 };

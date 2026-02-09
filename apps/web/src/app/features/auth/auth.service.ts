@@ -7,6 +7,8 @@ import {
   ApiResponse,
   SessionModel,
   UserModel,
+  IResetPasswordRequest,
+  IResetPasswordByCode,
 } from '@parking-system/libs';
 
 @Injectable({
@@ -24,5 +26,29 @@ export class AuthService {
   }
   getCurrentUser(): Observable<ApiResponse<UserModel>> {
     return this.request.get<UserModel>(`${this.endpoint}/me`);
+  }
+
+  requestResetPassword(
+    payload: IResetPasswordRequest,
+  ): Observable<ApiResponse<string>> {
+    return this.request.post<string>(
+      `${this.endpoint}/reset-password-request`,
+      payload,
+    );
+  }
+
+  resetPasswordConfirm(
+    payload: IResetPasswordByCode,
+  ): Observable<ApiResponse<SessionModel>> {
+    return this.request.post<SessionModel>(
+      `${this.endpoint}/reset-password-confirm`,
+      payload,
+    );
+  }
+
+  validateResetCode(code: string): Observable<ApiResponse<string>> {
+    return this.request.post<string>(`${this.endpoint}/validate-reset-code/`, {
+      code,
+    });
   }
 }

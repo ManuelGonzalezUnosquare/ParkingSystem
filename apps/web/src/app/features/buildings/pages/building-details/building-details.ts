@@ -8,7 +8,7 @@ import {
 import { BuildingDetailStore } from '@core/stores';
 import { UserForm } from '@features/buildings/components';
 import { SearchBuildingUsers, UserModel } from '@parking-system/libs';
-import { RoleTag, UserStatusTag } from '@shared/ui';
+import { RoleTag } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -18,14 +18,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-building-details',
-  imports: [
-    ButtonModule,
-    TableModule,
-    RoleTag,
-    CardModule,
-    InputTextModule,
-    UserStatusTag,
-  ],
+  imports: [ButtonModule, TableModule, RoleTag, CardModule, InputTextModule],
   templateUrl: './building-details.html',
   styleUrl: './building-details.css',
   standalone: true,

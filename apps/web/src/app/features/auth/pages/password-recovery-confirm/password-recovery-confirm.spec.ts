@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Register } from './register';
+import { PasswordRecoveryConfirm } from './password-recovery-confirm';
 
-describe('Register', () => {
-  let component: Register;
-  let fixture: ComponentFixture<Register>;
+describe('PasswordRecoveryConfirm', () => {
+  let component: PasswordRecoveryConfirm;
+  let fixture: ComponentFixture<PasswordRecoveryConfirm>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Register]
+      imports: [PasswordRecoveryConfirm],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Register);
+    fixture = TestBed.createComponent(PasswordRecoveryConfirm);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
