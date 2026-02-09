@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { UsersService } from '@modules/users/users.service';
+import { UsersService } from '@modules/users/services/users.service';
 
 export type MockUserService = {
   [P in keyof UsersService]: jest.Mock<any>;

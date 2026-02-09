@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { RoleEnum } from '@parking-system/libs';
 import { CreateUserDto } from '../auth/dtos/create-user.dto';
-import { UsersService } from './users.service';
+import { UsersService } from './services/users.service';
 
 @Controller('users')
 export class UsersController {

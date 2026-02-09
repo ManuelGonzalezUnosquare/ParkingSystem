@@ -4,7 +4,7 @@ import {
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
-import { Role, User } from '@database/entities';
+import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/buildings.service';
 import {
@@ -18,6 +18,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
 import { Like, Repository } from 'typeorm';
+import { RoleService } from './role.service';
 
 @Injectable()
 export class UsersService {
@@ -26,10 +27,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
     private readonly cryptoService: CryptoService,
     private readonly buildingService: BuildingsService,
+    private readonly roleService: RoleService,
   ) {}
 
   async create(dto: CreateUserDto, user: User): Promise<User> {
@@ -40,7 +40,7 @@ export class UsersService {
     const [emailExists, building, role] = await Promise.all([
       this.userRepository.exists({ where: { email: dto.email } }),
       this.buildingService.findOneByPublicId(dto.buildingId),
-      this.roleRepository.findOneBy({ name: dto.role }),
+      this.roleService.findByName(dto.role),
     ]);
 
     if (emailExists)
@@ -130,7 +130,7 @@ export class UsersService {
 
     const user = await this.userRepository.findOne({
       where: { publicId },
-      relations: ['role', 'building'],
+      relations: ['role', 'building', 'vehicles'],
     });
 
     if (!user) {
@@ -179,7 +179,7 @@ export class UsersService {
     }
 
     if (dto.role) {
-      validations.push(this.roleRepository.findOneBy({ name: dto.role }));
+      validations.push(this.roleService.findByName(dto.role));
     } else {
       validations.push(Promise.resolve(existingUser.role));
     }
@@ -229,6 +229,9 @@ export class UsersService {
 
     try {
       await this.userRepository.softDelete(user.id);
+      //delete vehicle if exists
+      //if has a busy slot: make it available
+
       this.logger.log(`User ID: ${publicId} successfully removed`);
     } catch (error) {
       this.logger.error(

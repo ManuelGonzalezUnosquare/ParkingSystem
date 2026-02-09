@@ -28,6 +28,13 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
+  @Column({ type: 'varchar', length: 50, default: null })
+  passwordResetCode: string;
+
+  @Exclude()
+  @Column({ type: 'bit', default: true })
+  requirePasswordChange: boolean;
+
   @Column({ type: 'int', default: 0 })
   priorityScore: number;
 

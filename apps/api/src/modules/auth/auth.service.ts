@@ -1,5 +1,5 @@
 import { User } from '@database/entities';
-import { UsersService } from '@modules/users/users.service';
+import { UsersService } from '@modules/users/services/users.service';
 import {
   forwardRef,
   Inject,
