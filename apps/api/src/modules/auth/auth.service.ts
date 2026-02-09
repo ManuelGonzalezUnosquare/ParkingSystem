@@ -37,6 +37,10 @@ export class AuthService {
     if (isMatch) {
       return user;
     }
+    if (user.passwordResetCode) {
+      await this.userService.cleanRecoveryCode(user.id);
+      delete user.passwordResetCode;
+    }
 
     throw new UnauthorizedException('Invalid credentials');
   }
@@ -58,5 +62,12 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       user,
     };
+  }
+
+  async validateResetCode(code: string): Promise<string> {
+    console.log('codeeeeeeeeeeee', code);
+    const email = await this.userService.findByResetCode(code);
+    if (!email) throw new UnauthorizedException('Invalid or expired code');
+    return email;
   }
 }

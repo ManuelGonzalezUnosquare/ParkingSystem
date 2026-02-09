@@ -13,4 +13,8 @@ export const createMockUserService = (): MockUserService => ({
   findOneByEmail: jest.fn(),
   update: jest.fn(),
   remove: jest.fn(),
+  resetPasswordRequest: jest.fn(),
+  resetPassword: jest.fn(),
+  findByResetCode: jest.fn(),
+  cleanRecoveryCode: jest.fn(),
 });

@@ -1,11 +1,12 @@
 import { SearchBuildingDto } from '@common/dtos';
 import {
+  generateSecureCode,
   PaginatedResult,
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
 import { User, Vehicle } from '@database/entities';
-import { CreateUserDto } from '@modules/auth/dtos';
+import { CreateUserDto, ResetPasswordByCodeDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/buildings.service';
 import {
   BadRequestException,
@@ -14,6 +15,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
@@ -124,7 +126,6 @@ export class UsersService {
 
     return await paginateQuery(query, filters);
   }
-
   async findOneById(id: number): Promise<User | null> {
     this.logger.log(`Searching for user with ID: ${id}`);
     const user = await this.userRepository.findOne({
@@ -159,7 +160,13 @@ export class UsersService {
     });
     return result;
   }
-
+  async findByResetCode(code: string): Promise<string | null> {
+    const result = await this.userRepository.findOne({
+      where: { passwordResetCode: code },
+    });
+    const email = result ? result.email : null;
+    return email;
+  }
   async update(
     publicId: string,
     dto: CreateUserDto,
@@ -244,7 +251,6 @@ export class UsersService {
       await queryRunner.release();
     }
   }
-
   async remove(publicId: string): Promise<void> {
     this.logger.log(`Initiating removal for user ID: ${publicId}`);
     const user = await this.findOneByPublicId(publicId);
@@ -266,5 +272,48 @@ export class UsersService {
       );
       throw new InternalServerErrorException('Could not remove user');
     }
+  }
+
+  async resetPasswordRequest(email: string): Promise<string> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    // 8 digits code
+    const resetCode = generateSecureCode(8);
+
+    user.passwordResetCode = resetCode;
+    await this.userRepository.save(user);
+
+    this.logger.log(`Password reset code generated for: ${email}`);
+
+    return resetCode;
+  }
+
+  async resetPassword(dto: ResetPasswordByCodeDto): Promise<User> {
+    const { email, code, newPassword } = dto;
+
+    const user = await this.userRepository.findOne({
+      where: { email, passwordResetCode: code },
+      relations: ['role', 'building'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or reset code');
+    }
+
+    try {
+      const hashedPassword = await this.cryptoService.hash(newPassword);
+
+      user.password = hashedPassword;
+      user.passwordResetCode = null;
+      await this.userRepository.save(user);
+      return user;
+    } catch (error) {
+      this.logger.error(`Error resetting password: ${error.message}`);
+      throw new InternalServerErrorException('Could not reset password');
+    }
+  }
+
+  async cleanRecoveryCode(id: number) {
+    await this.userRepository.update(id, { passwordResetCode: null });
   }
 }
