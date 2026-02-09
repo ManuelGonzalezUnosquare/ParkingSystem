@@ -10,6 +10,12 @@
       placeholder="Clock tower west"
       [invalid]="form.controls.name.invalid && form.controls.name.touched"
     />
+
+    <app-form-validation-error
+      [touched]="form.controls.name.touched"
+      [errors]="form.controls.name.errors"
+      label="Name"
+    />
   </div>
   <!-- address -->
   <div class="form-control">
@@ -22,6 +28,11 @@
       placeholder="123 Main Street"
       [invalid]="form.controls.address.invalid && form.controls.address.touched"
     />
+    <app-form-validation-error
+      [touched]="form.controls.address.touched"
+      [errors]="form.controls.address.errors"
+      label="Address"
+    />
   </div>
   <!-- slots number -->
   <div class="form-control">
@@ -33,7 +44,14 @@
       id="totSlots"
       [invalid]="form.controls.totalSlots.invalid && form.controls.totalSlots.touched"
     />
+    <app-form-validation-error
+      [touched]="form.controls.totalSlots.touched"
+      [errors]="form.controls.totalSlots.errors"
+      label="Slots"
+    />
   </div>
+
+  <app-form-feedback [callState]="store.callState()" />
 
   <div class="mt-10 flex gap-3 items-center justify-end">
     <p-button

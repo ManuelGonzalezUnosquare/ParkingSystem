@@ -11,6 +11,12 @@
         placeholder="John "
         [invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
       />
+
+      <app-form-validation-error
+        [touched]="form.controls.firstName.touched"
+        [errors]="form.controls.firstName.errors"
+        label="First Name"
+      />
     </div>
     <!-- last name -->
     <div class="form-control">
@@ -21,6 +27,11 @@
         id="lName"
         pInputText
         placeholder="Doe"
+      />
+      <app-form-validation-error
+        [touched]="form.controls.lastName.touched"
+        [errors]="form.controls.lastName.errors"
+        label="Last Name"
       />
     </div>
   </div>
@@ -37,6 +48,12 @@
       placeholder="john.doe@test.com"
       [invalid]="form.controls.email.invalid && form.controls.email.touched"
     />
+
+    <app-form-validation-error
+      [touched]="form.controls.email.touched"
+      [errors]="form.controls.email.errors"
+      label="Email"
+    />
   </div>
   <!-- roles -->
   @if(!sessionService.isAdmin()){
@@ -50,6 +67,13 @@
       required
       fluid
       appendTo="body"
+      [invalid]="form.controls.role.invalid && form.controls.role.touched"
+    />
+
+    <app-form-validation-error
+      [touched]="form.controls.role.touched"
+      [errors]="form.controls.role.errors"
+      label="Role"
     />
   </div>
   }
@@ -68,6 +92,13 @@
       id="lPlate"
       pInputText
       placeholder="123456161"
+      [invalid]="form.controls.licensePlate.invalid && form.controls.licensePlate.touched"
+    />
+
+    <app-form-validation-error
+      [touched]="form.controls.licensePlate.touched"
+      [errors]="form.controls.licensePlate.errors"
+      label="License Plate"
     />
   </div>
   <!-- description -->
@@ -80,8 +111,17 @@
       id="lPlate"
       pTextarea
       placeholder="2016 Volkswagen Touareg – V6 3.0TDI - Red"
+      [invalid]="form.controls.description.invalid && form.controls.description.touched"
     ></textarea>
+
+    <app-form-validation-error
+      [touched]="form.controls.description.touched"
+      [errors]="form.controls.description.errors"
+      label="Description"
+    />
   </div>
+
+  <app-form-feedback [callState]="store.callState()" />
 
   <div class="mt-10 flex gap-3 items-center justify-end">
     <p-button

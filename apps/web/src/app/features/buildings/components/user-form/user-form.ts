@@ -16,6 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { IUserForm } from './iUser-form';
 import { requireVehicleDetails } from './vehicle-details.validator';
+import { FormFeedback, FormValidationError } from '@shared/ui/feedback';
 
 @Component({
   selector: 'app-user-form',
@@ -26,6 +27,8 @@ import { requireVehicleDetails } from './vehicle-details.validator';
     SelectModule,
     TextareaModule,
     DividerModule,
+    FormValidationError,
+    FormFeedback,
   ],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css',

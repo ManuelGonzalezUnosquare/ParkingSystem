@@ -12,6 +12,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IBuildingForm } from './iBuilding-form';
 import { BuildingModel, ICreateBuilding } from '@parking-system/libs';
 import { BuildingsStore } from '@core/stores';
+import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
 
 @Component({
   selector: 'app-building-form',
@@ -20,6 +21,8 @@ import { BuildingsStore } from '@core/stores';
     InputTextModule,
     InputNumberModule,
     ButtonModule,
+    FormValidationError,
+    FormFeedback,
   ],
   templateUrl: './building-form.html',
   styleUrl: './building-form.css',

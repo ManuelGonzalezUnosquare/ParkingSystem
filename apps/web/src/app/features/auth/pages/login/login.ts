@@ -8,10 +8,10 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '@core/stores';
 import { ILogin } from '@parking-system/libs';
-import { FormValidationError } from '@shared/ui';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ILoginForm } from './login-form';
+import { FormFeedback, FormValidationError } from '@shared/ui/feedback';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +21,7 @@ import { ILoginForm } from './login-form';
     ButtonModule,
     RouterLink,
     FormValidationError,
+    FormFeedback,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',

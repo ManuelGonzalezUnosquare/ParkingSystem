@@ -5,17 +5,7 @@ import {
   input,
 } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
-
-const ERROR_MESSAGES: Record<string, (label: string, args: any) => string> = {
-  required: (label) => `${label} is required.`,
-  email: () => `Please enter a valid email address.`,
-  minlength: (label, args) =>
-    `${label} must be at least ${args.requiredLength} characters.`,
-  maxlength: (label, args) =>
-    `${label} cannot exceed ${args.requiredLength} characters.`,
-  min: (label, args) => `${label} must be at least ${args.min}.`,
-  pattern: (label) => `${label} format is invalid.`,
-};
+import { ERROR_MESSAGES } from './error-messages';
 
 @Component({
   selector: 'app-form-validation-error',
@@ -26,7 +16,7 @@ const ERROR_MESSAGES: Record<string, (label: string, args: any) => string> = {
     @if (shouldShowErrors()) {
       <div class="flex flex-column gap-1 mt-1">
         @for (error of errorMessages(); track $index) {
-          <small class="p-error block animate-fade-in text-xs">
+          <small class="p-error block animate-fade-in text-xs text-red-500">
             {{ error }}
           </small>
         }
