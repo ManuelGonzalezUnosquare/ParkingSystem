@@ -19,10 +19,17 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'buildings',
-        loadChildren: () =>
-          import('./features/buildings/building.routes').then(
-            (m) => m.BUILDING_ROUTES,
+        loadComponent: () =>
+          import('./features/buildings/pages/buildings/buildings').then(
+            (m) => m.Buildings,
           ),
+      },
+      {
+        path: 'buildings/:id/details',
+        loadComponent: () =>
+          import(
+            './features/buildings/pages/building-details/building-details'
+          ).then((m) => m.BuildingDetails),
       },
     ],
   },

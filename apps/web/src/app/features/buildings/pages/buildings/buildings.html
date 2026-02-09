@@ -68,7 +68,7 @@
               severity="secondary"
               size="small"
               text
-              [routerLink]="`/app/buildings/${building.publicId}/details`"
+              (click)="viewDetails(building)"
             />
             <p-button
               icon="pi pi-pencil"

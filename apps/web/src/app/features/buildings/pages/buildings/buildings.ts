@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { BuildingsStore } from '@core/stores';
 import { BuildingForm } from '@features/buildings/components';
 import { BuildingModel, Search } from '@parking-system/libs';
@@ -8,17 +8,11 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { TableModule, TableLazyLoadEvent } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-buildings',
-  imports: [
-    TableModule,
-    ButtonModule,
-    InputTextModule,
-    ConfirmDialogModule,
-    RouterLink,
-  ],
+  imports: [TableModule, ButtonModule, InputTextModule, ConfirmDialogModule],
   templateUrl: './buildings.html',
   styleUrl: './buildings.css',
   standalone: true,
@@ -28,6 +22,7 @@ import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 export class Buildings {
   readonly buildingStore = inject(BuildingsStore);
   readonly dialogService = inject(DialogService);
+  readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {
     width: '30vw',
@@ -61,10 +56,12 @@ export class Buildings {
         const success = await this.buildingStore.delete(building.publicId);
         if (success) {
           console.log('success');
-          // this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Building removed' });
         }
       },
     });
+  }
+  viewDetails(building: BuildingModel) {
+    this.router.navigate([`/app/buildings`, building.publicId, 'details']);
   }
   onLazyLoad(event: TableLazyLoadEvent) {
     const searchParams: Search = {
