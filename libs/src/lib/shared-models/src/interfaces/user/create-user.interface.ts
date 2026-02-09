@@ -1,4 +1,4 @@
-export class ICreateUser {
+export interface ICreateUser {
   email: string;
   firstName: string;
   lastName: string;
