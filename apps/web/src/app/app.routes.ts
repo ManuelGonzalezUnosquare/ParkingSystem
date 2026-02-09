@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
-import { authGuard } from '@core/guards';
+import { accessBuildingGuard, authGuard, roleGuard } from '@core/guards';
 import { MainLayout } from './features/layout/main-layout';
+import { RoleEnum } from '@parking-system/libs';
 
 export const appRoutes: Route[] = [
   {
@@ -19,6 +20,8 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'buildings',
+        canActivate: [roleGuard],
+        data: { roles: [RoleEnum.ROOT] },
         loadComponent: () =>
           import('./features/buildings/pages/buildings/buildings').then(
             (m) => m.Buildings,
@@ -26,6 +29,8 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'buildings/:id/details',
+        canActivate: [roleGuard, accessBuildingGuard],
+        data: { roles: [RoleEnum.ROOT, RoleEnum.ADMIN] },
         loadComponent: () =>
           import(
             './features/buildings/pages/building-details/building-details'

@@ -4,7 +4,7 @@ import {
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
-import { User } from '@database/entities';
+import { User, Vehicle } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/buildings.service';
 import {
@@ -19,6 +19,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
 import { Like, Repository } from 'typeorm';
 import { RoleService } from './role.service';
+import { VehiclesService } from '@modules/vehicles/vehicles.service';
 
 @Injectable()
 export class UsersService {
@@ -28,14 +29,13 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly cryptoService: CryptoService,
+    private readonly vehicleService: VehiclesService,
     private readonly buildingService: BuildingsService,
     private readonly roleService: RoleService,
   ) {}
 
-  async create(dto: CreateUserDto, user: User): Promise<User> {
-    PermissionValidator.validateBuildingAccess(user, dto.buildingId);
-
-    this.logger.log(`Attempting to create user with email: ${dto.email}`);
+  async create(dto: CreateUserDto, creator: User): Promise<User> {
+    PermissionValidator.validateBuildingAccess(creator, dto.buildingId);
 
     const [emailExists, building, role] = await Promise.all([
       this.userRepository.exists({ where: { email: dto.email } }),
@@ -43,20 +43,19 @@ export class UsersService {
       this.roleService.findByName(dto.role),
     ]);
 
-    if (emailExists)
-      throw new ConflictException('User with this email already exists');
+    if (emailExists) throw new ConflictException('User already exists');
     if (!building) throw new NotFoundException('Building not found');
     if (!role) throw new NotFoundException(`Role ${dto.role} not found.`);
 
-    const vehicles =
-      dto.description && dto.licensePlate
-        ? [{ description: dto.description, licensePlate: dto.licensePlate }]
-        : [];
-
-    const tempPassword = 'abc1234!'; //TODO: change this to a random string generator
+    const queryRunner =
+      this.userRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
+      const tempPassword = 'abc1234!'; // TODO: generator
       const hashedPassword = await this.cryptoService.hash(tempPassword);
+
       const newUser = this.userRepository.create({
         firstName: dto.firstName,
         lastName: dto.lastName,
@@ -64,20 +63,31 @@ export class UsersService {
         password: hashedPassword,
         role,
         building,
-        vehicles: vehicles,
       });
-      const savedUser = await this.userRepository.save(newUser);
 
-      // TODO: Enviar email con tempPassword aquí
+      const savedUser = await queryRunner.manager.save(newUser);
+      const vehicles: Vehicle[] = [];
+      if (dto.description && dto.licensePlate) {
+        const newVehicle = await this.vehicleService.create(
+          { description: dto.description, licensePlate: dto.licensePlate },
+          savedUser,
+          queryRunner.manager,
+        );
+        if (newVehicle) {
+          vehicles.push(newVehicle);
+        }
+      }
 
-      this.logger.log(`User successfully created with ID: ${savedUser.id}`);
+      await queryRunner.commitTransaction();
+      this.logger.log(`User created with ID: ${savedUser.id}`);
+      savedUser.vehicles = vehicles;
       return savedUser;
     } catch (error) {
-      this.logger.error(`Failed to create user: ${error.message}`, error.stack);
-
-      throw new InternalServerErrorException(
-        'An unexpected error occurred during user creation',
-      );
+      await queryRunner.rollbackTransaction();
+      this.logger.error(`Failed to create user: ${error.message}`);
+      throw new InternalServerErrorException('Error during user creation');
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -155,69 +165,83 @@ export class UsersService {
     dto: CreateUserDto,
     user: User,
   ): Promise<User> {
-    const existingUser = await this.userRepository.findOne({
-      where: { publicId },
-      relations: ['building', 'role', 'vehicles'],
-    });
-
+    const existingUser = await this.findOneByPublicId(publicId);
     if (!existingUser) throw new NotFoundException('User not found');
 
     PermissionValidator.validateBuildingAccess(
       user,
       existingUser.building.publicId,
     );
+
     if (dto.buildingId) {
       PermissionValidator.validateBuildingAccess(user, dto.buildingId);
     }
 
-    this.logger.log(`Updating user: ${publicId}`);
-
-    const validations = [];
-    if (dto.email && dto.email !== existingUser.email) {
-      validations.push(
-        this.userRepository.exists({ where: { email: dto.email } }),
-      );
-    } else {
-      validations.push(Promise.resolve(false));
-    }
-
-    if (dto.role) {
-      validations.push(this.roleService.findByName(dto.role));
-    } else {
-      validations.push(Promise.resolve(existingUser.role));
-    }
-
-    const [emailExists, role] = await Promise.all(validations);
+    const [emailExists, role, building] = await Promise.all([
+      dto.email && dto.email !== existingUser.email
+        ? this.userRepository.exists({ where: { email: dto.email } })
+        : Promise.resolve(false),
+      dto.role
+        ? this.roleService.findByName(dto.role)
+        : Promise.resolve(existingUser.role),
+      dto.buildingId
+        ? this.buildingService.findOneByPublicId(dto.buildingId)
+        : Promise.resolve(existingUser.building),
+    ]);
 
     if (emailExists) throw new ConflictException('Email already in use');
     if (!role) throw new NotFoundException(`Role ${dto.role} not found`);
 
-    if (dto.description && dto.licensePlate) {
-      const vehicleData = {
-        description: dto.description,
-        licensePlate: dto.licensePlate,
-      };
-      if (existingUser.vehicles.length > 0) {
-        Object.assign(existingUser.vehicles[0], vehicleData);
-      } else {
-        existingUser.vehicles = [vehicleData as any];
-      }
-    }
+    this.logger.log(`Updating user: ${publicId}`);
+
+    const queryRunner =
+      this.userRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
       const updatedUser = this.userRepository.merge(existingUser, {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
+        ...dto,
         role,
+        building,
       });
 
-      const savedUser = await this.userRepository.save(updatedUser);
-      this.logger.log(`User ${publicId} successfully updated`);
+      const savedUser = await queryRunner.manager.save(updatedUser);
+
+      if (dto.description && dto.licensePlate) {
+        const vehicleData = {
+          description: dto.description,
+          licensePlate: dto.licensePlate,
+        };
+
+        if (existingUser.vehicles && existingUser.vehicles.length > 0) {
+          await this.vehicleService.update(
+            existingUser.vehicles[0].id,
+            vehicleData,
+            queryRunner.manager,
+          );
+        } else {
+          await this.vehicleService.create(
+            vehicleData,
+            savedUser,
+            queryRunner.manager,
+          );
+        }
+      }
+
+      await queryRunner.commitTransaction();
+      this.logger.log(`User ${publicId} successfully updated with transaction`);
+
       return savedUser;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       this.logger.error(`Failed to update user: ${error.message}`, error.stack);
-      throw new InternalServerErrorException('User update failed');
+
+      throw error instanceof ConflictException
+        ? error
+        : new InternalServerErrorException('User update failed');
+    } finally {
+      await queryRunner.release();
     }
   }
 

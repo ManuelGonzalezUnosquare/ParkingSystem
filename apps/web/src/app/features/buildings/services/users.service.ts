@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { RequestService } from '@core/services';
 import {
   ApiResponse,
-  ICreateBuilding,
   ICreateUser,
   SearchBuildingUsers,
   UserModel,
