@@ -49,6 +49,12 @@
       pInputText
       placeholder="********"
       type="password"
+      [invalid]="form.controls.password.invalid && form.controls.password.touched"
+    />
+    <app-form-validation-error
+      [touched]="form.controls.password.touched"
+      [errors]="form.controls.password.errors"
+      label="Password"
     />
   </div>
   <!-- pass recovery -->

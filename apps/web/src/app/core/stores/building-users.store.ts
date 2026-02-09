@@ -15,6 +15,7 @@ import {
 import {
   addEntity,
   entityConfig,
+  removeEntity,
   setAllEntities,
   updateEntity,
   withEntities,
@@ -143,6 +144,19 @@ export const withBuildingUsersStore = signalStoreFeature(
       } catch (err: any) {
         patchState(store, {
           callState: { error: err.error?.message || 'Update user failed' },
+        });
+        return false;
+      }
+    },
+    delete: async (id: string): Promise<boolean> => {
+      patchState(store, { callState: 'loading' });
+      try {
+        await lastValueFrom(store._usersService.delete(id));
+        patchState(store, removeEntity(id, config), { callState: 'loaded' });
+        return true;
+      } catch (err: any) {
+        patchState(store, {
+          callState: { error: err.error?.message || 'Delete failed' },
         });
         return false;
       }

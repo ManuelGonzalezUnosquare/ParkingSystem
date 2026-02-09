@@ -140,11 +140,12 @@
       </ng-template>
       <ng-template #header>
         <tr>
-          <th class="text-xs font-semibold uppercase tracking-wider">Name</th>
-          <th class="text-xs font-semibold uppercase tracking-wider">Email</th>
-          <th class="text-xs font-semibold uppercase tracking-wider">Role</th>
-          <th class="text-xs font-semibold uppercase tracking-wider">Unit</th>
           <th class="text-xs font-semibold uppercase tracking-wider">Status</th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Name</th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Role</th>
+          <th class="text-xs font-semibold uppercase tracking-wider w-[30%]">
+            Vehicle
+          </th>
           <th
             class="text-xs font-semibold uppercase tracking-wider text-center"
           >
@@ -154,19 +155,34 @@
       </ng-template>
       <ng-template #body let-user>
         <tr>
-          <td class="text-sm font-medium">
-            {{ user.firstName }} {{ user.lastName }}
+          <td>
+            <div class="flex items-center justify-center">
+              <div
+                [title]="user.status"
+                [class.bg-emerald-400]="user.status === 'ACTIVE'"
+                [class.bg-amber-400]="user.status === 'INACTIVE'"
+                class="rounded-full size-4"
+              ></div>
+            </div>
           </td>
-          <td class="text-sm font-medium">{{ user.email }}</td>
+          <td class="text-sm font-medium">
+            <p class="truncate">{{ user.firstName }} {{ user.lastName }}</p>
+            <span class="text-slate-400">{{user.email}}</span>
+          </td>
           <td class="text-sm font-medium">
             <app-role-tag [role]="user.role" />
           </td>
-          <td class="text-sm font-medium">
-            {{user.vehicles[0]?.licensePlate || '--'}}
+          <td class="text-sm font-medium w-10 max-w-30">
+            @let vehicle = user?.vehicles[0]; @if(vehicle){
+            <div class="hover:cursor-pointer" [title]="vehicle.description">
+              <p class="truncate">{{vehicle.description}}</p>
+              <span class="text-slate-400">{{vehicle.licensePlate}}</span>
+            </div>
+            } @else{
+            <p class="text-slate-400">--</p>
+            }
           </td>
-          <td class="text-sm font-medium">
-            <app-user-status-tag [status]="user.status" />
-          </td>
+
           <td>
             <div class="text-center">
               <p-button
