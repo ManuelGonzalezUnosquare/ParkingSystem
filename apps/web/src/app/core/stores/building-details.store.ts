@@ -3,13 +3,12 @@ import {
   withDevtools,
   withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { computed, effect, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
   withComputed,
-  withHooks,
   withMethods,
   withProps,
   withState,
@@ -80,18 +79,4 @@ export const BuildingDetailStore = signalStore(
       patchState(store, { building: undefined, callState: 'loaded' }),
   })),
   withBuildingUsersStore,
-  withHooks({
-    onInit(store) {
-      effect(() => {
-        const building = store.building();
-        if (building) {
-          store.loadAll({
-            first: 0,
-            rows: 10,
-            buildingId: store.building()?.publicId,
-          });
-        }
-      });
-    },
-  }),
 );

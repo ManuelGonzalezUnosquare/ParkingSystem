@@ -1,13 +1,10 @@
-import { UserStatusEnum } from "../../enums";
-
 export class ICreateUser {
   email: string;
-
-  password: string; //TODO: review this
-
   firstName: string;
-
   lastName: string;
+  role: string;
+  buildingId?: string;
 
-  status: UserStatusEnum;
+  licensePlate: string;
+  description: string;
 }

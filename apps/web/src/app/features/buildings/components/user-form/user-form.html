@@ -1,0 +1,101 @@
+<form [formGroup]="form" (submit)="doSubmit()" class="space-y-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 md:gap-4">
+    <!-- first name -->
+    <div class="form-control">
+      <label class="form-label" for="fName">First Name</label>
+      <input
+        fluid
+        formControlName="firstName"
+        id="fName"
+        pInputText
+        placeholder="John "
+        [invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
+      />
+    </div>
+    <!-- last name -->
+    <div class="form-control">
+      <label class="form-label" for="lName">Last Name</label>
+      <input
+        fluid
+        formControlName="lastName"
+        id="lName"
+        pInputText
+        placeholder="Doe"
+      />
+    </div>
+  </div>
+
+  <!-- email -->
+  <div class="form-control">
+    <label class="form-label" for="email">Email</label>
+    <input
+      pInputText
+      inputId="email"
+      fluid
+      formControlName="email"
+      id="email"
+      placeholder="john.doe@test.com"
+      [invalid]="form.controls.email.invalid && form.controls.email.touched"
+    />
+  </div>
+  <!-- roles -->
+  @if(!sessionService.isAdmin()){
+  <div class="form-control">
+    <label class="form-label" for="role">Role</label>
+    <p-select
+      [options]="roles"
+      formControlName="role"
+      name="role"
+      placeholder="Select role"
+      required
+      fluid
+      appendTo="body"
+    />
+  </div>
+  }
+
+  <!---- vehicle info ---->
+  <p-divider class="hidden! md:flex!"
+    ><b class="text-slate-500">Vehicle information</b></p-divider
+  >
+
+  <!-- Licence Plate -->
+  <div class="form-control">
+    <label class="form-label" for="lPlate">License Plate</label>
+    <input
+      fluid
+      formControlName="licensePlate"
+      id="lPlate"
+      pInputText
+      placeholder="123456161"
+    />
+  </div>
+  <!-- description -->
+  <div class="form-control">
+    <label class="form-label" for="desc">Description</label>
+    <textarea
+      rows="3"
+      fluid
+      formControlName="description"
+      id="lPlate"
+      pTextarea
+      placeholder="2016 Volkswagen Touareg – V6 3.0TDI - Red"
+    ></textarea>
+  </div>
+
+  <div class="mt-10 flex gap-3 items-center justify-end">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      (click)="doCancel()"
+      [disabled]="store.isLoading()"
+    />
+    <p-button
+      label="Submit"
+      type="submit"
+      class="w-30"
+      fluid
+      [loading]="store.isLoading()"
+    />
+  </div>
+</form>

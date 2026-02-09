@@ -25,8 +25,8 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+    return this.usersService.create(createUserDto, user);
   }
 
   @Get()
@@ -45,9 +45,10 @@ export class UsersController {
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateUserDto: Partial<CreateUserDto>,
+    @Body() updateUserDto: CreateUserDto,
+    @CurrentUser() user: User,
   ) {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto, user);
   }
 
   @Delete(':id')

@@ -46,6 +46,6 @@ export class User extends BaseEntity {
   @JoinColumn({ name: 'building_id' })
   building: Building; // NULL if ROOT
 
-  @OneToMany(() => Vehicle, (vehicle) => vehicle.user)
+  @OneToMany(() => Vehicle, (vehicle) => vehicle.user, { cascade: true })
   vehicles: Relation<Vehicle>[];
 }

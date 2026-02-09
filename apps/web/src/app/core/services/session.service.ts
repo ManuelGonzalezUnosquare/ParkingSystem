@@ -19,6 +19,7 @@ export class SessionService {
   readonly token = computed(() => this.authStore.token());
   readonly user = computed(() => this.authStore.user());
   readonly role = computed(() => this.user()?.role?.name);
+  readonly isAdmin = computed(() => this.role() === RoleEnum.ADMIN);
 
   readonly sideBarItems = computed<MenuItem[]>(() => {
     const currentRole = this.role();

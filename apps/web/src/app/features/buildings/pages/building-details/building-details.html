@@ -16,7 +16,7 @@
     <p-button label="Trigger Raffle" />
   </div>
 
-  <!-- cards (mock) -->
+  <!-- cards -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
     <p-card>
       <ng-template #title>
@@ -58,7 +58,7 @@
         <p
           class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
         >
-          0
+          {{store.vehicleCount()}}
         </p>
       </ng-template>
       <ng-template #footer>
@@ -90,7 +90,7 @@
       <ng-template #footer>
         <div class="flex gap-2 items-center text-sm font-bold">
           <span class="text-slate-400 text-xs">
-            120 out of 1500 spots assigned</span
+            0 out of {{store.building()?.totalSlots || 0}} spots assigned</span
           >
         </div>
       </ng-template>
@@ -133,6 +133,7 @@
               severity="secondary"
               size="small"
               variant="outlined"
+              (click)="addUser()"
             />
           </div>
         </div>
@@ -158,10 +159,14 @@
           </td>
           <td class="text-sm font-medium">{{ user.email }}</td>
           <td class="text-sm font-medium">
-            <p-tag [value]="user.role.name" />
+            <app-role-tag [role]="user.role" />
           </td>
-          <td class="text-sm font-medium">S-401</td>
-          <td class="text-sm font-medium">{{user.status}}</td>
+          <td class="text-sm font-medium">
+            {{user.vehicles[0]?.licensePlate || '--'}}
+          </td>
+          <td class="text-sm font-medium">
+            <app-user-status-tag [status]="user.status" />
+          </td>
           <td>
             <div class="text-center">
               <p-button
@@ -175,6 +180,7 @@
                 severity="secondary"
                 size="small"
                 text
+                (click)="update(user)"
               />
               <p-button
                 icon="pi pi-trash"

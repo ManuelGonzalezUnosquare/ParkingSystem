@@ -8,5 +8,6 @@ import { Building } from '@database/entities';
   imports: [TypeOrmModule.forFeature([Building])],
   controllers: [BuildingsController],
   providers: [BuildingsService],
+  exports: [BuildingsService],
 })
 export class BuildingsModule {}

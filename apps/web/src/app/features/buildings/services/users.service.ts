@@ -3,6 +3,7 @@ import { RequestService } from '@core/services';
 import {
   ApiResponse,
   ICreateBuilding,
+  ICreateUser,
   SearchBuildingUsers,
   UserModel,
 } from '@parking-system/libs';
@@ -23,15 +24,13 @@ export class UsersService {
     return this.request.get<UserModel>(`${this.endpoint}/${id}`);
   }
 
-  create(
-    building: Partial<ICreateBuilding>,
-  ): Observable<ApiResponse<UserModel>> {
-    return this.request.post<UserModel>(this.endpoint, building);
+  create(user: ICreateUser): Observable<ApiResponse<UserModel>> {
+    return this.request.post<UserModel>(this.endpoint, user);
   }
 
   update(
     id: string,
-    building: ICreateBuilding,
+    building: ICreateUser,
   ): Observable<ApiResponse<UserModel>> {
     return this.request.patch<UserModel>(`${this.endpoint}/${id}`, building);
   }

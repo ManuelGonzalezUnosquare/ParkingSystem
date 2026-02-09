@@ -1,4 +1,7 @@
-export * from "./building.model";
-export * from "./role.model";
-export * from "./session.model";
-export * from "./user.model";
+export * from './building.model';
+export * from './role.model';
+export * from './session.model';
+export * from './user.model';
+
+export * from './vehicle.model';
+export * from './slot.model';
