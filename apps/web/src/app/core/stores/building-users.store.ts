@@ -1,4 +1,4 @@
-import { withCallState } from '@angular-architects/ngrx-toolkit';
+import { withCallState, withReset } from '@angular-architects/ngrx-toolkit';
 import { computed, effect, inject } from '@angular/core';
 import { UsersService } from '@features/buildings/services/users.service';
 import { tapResponse } from '@ngrx/operators';
@@ -30,6 +30,7 @@ import {
   UserModel,
 } from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
+import { AuthStore } from './auth.store';
 
 const config = entityConfig({
   entity: type<UserModel>(),
@@ -44,6 +45,7 @@ type BuildingUsersState = {
 
 export const withBuildingUsersStore = signalStoreFeature(
   withEntities(config),
+  withReset(),
   withState<BuildingUsersState>({
     building: undefined,
     pagination: undefined,
@@ -163,18 +165,28 @@ export const withBuildingUsersStore = signalStoreFeature(
     },
   })),
 
-  withHooks({
-    onInit(store) {
-      effect(() => {
-        const building = store.building();
-        if (building) {
-          store.loadAll({
-            first: 0,
-            rows: 10,
-            buildingId: store.building()?.publicId,
-          });
-        }
-      });
-    },
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          const isLoggedIn = authStore.isAuthenticated();
+          if (!isLoggedIn) {
+            store.resetState();
+          }
+        });
+
+        effect(() => {
+          const building = store.building();
+          if (building) {
+            store.loadAll({
+              first: 0,
+              rows: 10,
+              buildingId: store.building()?.publicId,
+            });
+          }
+        });
+      },
+    };
   }),
 );

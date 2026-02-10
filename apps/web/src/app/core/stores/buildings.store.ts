@@ -3,13 +3,14 @@ import {
   withDevtools,
   withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { computed, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
   type,
   withComputed,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -32,6 +33,7 @@ import {
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { BuildingService } from '../../features/buildings/services/building.service';
 import { FeedbackService } from '@core/services';
+import { AuthStore } from './auth.store';
 
 const bConfig = entityConfig({
   entity: type<BuildingModel>(),
@@ -140,4 +142,17 @@ export const BuildingsStore = signalStore(
       }
     },
   })),
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          const isLoggedIn = authStore.isAuthenticated();
+          if (!isLoggedIn) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );
