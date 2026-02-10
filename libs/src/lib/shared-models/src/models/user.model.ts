@@ -8,6 +8,7 @@ export interface UserModel extends BaseModel {
   lastName: string;
   status: string;
   email: string;
+  requirePasswordChange: boolean;
   role: RoleModel;
   building: BuildingModel;
   vehicles: VehicleModel[];

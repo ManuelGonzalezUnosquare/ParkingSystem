@@ -28,6 +28,12 @@ export class AuthService {
     return this.request.get<UserModel>(`${this.endpoint}/me`);
   }
 
+  changePassword(newPassword: string): Observable<ApiResponse<UserModel>> {
+    return this.request.post<UserModel>(`${this.endpoint}/change-password`, {
+      newPassword,
+    });
+  }
+
   requestResetPassword(
     payload: IResetPasswordRequest,
   ): Observable<ApiResponse<string>> {

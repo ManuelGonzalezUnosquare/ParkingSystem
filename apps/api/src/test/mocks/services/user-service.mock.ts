@@ -17,4 +17,5 @@ export const createMockUserService = (): MockUserService => ({
   resetPassword: jest.fn(),
   findByResetCode: jest.fn(),
   cleanRecoveryCode: jest.fn(),
+  changePassword: jest.fn(),
 });

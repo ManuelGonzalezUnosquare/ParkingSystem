@@ -1,22 +1,21 @@
+import { CurrentUser, Public } from '@common/decorators';
+import { User } from '@database/entities';
+import { UsersService } from '@modules/users/services';
 import {
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
 } from '@nestjs/common';
+import { SessionModel } from '@parking-system/libs';
 import { AuthService } from './auth.service';
 import {
   LoginDto,
   ResetPasswordByCodeDto,
   ResetPasswordRequestDto,
 } from './dtos';
-import { SessionModel } from '@parking-system/libs';
-import { Public, CurrentUser } from '@common/decorators';
-import { User } from '@database/entities';
-import { UsersService } from '@modules/users/services';
 
 @Controller('auth')
 export class AuthController {
@@ -40,6 +39,15 @@ export class AuthController {
   @Get('me')
   async getMe(@CurrentUser() user: User) {
     return user;
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body() dto: { newPassword: string },
+    @CurrentUser() user: User,
+  ) {
+    return await this.userService.changePassword(dto.newPassword, user);
   }
 
   @Public()

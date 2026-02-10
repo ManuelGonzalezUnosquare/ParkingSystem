@@ -31,8 +31,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 50, default: null })
   passwordResetCode: string;
 
-  @Exclude()
-  @Column({ type: 'bit', default: true })
+  @Column({ default: true })
   requirePasswordChange: boolean;
 
   @Column({ type: 'int', default: 0 })

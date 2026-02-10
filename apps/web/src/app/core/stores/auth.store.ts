@@ -124,6 +124,7 @@ export const AuthStore = signalStore(
           const response = await lastValueFrom(
             store._authService.resetPasswordConfirm(dto),
           );
+          patchState(store, { callState: 'loaded' });
           handleAuthSuccess(response.data);
 
           return true;
@@ -136,6 +137,24 @@ export const AuthStore = signalStore(
           return false;
         }
       },
+      changePassword: async (newPassword: string): Promise<boolean> => {
+        patchState(store, { callState: 'loading' });
+        try {
+          const response = await lastValueFrom(
+            store._authService.changePassword(newPassword),
+          );
+          patchState(store, { callState: 'loaded', user: response.data });
+          return true;
+        } catch (err: any) {
+          patchState(store, {
+            callState: {
+              error: err.error?.message || 'Change password failed',
+            },
+          });
+          return false;
+        }
+      },
+
       initializeAuth: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { callState: 'loading' })),
@@ -164,6 +183,9 @@ export const AuthStore = signalStore(
       ),
       logout: () => {
         localStorage.removeItem(AUTH_CONSTANTS.TOKEN_STORAGE_KEY);
+        patchState(store, {
+          token: null,
+        });
         store.resetState();
       },
     };

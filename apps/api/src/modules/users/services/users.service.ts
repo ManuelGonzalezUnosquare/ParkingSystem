@@ -36,6 +36,16 @@ export class UsersService {
     private readonly roleService: RoleService,
   ) {}
 
+  async changePassword(newPassword: string, user: User) {
+    const hashedPassword = await this.cryptoService.hash(newPassword);
+    await this.userRepository.update(user.id, {
+      password: hashedPassword,
+      requirePasswordChange: false,
+    });
+    user.requirePasswordChange = false;
+    return user;
+  }
+
   async create(dto: CreateUserDto, creator: User): Promise<User> {
     PermissionValidator.validateBuildingAccess(creator, dto.buildingId);
 

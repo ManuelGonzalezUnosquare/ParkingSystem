@@ -65,7 +65,6 @@ export class AuthService {
   }
 
   async validateResetCode(code: string): Promise<string> {
-    console.log('codeeeeeeeeeeee', code);
     const email = await this.userService.findByResetCode(code);
     if (!email) throw new UnauthorizedException('Invalid or expired code');
     return email;
