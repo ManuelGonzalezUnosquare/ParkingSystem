@@ -12,13 +12,16 @@ import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 import { MyPreset } from '../preset';
 import { appRoutes } from './app.routes';
-import { authInterceptor } from './core/interceptors';
+import { authInterceptor, errorInterceptor } from './core/interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor, errorInterceptor]),
+    ),
     MessageService,
     providePrimeNG({
       inputVariant: 'filled',

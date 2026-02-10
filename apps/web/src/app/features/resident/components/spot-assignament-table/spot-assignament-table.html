@@ -1,0 +1,25 @@
+<p-card>
+  <ng-template #title>
+    <div class="flex justify-between items-center">
+      <h2>Assignament History</h2>
+      <p-button label="Export to PDF" text size="small" />
+    </div>
+  </ng-template>
+
+  <p-table [value]="[]">
+    <ng-template #header>
+      <tr>
+        <th>Date</th>
+        <th>Assigned Spot</th>
+        <th>Outcome</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-spot>
+      <tr>
+        <td>{{ spot.code }}</td>
+        <td>{{ spot.name }}</td>
+        <td>{{ spot.category }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

@@ -1,0 +1,123 @@
+@if(vehicle(); as v){
+<p-card role="complementary" aria-labelledby="vehicle-widget-title">
+  <ng-template #content>
+    <div
+      class="border-b border-slate-50 bg-slate-50/50 flex items-center justify-between"
+    >
+      <h2
+        id="vehicle-widget-title"
+        class="text-sm font-bold text-slate-900 uppercase tracking-wider"
+      >
+        My Vehicle
+      </h2>
+      <i class="pi pi-car text-indigo-500" aria-hidden="true"></i>
+    </div>
+
+    <div class="flex pt-10 pb-5 flex-col items-center text-center">
+      <div class="mb-5 w-full">
+        <span
+          class="block text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-0.5"
+          >License Plate</span
+        >
+        <span
+          class="text-2xl font-mono font-black tracking-widest text-slate-900 uppercase"
+        >
+          {{v.licensePlate}}
+        </span>
+      </div>
+
+      <h3 class="text-lg font-medium text-slate-500 leading-tight">
+        {{v.description}}
+      </h3>
+
+      <div
+        class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+      >
+        <span class="relative flex h-2 w-2">
+          <span
+            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+          ></span>
+          <span
+            class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
+          ></span>
+        </span>
+        <span class="text-[10px] font-bold uppercase tracking-wide"
+          >Raffle Eligible</span
+        >
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #footer>
+    <div class="flex flex-col">
+      <div
+        class="p-6 rounded-md bg-linear-to-b from-gray-50 to-slate-100 text-white"
+      >
+        <p class="text-xs text-slate-500 leading-relaxed mb-4">
+          Data incorrect? Please contact your building admin to update your
+          information.
+        </p>
+        <p-button label="Contact Admin" fluid severity="contrast" />
+      </div>
+    </div>
+  </ng-template>
+</p-card>
+} @else{
+<p-card role="complementary" aria-labelledby="vehicle-widget-title">
+  <ng-template #title>
+    <div class="flex items-center justify-between">
+      <h2
+        id="vehicle-widget-title"
+        class="text-xs font-bold text-slate-900 uppercase tracking-wider"
+      >
+        Vehicle Status
+      </h2>
+      <div class="flex h-2 w-2 rounded-full bg-slate-300"></div>
+    </div>
+  </ng-template>
+  <ng-template #content>
+    <div>
+      <div class="mt-10 flex flex-col items-center text-center">
+        <div class="relative mb-6">
+          <div
+            class="relative h-16 w-16 rounded-2xl bg-linear-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200"
+          >
+            <i class="pi pi-car text-2xl text-white"></i>
+          </div>
+          <span
+            class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white"
+            >!</span
+          >
+        </div>
+
+        <h3 class="text-lg font-bold text-slate-800 mb-2">No Vehicle Linked</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-6">
+          You need a registered vehicle to participate in the upcoming parking
+          spot raffles.
+        </p>
+      </div>
+      <p-button
+        label="Contact Administrator"
+        fluid
+        size="small"
+        severity="contrast"
+        icon="pi pi-external-link"
+        iconPos="right"
+      />
+    </div>
+  </ng-template>
+  <ng-template #footer>
+    <div class="flex flex-col">
+      <div class="pt-3">
+        <div class="flex items-start gap-3 text-left">
+          <i class="pi pi-info-circle text-indigo-500 mt-0.5"></i>
+          <p class="text-[11px] text-slate-400 leading-normal">
+            Once the admin registers your vehicle, it will automatically appear
+            here for the next raffle.
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-card>
+
+}

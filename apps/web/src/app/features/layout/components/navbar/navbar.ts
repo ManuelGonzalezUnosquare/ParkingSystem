@@ -1,57 +1,42 @@
-import { Component, OnInit, signal } from "@angular/core";
-import { ToolbarModule } from "primeng/toolbar";
+import { Component, effect, inject, signal } from '@angular/core';
+import { ToolbarModule } from 'primeng/toolbar';
 
-import { MenuItem } from "primeng/api";
-import { ButtonModule } from "primeng/button";
-import { IconFieldModule } from "primeng/iconfield";
-import { InputIconModule } from "primeng/inputicon";
-import { InputTextModule } from "primeng/inputtext";
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { SessionService } from '@core/services';
+import { MenuItem } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-  selector: "app-navbar",
+  selector: 'app-navbar',
   imports: [
     ButtonModule,
     IconFieldModule,
     InputIconModule,
     ToolbarModule,
     InputTextModule,
+    RouterLink,
+    RouterLinkActive,
   ],
-  templateUrl: "./navbar.html",
-  styleUrl: "./navbar.css",
+  templateUrl: './navbar.html',
+  styleUrl: './navbar.css',
 })
-export class Navbar implements OnInit {
+export class Navbar {
   items = signal<MenuItem[]>([]);
+  private readonly sessionService = inject(SessionService);
 
-  ngOnInit(): void {
-    const isUser = false;
-    const gItems: MenuItem[] = [
-      {
-        icon: "pi pi-bell",
-      },
-    ];
-    let rItems: MenuItem[] = [];
-    if (isUser) {
-      rItems = this.userOptionsCreation();
-    } else {
-      rItems = this.adminOptionsCreation();
-    }
+  constructor() {
+    effect(() => {
+      const gItems: MenuItem[] = [
+        {
+          icon: 'pi pi-bell',
+        },
+      ];
+      const uItems = this.sessionService.sideBarItems();
 
-    this.items.set([...rItems, ...gItems]);
-  }
-  private adminOptionsCreation(): MenuItem[] {
-    return [];
-  }
-  private userOptionsCreation(): MenuItem[] {
-    return [
-      {
-        label: "Dashboard",
-      },
-      {
-        label: "My Account",
-      },
-      {
-        label: "Support",
-      },
-    ];
+      this.items.set([...uItems, ...gItems]);
+    });
   }
 }

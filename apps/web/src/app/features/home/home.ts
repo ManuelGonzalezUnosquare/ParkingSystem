@@ -36,7 +36,7 @@ export class Home {
 
   protected readonly componentInputs = computed(() => {
     const user = this.authStore.user();
-    if (user && user.role.name !== RoleEnum.ROOT) {
+    if (user && user.role.name === RoleEnum.ADMIN) {
       return { id: user.building?.publicId };
     }
     return {};
@@ -61,11 +61,14 @@ export class Home {
           if (role === RoleEnum.ROOT) {
             const m = await import('../buildings/pages/buildings/buildings');
             component = m.Buildings;
-          } else {
+          } else if (role === RoleEnum.ADMIN) {
             const m = await import(
               '../buildings/pages/building-details/building-details'
             );
             component = m.BuildingDetails;
+          } else {
+            const m = await import('../resident/resident-layout');
+            component = m.ResidentLayout;
           }
 
           this.loadedComponent.set(component);

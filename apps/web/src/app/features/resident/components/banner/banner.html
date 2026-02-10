@@ -1,0 +1,64 @@
+<p-card
+  class="overflow-hidden bg-indigo-600"
+  role="region"
+  aria-labelledby="resident-welcome-title"
+>
+  <ng-template #title>
+    <div aria-label="Breadcrumb" class="">
+      <span
+        class="inline-flex items-center gap-2 rounded-full bg-indigo-500/30 px-4 py-2 text-xs font-semibold tracking-wide text-indigo-50 ring-1 ring-inset ring-white/20 backdrop-blur-md"
+      >
+        <i class="pi pi-building" aria-hidden="true"></i>
+        {{user().building.name}} Official Resident
+      </span>
+    </div>
+  </ng-template>
+
+  <div
+    class="z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8"
+  >
+    <div>
+      <h1
+        id="resident-welcome-title"
+        class="text-4xl font-bold tracking-tight text-white sm:text-5xl"
+      >
+        Welcome back,
+        <span class="capitalize font-extrabold">{{user().firstName}}</span>
+      </h1>
+
+      <p class="mt-6 text-lg leading-relaxed text-indigo-100">
+        Your residency at
+        <strong class="font-extrabold">{{user().building.name}}</strong> is
+        active. You are automatically considered for the upcoming parking
+        allocation process. No further action is required from your side.
+      </p>
+    </div>
+
+    <div class="hidden lg:block opacity-20" aria-hidden="true">
+      <i class="pi pi-car text-[170px] text-white"></i>
+    </div>
+  </div>
+  <ng-template #footer>
+    <div class="mt-4">
+      <div
+        class="inline-flex items-center gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/20"
+      >
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm"
+        >
+          <i class="pi pi-calendar-clock text-2xl" aria-hidden="true"></i>
+        </div>
+        <div>
+          <p
+            class="text-xs font-bold uppercase tracking-widest text-indigo-200"
+          >
+            Next Raffle Process
+          </p>
+          <time datetime="2026-05-15" class="text-xl font-bold text-white"
+            >May 15, 2026</time
+          >
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-card>

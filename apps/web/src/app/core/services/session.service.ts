@@ -53,15 +53,6 @@ export class SessionService {
         },
       },
       {
-        label: 'Resident List',
-        icon: 'pi pi-users',
-        routerLink: '/admin/users',
-        allowedRoles: [RoleEnum.ADMIN],
-        routerLinkActiveOptions: {
-          exact: true,
-        },
-      },
-      {
         label: 'Allocation History',
         icon: 'pi pi-building',
         routerLink: '/admin/buildings',
@@ -75,7 +66,17 @@ export class SessionService {
         icon: 'pi pi-map-marker',
         disabled: true,
         routerLink: '/parking-slots',
-        allowedRoles: [RoleEnum.ROOT],
+        allowedRoles: [RoleEnum.ROOT, RoleEnum.ADMIN],
+      },
+
+      {
+        label: 'My Account',
+        icon: 'pi pi-cog',
+        routerLink: '/app/account',
+        allowedRoles: [RoleEnum.USER, RoleEnum.ROOT, RoleEnum.ADMIN],
+        routerLinkActiveOptions: {
+          exact: true,
+        },
       },
     ];
 

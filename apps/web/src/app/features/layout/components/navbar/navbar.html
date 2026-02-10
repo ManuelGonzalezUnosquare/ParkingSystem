@@ -13,14 +13,23 @@
   </ng-template>
   <ng-template #center> </ng-template>
   <ng-template #end>
-    @for(opt of items(); track opt.label){
-    <p-button
-      [label]="opt.label"
-      class="mr-2"
-      text
-      severity="secondary"
-      [icon]="opt.icon"
-    />
-    }
+    <div class="flex items-center gap-2">
+      @for(opt of items(); track opt.label){
+      <a
+        pButton
+        severity="secondary"
+        text
+        [routerLink]="opt.routerLink"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}"
+      >
+        @if(!opt.label){
+        <span pButtonIcon [class]="opt.icon"></span>
+        }
+        <span pButtonLabel>{{opt.label}}</span>
+      </a>
+
+      }
+    </div>
   </ng-template>
 </p-toolbar>

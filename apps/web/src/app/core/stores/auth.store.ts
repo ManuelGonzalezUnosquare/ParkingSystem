@@ -59,6 +59,12 @@ export const AuthStore = signalStore(
     isRootUser: computed(() => {
       return store.user()?.role?.name === RoleEnum.ROOT;
     }),
+    isAdminUser: computed(() => {
+      return store.user()?.role?.name === RoleEnum.ADMIN;
+    }),
+    isResident: computed(() => {
+      return store.user()?.role?.name === RoleEnum.USER;
+    }),
   })),
   withMethods((store) => {
     const handleAuthSuccess = (session: SessionModel) => {
