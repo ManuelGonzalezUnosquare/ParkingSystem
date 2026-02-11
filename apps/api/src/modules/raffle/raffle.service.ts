@@ -62,6 +62,21 @@ export class RaffleService {
       raffleId = raffle.id;
       this.logger.log(`Starting transaction for raffle ID: ${raffleId}`);
 
+      //clear prev assignations
+      const buildingVehicleIds = raffle.building.users
+        .flatMap((u) => u.vehicles || [])
+        .map((v) => v.id);
+
+      if (buildingVehicleIds.length > 0) {
+        this.logger.log(
+          `Resetting slots for ${buildingVehicleIds.length} vehicles before new assignment...`,
+        );
+        await queryRunner.manager.update(Vehicle, buildingVehicleIds, {
+          slot: null,
+        });
+      }
+      // -------------------------
+
       // 2. Identify Candidates (Active Users with at least one vehicle)
       const candidates = raffle.building.users.filter(
         (u) =>

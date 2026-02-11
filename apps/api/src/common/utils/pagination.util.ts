@@ -40,7 +40,7 @@ export async function paginateQuery<T>(
 ): Promise<PaginatedResult<T>> {
   const first = searchDto.first || 0;
   const rows = searchDto.rows || 10;
-  const sortField = searchDto.sortField;
+  const sortField = searchDto.sortField ? searchDto.sortField : 'createdAt';
   const sortOrder = searchDto.sortOrder === 1 ? 'ASC' : 'DESC';
 
   if (sortField) {
