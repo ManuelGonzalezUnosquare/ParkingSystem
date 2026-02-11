@@ -1,0 +1,21 @@
+<p-card>
+  <ng-template #title>
+    <div class="flex justify-between items-start">
+      <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
+        Total Residents
+      </p>
+      <i class="pi pi-user text-blue-500"></i>
+    </div>
+  </ng-template>
+  <ng-template #subtitle>
+    <p class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight">
+      {{residentCount()}}
+    </p>
+  </ng-template>
+  <ng-template #footer>
+    <div class="flex gap-2 items-center text-sm font-bold">
+      <span class="text-emerald-600">+ {{adminCount()}} </span>
+      <span class="text-slate-400 text-xs"> administrators</span>
+    </div>
+  </ng-template>
+</p-card>

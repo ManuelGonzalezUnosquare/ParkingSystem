@@ -1,12 +1,20 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   input,
   OnInit,
 } from '@angular/core';
 import { BuildingDetailStore } from '@core/stores';
-import { UserForm } from '@features/buildings/components';
+import {
+  TotalResidentCard,
+  UserForm,
+  UtilizationCard,
+  VehiclesCard,
+} from '@features/buildings/components';
+import { LastRaffleCard } from '@features/buildings/components/last-raffle-card/last-raffle-card';
+import { BuildingService } from '@features/buildings/services/building.service';
 import { SearchBuildingUsers, UserModel } from '@parking-system/libs';
 import { RoleTag } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
@@ -15,10 +23,22 @@ import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-building-details',
-  imports: [ButtonModule, TableModule, RoleTag, CardModule, InputTextModule],
+  imports: [
+    ButtonModule,
+    TableModule,
+    RoleTag,
+    CardModule,
+    InputTextModule,
+    //cards
+    TotalResidentCard,
+    VehiclesCard,
+    LastRaffleCard,
+    UtilizationCard,
+  ],
   templateUrl: './building-details.html',
   styleUrl: './building-details.css',
   standalone: true,
@@ -28,6 +48,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 export class BuildingDetails implements OnInit {
   readonly store = inject(BuildingDetailStore);
   readonly dialogService = inject(DialogService);
+  readonly buildingService = inject(BuildingService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {
     width: '50vw',
@@ -39,6 +60,18 @@ export class BuildingDetails implements OnInit {
     },
   };
   id = input.required<string>();
+
+  readonly assignedSlotsCount = computed(() => {
+    const cUsers = this.store.usersEntities();
+    if (!cUsers) return 0;
+
+    return cUsers.reduce((total, user) => {
+      const userAssignedVehicles = user.vehicles.filter(
+        (v) => v.slot !== null,
+      ).length;
+      return total + userAssignedVehicles;
+    }, 0);
+  });
 
   ngOnInit(): void {
     this.store.loadById(this.id());
@@ -62,7 +95,7 @@ export class BuildingDetails implements OnInit {
       buildingId: this.store.building()?.publicId,
     };
 
-    this.store.loadAll(searchParams);
+    this.store.loadUsers(searchParams);
   }
 
   private openBuildingDialog(header: string, user?: UserModel) {
@@ -71,5 +104,9 @@ export class BuildingDetails implements OnInit {
       header,
       data: { user },
     });
+  }
+  async raffle() {
+    // const result = await lastValueFrom(this.buildingService.executeRaffle());
+    console.log('result');
   }
 }

@@ -13,88 +13,19 @@
         Manage parking allocations and resident data for this building.
       </p>
     </div>
-    <p-button label="Trigger Raffle" />
+    <p-button label="Trigger Raffle" (click)="raffle()" />
   </div>
 
   <!-- cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
-    <p-card>
-      <ng-template #title>
-        <div class="flex justify-between items-start">
-          <p
-            class="text-[#4b739b] text-sm font-medium uppercase tracking-wider"
-          >
-            Total Residents
-          </p>
-          <i class="pi pi-user text-blue-500"></i>
-        </div>
-      </ng-template>
-      <ng-template #subtitle>
-        <p
-          class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
-        >
-          {{store.residentCount().length}}
-        </p>
-      </ng-template>
-      <ng-template #footer>
-        <div class="flex gap-2 items-center text-sm font-bold">
-          <span class="text-emerald-600">+ {{store.adminCount().length}} </span>
-          <span class="text-slate-400 text-xs"> administrators</span>
-        </div>
-      </ng-template>
-    </p-card>
-    <p-card>
-      <ng-template #title>
-        <div class="flex justify-between items-start">
-          <p
-            class="text-[#4b739b] text-sm font-medium uppercase tracking-wider"
-          >
-            Total Vehicles
-          </p>
-          <i class="pi pi-car text-blue-500"></i>
-        </div>
-      </ng-template>
-      <ng-template #subtitle>
-        <p
-          class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
-        >
-          {{store.vehicleCount()}}
-        </p>
-      </ng-template>
-      <ng-template #footer>
-        <div class="flex gap-2 items-center text-sm font-bold">
-          <span class="text-emerald-600">0 </span>
-          <span class="text-slate-400 text-xs"> something</span>
-        </div>
-      </ng-template>
-    </p-card>
-
-    <p-card>
-      <ng-template #title>
-        <div class="flex justify-between items-start">
-          <p
-            class="text-[#4b739b] text-sm font-medium uppercase tracking-wider"
-          >
-            Utilization
-          </p>
-          <p class="font-bold text-sm text-blue-500 tracking-wider">80%</p>
-        </div>
-      </ng-template>
-      <ng-template #subtitle>
-        <p
-          class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight"
-        >
-          0
-        </p>
-      </ng-template>
-      <ng-template #footer>
-        <div class="flex gap-2 items-center text-sm font-bold">
-          <span class="text-slate-400 text-xs">
-            0 out of {{store.building()?.totalSlots || 0}} spots assigned</span
-          >
-        </div>
-      </ng-template>
-    </p-card>
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-5">
+    <app-total-resident-card class="block" [users]="store.usersEntities()" />
+    <app-vehicles-card class="block" [users]="store.usersEntities()" />
+    <app-last-raffle-card class="block" />
+    <app-utilization-card
+      class="block"
+      [users]="store.usersEntities()"
+      [availableSpots]="store.building()?.totalSlots || 0"
+    />
   </div>
 
   <!-- Resident Management Section -->
@@ -107,7 +38,7 @@
       (onLazyLoad)="onLazyLoad($event)"
       [paginator]="true"
       [rows]="10"
-      [totalRecords]="store.pagination()?.total || 0"
+      [totalRecords]="store.usersPagination()?.total || 0"
       [loading]="store.isLoading()"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings"

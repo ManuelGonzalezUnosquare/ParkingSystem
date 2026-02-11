@@ -154,7 +154,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       building = this.buildingRepo.create({
         name: buildingName,
         address: '123 Unosquare Blvd',
-        totalSlots: 15,
+        totalSlots: 3,
       });
 
       building = await this.buildingRepo.save(building);

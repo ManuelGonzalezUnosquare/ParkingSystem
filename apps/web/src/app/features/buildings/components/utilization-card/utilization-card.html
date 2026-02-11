@@ -1,0 +1,23 @@
+<p-card>
+  <ng-template #title>
+    <div class="flex justify-between items-start">
+      <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
+        Utilization
+      </p>
+    </div>
+  </ng-template>
+
+  <ng-template #content>
+    <div class="py-4">
+      <p-progressbar [color]="progressColor()" [value]="progressValue()" />
+    </div>
+  </ng-template>
+  <ng-template #footer>
+    <div class="flex gap-2 items-center text-sm font-bold">
+      <span class="text-slate-400 text-xs">
+        {{assignedSlotsCount()}} out of {{availableSpots()}} spots
+        assigned</span
+      >
+    </div>
+  </ng-template>
+</p-card>

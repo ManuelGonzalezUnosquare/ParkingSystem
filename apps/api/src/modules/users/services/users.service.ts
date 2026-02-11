@@ -121,6 +121,7 @@ export class UsersService {
       .leftJoinAndSelect('users.role', 'role')
       .leftJoin('users.building', 'building')
       .leftJoinAndSelect('users.vehicles', 'vehicles')
+      .leftJoinAndSelect('vehicles.slot', 'slot')
       .where('building.publicId = :publicId', { publicId });
 
     if (globalFilter) {
@@ -283,7 +284,6 @@ export class UsersService {
       throw new InternalServerErrorException('Could not remove user');
     }
   }
-
   async resetPasswordRequest(email: string): Promise<string> {
     const user = await this.userRepository.findOne({ where: { email } });
 
@@ -297,7 +297,6 @@ export class UsersService {
 
     return resetCode;
   }
-
   async resetPassword(dto: ResetPasswordByCodeDto): Promise<User> {
     const { email, code, newPassword } = dto;
 
@@ -322,8 +321,38 @@ export class UsersService {
       throw new InternalServerErrorException('Could not reset password');
     }
   }
-
   async cleanRecoveryCode(id: number) {
     await this.userRepository.update(id, { passwordResetCode: null });
+  }
+
+  /**
+   * 1. internalUpdate
+   * Updates any user property internally.
+   * Designed for automated processes like the raffle system, bypassing DTO constraints.
+   */
+  async internalUpdate(id: number, data: Partial<User>): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${id} not found for internal update`,
+      );
+    }
+
+    // Merges the current state with the new partial data
+    const updatedUser = this.userRepository.merge(user, data);
+
+    this.logger.log(`Internal update executed for user: ${user.email}`);
+    return await this.userRepository.save(updatedUser);
+  }
+
+  /**
+   * 2. incrementPriority
+   * Increments the priorityScore of a user by 1.
+   * Typically used for "losers" of a raffle to increase their future probability.
+   */
+  async incrementPriority(userId: number): Promise<void> {
+    this.logger.debug(`Incrementing priority score for user ID: ${userId}`);
+
+    await this.userRepository.increment({ id: userId }, 'priorityScore', 1);
   }
 }

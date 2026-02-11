@@ -1,5 +1,5 @@
 import { withCallState, withReset } from '@angular-architects/ngrx-toolkit';
-import { computed, effect, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { UsersService } from '@features/buildings/services/users.service';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -7,7 +7,6 @@ import {
   signalStoreFeature,
   type,
   withComputed,
-  withHooks,
   withMethods,
   withProps,
   withState,
@@ -25,12 +24,10 @@ import {
   ApiPaginationMeta,
   BuildingModel,
   ICreateUser,
-  RoleEnum,
   SearchBuildingUsers,
   UserModel,
 } from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { AuthStore } from './auth.store';
 
 const config = entityConfig({
   entity: type<UserModel>(),
@@ -40,7 +37,7 @@ const config = entityConfig({
 
 type BuildingUsersState = {
   building: BuildingModel | undefined;
-  pagination: ApiPaginationMeta | undefined;
+  usersPagination: ApiPaginationMeta | undefined;
 };
 
 export const withBuildingUsersStore = signalStoreFeature(
@@ -48,7 +45,7 @@ export const withBuildingUsersStore = signalStoreFeature(
   withReset(),
   withState<BuildingUsersState>({
     building: undefined,
-    pagination: undefined,
+    usersPagination: undefined,
   }),
   withCallState(),
   withProps(() => ({
@@ -58,45 +55,27 @@ export const withBuildingUsersStore = signalStoreFeature(
     isLoading: computed(() => {
       return store.callState() === 'loading';
     }),
-    adminCount: computed(() => {
-      return store
-        .usersEntities()
-        .filter((f) => f.role?.name === RoleEnum.ADMIN);
-    }),
-    residentCount: computed(() => {
-      return store
-        .usersEntities()
-        .filter((f) => f.role?.name === RoleEnum.USER);
-    }),
-    vehicleCount: computed(() => {
-      return store
-        .usersEntities()
-        .filter((f) => f.vehicles.length > 0)
-        .map((f) => f.vehicles).length;
-    }),
   })),
   withMethods((store) => ({
-    loadAll: rxMethod<SearchBuildingUsers>(
+    loadUsers: rxMethod<SearchBuildingUsers>(
       pipe(
         tap(() => patchState(store, { callState: 'loading' })),
         switchMap((dto) =>
-          store._usersService
-            .getAll({ ...dto, buildingId: store.building()?.publicId })
-            .pipe(
-              tapResponse({
-                next: (response) =>
-                  patchState(store, setAllEntities(response.data, config), {
-                    callState: 'loaded',
-                    pagination: response.meta,
-                  }),
-                error: (err: any) =>
-                  patchState(store, {
-                    callState: {
-                      error: err.error?.message || 'Load buildings failed',
-                    },
-                  }),
-              }),
-            ),
+          store._usersService.getAll(dto).pipe(
+            tapResponse({
+              next: (response) =>
+                patchState(store, setAllEntities(response.data, config), {
+                  callState: 'loaded',
+                  usersPagination: response.meta,
+                }),
+              error: (err: any) =>
+                patchState(store, {
+                  callState: {
+                    error: err.error?.message || 'Load buildings failed',
+                  },
+                }),
+            }),
+          ),
         ),
       ),
     ),
@@ -111,9 +90,9 @@ export const withBuildingUsersStore = signalStoreFeature(
         );
         patchState(store, addEntity(response.data, config), {
           callState: 'loaded',
-          pagination: {
-            ...store.pagination()!,
-            total: (store.pagination()?.total || 0) + 1,
+          usersPagination: {
+            ...store.usersPagination()!,
+            total: (store.usersPagination()?.total || 0) + 1,
           },
         });
 
@@ -164,29 +143,4 @@ export const withBuildingUsersStore = signalStoreFeature(
       }
     },
   })),
-
-  withHooks((store) => {
-    const authStore = inject(AuthStore);
-    return {
-      onInit: (): void => {
-        effect(() => {
-          const isLoggedIn = authStore.isAuthenticated();
-          if (!isLoggedIn) {
-            store.resetState();
-          }
-        });
-
-        effect(() => {
-          const building = store.building();
-          if (building) {
-            store.loadAll({
-              first: 0,
-              rows: 10,
-              buildingId: store.building()?.publicId,
-            });
-          }
-        });
-      },
-    };
-  }),
 );

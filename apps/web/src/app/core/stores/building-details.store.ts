@@ -3,12 +3,13 @@ import {
   withDevtools,
   withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { computed, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
   withComputed,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -19,6 +20,7 @@ import { pipe, switchMap, tap } from 'rxjs';
 import { BuildingService } from '../../features/buildings/services/building.service';
 import { AuthStore } from './auth.store';
 import { withBuildingUsersStore } from './building-users.store';
+import { withBuildingRaffleStore } from './building-raffle.store';
 
 interface BuildingDetailState {
   building: BuildingModel | undefined;
@@ -48,8 +50,6 @@ export const BuildingDetailStore = signalStore(
         user.building?.publicId === building.publicId
       );
     }),
-
-    isAdminView: computed(() => !store._authStore.isRootUser()),
   })),
 
   withMethods((store) => ({
@@ -79,4 +79,31 @@ export const BuildingDetailStore = signalStore(
       patchState(store, { building: undefined, callState: 'loaded' }),
   })),
   withBuildingUsersStore,
+  withBuildingRaffleStore,
+
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          const isLoggedIn = authStore.isAuthenticated();
+          if (!isLoggedIn) {
+            store.resetState();
+          }
+        });
+
+        effect(() => {
+          const building = store.building();
+          if (building) {
+            store.loadRaffles();
+            store.loadUsers({
+              first: 0,
+              rows: 10,
+              buildingId: building.publicId,
+            });
+          }
+        });
+      },
+    };
+  }),
 );

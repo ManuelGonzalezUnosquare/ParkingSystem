@@ -1,0 +1,21 @@
+<p-card>
+  <ng-template #title>
+    <div class="flex justify-between items-start">
+      <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
+        Total Vehicles
+      </p>
+      <i class="pi pi-car text-blue-500"></i>
+    </div>
+  </ng-template>
+  <ng-template #subtitle>
+    <p class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight">
+      {{vehicles().length}}
+    </p>
+  </ng-template>
+  <ng-template #footer>
+    <div class="flex gap-2 items-center text-sm font-bold">
+      <span class="text-cyan-600">{{usersWithoutVehicle().length}} </span>
+      <span class="text-slate-400 text-xs"> user(s) without vehicle</span>
+    </div>
+  </ng-template>
+</p-card>

@@ -5,3 +5,6 @@ export * from './user.model';
 
 export * from './vehicle.model';
 export * from './slot.model';
+
+export * from './raffle.model';
+export * from './raffle-result.model';

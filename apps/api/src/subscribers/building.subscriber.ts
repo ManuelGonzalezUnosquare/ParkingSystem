@@ -5,7 +5,7 @@ import {
   DataSource,
 } from 'typeorm';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Building, ParkingSlot } from '@database/entities';
+import { Building, ParkingSlot, Raffle } from '@database/entities';
 
 @Injectable()
 @EventSubscriber()
@@ -73,5 +73,20 @@ export class BuildingSubscriber
         );
       }
     }
+
+    const firstRaffleDate = new Date();
+    firstRaffleDate.setMonth(firstRaffleDate.getMonth() + 3);
+
+    const initialRaffle = manager.create(Raffle, {
+      building: entity,
+      executionDate: firstRaffleDate,
+      isManual: false,
+    });
+
+    await manager.save(initialRaffle);
+
+    this.logger.log(
+      `Initial raffle scheduled for building ${entity.name} on ${firstRaffleDate.toDateString()}`,
+    );
   }
 }

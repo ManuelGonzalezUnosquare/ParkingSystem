@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { RequestService } from '@core/services';
 import {
   ApiResponse,
   BuildingModel,
@@ -6,7 +7,6 @@ import {
   Search,
 } from '@parking-system/libs';
 import { Observable } from 'rxjs';
-import { RequestService } from '../../../core/services';
 
 @Injectable({
   providedIn: 'root',

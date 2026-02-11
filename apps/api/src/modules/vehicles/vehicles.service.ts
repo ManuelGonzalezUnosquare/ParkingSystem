@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVehicleDto } from './dtos/create-vehicle.dto';
-import { User, Vehicle } from '@database/entities';
+import { ParkingSlot, User, Vehicle } from '@database/entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
@@ -36,6 +36,16 @@ export class VehiclesService {
       : this.vehicleRepository;
     await repo.update(id, data);
     return repo.findOneBy({ id });
+  }
+
+  async assignSlot(id: number, slot: ParkingSlot) {
+    const vehicle = await this.vehicleRepository.findOneBy({ id });
+    if (!vehicle) {
+      throw new NotFoundException(`Vehicle with ID ${id} not found`);
+    }
+
+    vehicle.slot = slot;
+    return await this.vehicleRepository.save(vehicle);
   }
 
   async remove(id: number) {
