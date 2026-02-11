@@ -1,19 +1,21 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { FeedbackService } from '@core/services';
+import { inject, Injector } from '@angular/core';
+import { FeedbackService, SessionService } from '@core/services';
 import { catchError, throwError } from 'rxjs';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const feedback = inject(FeedbackService);
+  const injector = inject(Injector);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      const service = injector.get(SessionService);
       if (error.status === 401) {
         const isLoginAttempt = req.url.includes('/auth/login');
 
         if (!isLoginAttempt) {
           feedback.showError('Session expired. Please log in again.');
-          // sService.logout();
+          service.logout();
           return throwError(() => error);
         }
       }

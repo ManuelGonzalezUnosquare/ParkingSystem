@@ -36,6 +36,15 @@ export const appRoutes: Route[] = [
             './features/buildings/pages/building-details/building-details'
           ).then((m) => m.BuildingDetails),
       },
+      {
+        path: 'buildings/:id/history',
+        canActivate: [roleGuard, accessBuildingGuard],
+        data: { roles: [RoleEnum.ROOT, RoleEnum.ADMIN] },
+        loadComponent: () =>
+          import(
+            './features/buildings/pages/allocation-history/allocation-history'
+          ).then((m) => m.AllocationHistory),
+      },
     ],
   },
   {

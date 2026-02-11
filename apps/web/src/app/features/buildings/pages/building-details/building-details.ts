@@ -14,7 +14,6 @@ import {
   VehiclesCard,
 } from '@features/buildings/components';
 import { LastRaffleCard } from '@features/buildings/components/last-raffle-card/last-raffle-card';
-import { BuildingService } from '@features/buildings/services/building.service';
 import { SearchBuildingUsers, UserModel } from '@parking-system/libs';
 import { RoleTag } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
@@ -23,7 +22,6 @@ import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-building-details',
@@ -48,7 +46,6 @@ import { lastValueFrom } from 'rxjs';
 export class BuildingDetails implements OnInit {
   readonly store = inject(BuildingDetailStore);
   readonly dialogService = inject(DialogService);
-  readonly buildingService = inject(BuildingService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {
     width: '50vw',
@@ -106,7 +103,6 @@ export class BuildingDetails implements OnInit {
     });
   }
   async raffle() {
-    // const result = await lastValueFrom(this.buildingService.executeRaffle());
-    console.log('result');
+    this.store.runRaffle();
   }
 }

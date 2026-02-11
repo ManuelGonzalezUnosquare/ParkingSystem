@@ -29,14 +29,16 @@ export class Navbar {
 
   constructor() {
     effect(() => {
-      const gItems: MenuItem[] = [
+      let gItems: MenuItem[] = [
         {
           icon: 'pi pi-bell',
         },
       ];
-      const uItems = this.sessionService.sideBarItems();
+      if (this.sessionService.isResident()) {
+        gItems = [...this.sessionService.sideBarItems(), ...gItems];
+      }
 
-      this.items.set([...uItems, ...gItems]);
+      this.items.set(gItems);
     });
   }
 }

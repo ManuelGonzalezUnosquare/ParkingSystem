@@ -104,7 +104,6 @@ export const withBuildingUsersStore = signalStoreFeature(
         return false;
       }
     },
-
     update: async (id: string, dto: ICreateUser): Promise<boolean> => {
       patchState(store, { callState: 'loading' });
       try {

@@ -15,19 +15,17 @@
     </div>
     <p-button label="Trigger Raffle" (click)="raffle()" />
   </div>
-
   <!-- cards -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-5">
     <app-total-resident-card class="block" [users]="store.usersEntities()" />
     <app-vehicles-card class="block" [users]="store.usersEntities()" />
-    <app-last-raffle-card class="block" />
+    <app-last-raffle-card class="block" [raffle]="store.liveRaffle()" />
     <app-utilization-card
       class="block"
       [users]="store.usersEntities()"
       [availableSpots]="store.building()?.totalSlots || 0"
     />
   </div>
-
   <!-- Resident Management Section -->
   <p-card>
     <p-table
@@ -71,12 +69,15 @@
       </ng-template>
       <ng-template #header>
         <tr>
-          <th class="text-xs font-semibold uppercase tracking-wider">Status</th>
+          <th class="text-xs font-semibold uppercase tracking-wider w-[5%]">
+            Status
+          </th>
           <th class="text-xs font-semibold uppercase tracking-wider">Name</th>
           <th class="text-xs font-semibold uppercase tracking-wider">Role</th>
           <th class="text-xs font-semibold uppercase tracking-wider w-[30%]">
             Vehicle
           </th>
+          <th class="text-xs font-semibold uppercase tracking-wider">Spot</th>
           <th
             class="text-xs font-semibold uppercase tracking-wider text-center"
           >
@@ -112,6 +113,10 @@
             } @else{
             <p class="text-slate-400">--</p>
             }
+          </td>
+
+          <td class="text-sm font-medium">
+            @let slot =user.vehicles[0]?.slot; {{slot?.slotNumber ?? '--'}}
           </td>
 
           <td>

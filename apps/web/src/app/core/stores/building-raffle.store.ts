@@ -18,7 +18,7 @@ import {
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { BuildingModel, RaffleModel } from '@parking-system/libs';
-import { pipe, switchMap, tap } from 'rxjs';
+import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 
 const config = entityConfig({
   entity: type<RaffleModel>(),
@@ -69,5 +69,20 @@ export const withBuildingRaffleStore = signalStoreFeature(
         ),
       ),
     ),
+    runRaffle: async (): Promise<boolean> => {
+      patchState(store, { callState: 'loading' });
+      try {
+        const response = await lastValueFrom(
+          store._raffleService.executeRaffle(),
+        );
+        patchState(store, { callState: 'loaded' });
+        return true;
+      } catch (err: any) {
+        patchState(store, {
+          callState: { error: err.error?.message || 'Run raffle failed' },
+        });
+        return false;
+      }
+    },
   })),
 );
