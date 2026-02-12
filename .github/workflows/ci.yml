@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,6 +27,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
+
+      - name: set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
 
       - name: Lint check
         run: npx nx affected -t lint
