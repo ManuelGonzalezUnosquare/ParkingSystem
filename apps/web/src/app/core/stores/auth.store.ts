@@ -57,13 +57,13 @@ export const AuthStore = signalStore(
       return !!store.token();
     }),
     isRootUser: computed(() => {
-      return store.user()?.role?.name === RoleEnum.ROOT;
+      return store.user()?.role === RoleEnum.ROOT;
     }),
     isAdminUser: computed(() => {
-      return store.user()?.role?.name === RoleEnum.ADMIN;
+      return store.user()?.role === RoleEnum.ADMIN;
     }),
     isResident: computed(() => {
-      return store.user()?.role?.name === RoleEnum.USER;
+      return store.user()?.role === RoleEnum.USER;
     }),
   })),
   withMethods((store) => {
@@ -188,11 +188,11 @@ export const AuthStore = signalStore(
         ),
       ),
       logout: () => {
-        localStorage.removeItem(AUTH_CONSTANTS.TOKEN_STORAGE_KEY);
+        localStorage.clear();
         patchState(store, {
           token: null,
+          user: null,
         });
-        store.resetState();
       },
     };
   }),

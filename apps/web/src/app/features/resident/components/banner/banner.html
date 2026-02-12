@@ -9,7 +9,7 @@
         class="inline-flex items-center gap-2 rounded-full bg-indigo-500/30 px-4 py-2 text-xs font-semibold tracking-wide text-indigo-50 ring-1 ring-inset ring-white/20 backdrop-blur-md"
       >
         <i class="pi pi-building" aria-hidden="true"></i>
-        {{user().building.name}} Official Resident
+        {{user().buildingName}} Official Resident
       </span>
     </div>
   </ng-template>
@@ -28,7 +28,7 @@
 
       <p class="mt-6 text-lg leading-relaxed text-indigo-100">
         Your residency at
-        <strong class="font-extrabold">{{user().building.name}}</strong> is
+        <strong class="font-extrabold">{{user().buildingName}}</strong> is
         active. You are automatically considered for the upcoming parking
         allocation process. No further action is required from your side.
       </p>

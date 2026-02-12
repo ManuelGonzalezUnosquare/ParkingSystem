@@ -19,7 +19,7 @@
   <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-5">
     <app-total-resident-card class="block" [users]="store.usersEntities()" />
     <app-vehicles-card class="block" [users]="store.usersEntities()" />
-    <app-last-raffle-card class="block" [raffle]="store.liveRaffle()" />
+    <!-- <app-last-raffle-card class="block" [raffle]="store.liveRaffle()" /> -->
     <app-utilization-card
       class="block"
       [users]="store.usersEntities()"
@@ -91,33 +91,27 @@
             <div class="flex items-center justify-center">
               <div
                 [title]="user.status"
-                [class.bg-emerald-400]="user.status === 'ACTIVE'"
-                [class.bg-amber-400]="user.status === 'INACTIVE'"
+                [class.bg-emerald-400]="user.isActive"
+                [class.bg-amber-400]="!user.isActive"
                 class="rounded-full size-4"
               ></div>
             </div>
           </td>
           <td class="text-sm font-medium">
-            <p class="truncate">{{ user.firstName }} {{ user.lastName }}</p>
+            <p class="truncate">{{ user.fullName }}</p>
             <span class="text-slate-400">{{user.email}}</span>
           </td>
           <td class="text-sm font-medium">
             <app-role-tag [role]="user.role" />
           </td>
           <td class="text-sm font-medium w-10 max-w-30">
-            @let vehicle = user?.vehicles[0]; @if(vehicle){
-            <div class="hover:cursor-pointer" [title]="vehicle.description">
-              <p class="truncate">{{vehicle.description}}</p>
-              <span class="text-slate-400">{{vehicle.licensePlate}}</span>
+            <div class="hover:cursor-pointer" [title]="user.vehicleDescription">
+              <p class="truncate">{{user.vehicleDescription}}</p>
+              <span class="text-slate-400">{{user.vehiclePlate}}</span>
             </div>
-            } @else{
-            <p class="text-slate-400">--</p>
-            }
           </td>
 
-          <td class="text-sm font-medium">
-            @let slot =user.vehicles[0]?.slot; {{slot?.slotNumber ?? '--'}}
-          </td>
+          <td class="text-sm font-medium">{{user.assignedSlotNumber}}</td>
 
           <td>
             <div class="text-center">

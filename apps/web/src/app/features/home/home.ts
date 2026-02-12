@@ -36,8 +36,8 @@ export class Home {
 
   protected readonly componentInputs = computed(() => {
     const user = this.authStore.user();
-    if (user && user.role.name === RoleEnum.ADMIN) {
-      return { id: user.building?.publicId };
+    if (user && user.role === RoleEnum.ADMIN) {
+      return { id: user.buildingId };
     }
     return {};
   });
@@ -55,7 +55,7 @@ export class Home {
         if (this.loadedComponent()) return;
 
         try {
-          const role = user.role.name;
+          const role = user.role;
           let component: Type<any>;
 
           if (role === RoleEnum.ROOT) {

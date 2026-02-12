@@ -18,7 +18,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
     filter(({ isLoading, token }) => !isLoading || !token),
     take(1),
     map(({ user, token }) => {
-      const uRole = user?.role?.name;
+      const uRole = user?.role;
       if (token && expectedRoles.includes(uRole ?? '')) {
         return true;
       }

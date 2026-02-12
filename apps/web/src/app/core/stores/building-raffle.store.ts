@@ -1,5 +1,5 @@
 import { withCallState, withReset } from '@angular-architects/ngrx-toolkit';
-import { computed, inject } from '@angular/core';
+import { computed, inject, Signal } from '@angular/core';
 import { RaffleService } from '@features/buildings/services';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -17,7 +17,11 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { BuildingModel, RaffleModel } from '@parking-system/libs';
+import {
+  ApiPaginationMeta,
+  BuildingModel,
+  RaffleModel,
+} from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 
 const config = entityConfig({
@@ -27,62 +31,65 @@ const config = entityConfig({
 });
 
 type BuildingUsersState = {
-  building: BuildingModel | undefined;
+  rafflesPagination: ApiPaginationMeta | undefined;
 };
 
-export const withBuildingRaffleStore = signalStoreFeature(
-  withEntities(config),
-  withReset(),
-  withState<BuildingUsersState>({
-    building: undefined,
-  }),
-
-  withCallState(),
-  withProps(() => ({
-    _raffleService: inject(RaffleService),
-  })),
-  withComputed((store) => ({
-    liveRaffle: computed(() => {
-      return store.rafflesEntities().find((f) => !f.executedAt);
+export function withBuildingRaffles(
+  building: Signal<BuildingModel | undefined>,
+) {
+  return signalStoreFeature(
+    withEntities(config),
+    withReset(),
+    withState<BuildingUsersState>({
+      rafflesPagination: undefined,
     }),
-  })),
+    withCallState(),
+    withProps(() => ({
+      _raffleService: inject(RaffleService),
+    })),
+    withComputed((store) => ({
+      liveRaffle: computed(() => {
+        return store.rafflesEntities().find((f) => !f.executedAt);
+      }),
+    })),
 
-  withMethods((store) => ({
-    loadRaffles: rxMethod<void>(
-      pipe(
-        tap(() => patchState(store, { callState: 'loading' })),
-        switchMap(() =>
-          store._raffleService.load().pipe(
-            tapResponse({
-              next: (response) =>
-                patchState(store, setAllEntities(response.data, config), {
-                  callState: 'loaded',
-                }),
-              error: (err: any) =>
-                patchState(store, {
-                  callState: {
-                    error: err.error?.message || 'Load raffles failed',
-                  },
-                }),
-            }),
+    withMethods((store) => ({
+      loadRaffles: rxMethod<void>(
+        pipe(
+          tap(() => patchState(store, { callState: 'loading' })),
+          switchMap(() =>
+            store._raffleService.load(building()?.publicId || '').pipe(
+              tapResponse({
+                next: (response) =>
+                  patchState(store, setAllEntities(response.data, config), {
+                    callState: 'loaded',
+                  }),
+                error: (err: any) =>
+                  patchState(store, {
+                    callState: {
+                      error: err.error?.message || 'Load raffles failed',
+                    },
+                  }),
+              }),
+            ),
           ),
         ),
       ),
-    ),
-    runRaffle: async (): Promise<boolean> => {
-      patchState(store, { callState: 'loading' });
-      try {
-        const response = await lastValueFrom(
-          store._raffleService.executeRaffle(),
-        );
-        patchState(store, { callState: 'loaded' });
-        return true;
-      } catch (err: any) {
-        patchState(store, {
-          callState: { error: err.error?.message || 'Run raffle failed' },
-        });
-        return false;
-      }
-    },
-  })),
-);
+      runRaffle: async (): Promise<boolean> => {
+        patchState(store, { callState: 'loading' });
+        try {
+          const response = await lastValueFrom(
+            store._raffleService.executeRaffle(),
+          );
+          patchState(store, { callState: 'loaded' });
+          return true;
+        } catch (err: any) {
+          patchState(store, {
+            callState: { error: err.error?.message || 'Run raffle failed' },
+          });
+          return false;
+        }
+      },
+    })),
+  );
+}

@@ -1,15 +1,20 @@
 import { BaseModel } from './base.model';
-import { BuildingModel } from './building.model';
-import { RoleModel } from './role.model';
-import { VehicleModel } from './vehicle.model';
 
 export interface UserModel extends BaseModel {
   firstName: string;
   lastName: string;
-  status: string;
+  fullName: string;
   email: string;
+  role: string;
+  priorityScore: number;
+  isActive: boolean;
   requirePasswordChange: boolean;
-  role: RoleModel;
-  building: BuildingModel;
-  vehicles: VehicleModel[];
+
+  buildingId?: string;
+  buildingName?: string;
+
+  hasVehicle: boolean;
+  vehicleDescription?: string;
+  vehiclePlate?: string;
+  assignedSlotNumber?: string;
 }

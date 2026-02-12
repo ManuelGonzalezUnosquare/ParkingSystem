@@ -11,11 +11,11 @@ import { CardModule } from 'primeng/card';
 export class VehiclesCard {
   users = input.required<UserModel[]>();
 
-  vehicles = computed(() => {
-    return this.users().flatMap((user) => user.vehicles || []);
+  usersWithVehicle = computed(() => {
+    return this.users().filter((f) => f.hasVehicle).length;
   });
 
   usersWithoutVehicle = computed(() => {
-    return this.users().filter((f) => f.vehicles.length === 0);
+    return this.users().filter((f) => !f.hasVehicle).length;
   });
 }

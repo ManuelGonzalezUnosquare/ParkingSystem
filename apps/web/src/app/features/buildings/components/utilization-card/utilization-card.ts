@@ -14,18 +14,15 @@ export class UtilizationCard {
   users = input.required<UserModel[]>();
 
   assignedSlotsCount = computed(() => {
-    return this.users().reduce((total, user) => {
-      const userAssignedVehicles = user.vehicles.filter(
-        (v) => v.slot !== null,
-      ).length;
-      return total + userAssignedVehicles;
-    }, 0);
+    return this.users().filter((u) => u.hasVehicle).length;
   });
 
   progressValue = computed(() => {
     const sCount = this.assignedSlotsCount();
     const aCount = this.availableSpots();
-    return (sCount / aCount) * 100;
+    if (sCount === 0) return 0;
+    const res = (sCount / aCount) * 100;
+    return Math.trunc(res);
   });
 
   progressColor = computed(() => {

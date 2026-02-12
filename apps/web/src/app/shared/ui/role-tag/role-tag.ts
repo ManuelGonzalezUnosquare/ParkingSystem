@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { RoleEnum, RoleModel } from '@parking-system/libs';
+import { RoleEnum } from '@parking-system/libs';
 import { TagModule } from 'primeng/tag';
 
 type TagSeverity =
@@ -29,17 +29,17 @@ const ROLE_SEVERITY_MAP: Record<string, TagSeverity> = {
   template: `
     <p-tag
       class="h-6 w-18"
-      [value]="role().name"
+      [value]="role()"
       [severity]="severity()"
       [rounded]="rounded()"
     />
   `,
 })
 export class RoleTag {
-  readonly role = input.required<RoleModel>();
+  readonly role = input.required<string>();
   rounded = input<boolean>(false);
 
   protected readonly severity = computed<TagSeverity>(() => {
-    return ROLE_SEVERITY_MAP[this.role().name] ?? 'info';
+    return ROLE_SEVERITY_MAP[this.role()] ?? 'info';
   });
 }

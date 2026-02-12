@@ -18,7 +18,7 @@ export class SessionService {
 
   readonly token = computed(() => this.authStore.token());
   readonly user = computed(() => this.authStore.user());
-  readonly role = computed(() => this.user()?.role?.name);
+  readonly role = computed(() => this.user()?.role);
   readonly isAdmin = computed(() => this.role() === RoleEnum.ADMIN);
   readonly isResident = computed(() => this.role() === RoleEnum.USER);
 
@@ -56,7 +56,7 @@ export class SessionService {
       {
         label: 'Allocation History',
         icon: 'pi pi-building',
-        routerLink: `buildings/${this.user()?.building?.publicId}/history`,
+        routerLink: `buildings/${this.user()?.buildingId}/history`,
         allowedRoles: [RoleEnum.ADMIN],
         routerLinkActiveOptions: {
           exact: true,

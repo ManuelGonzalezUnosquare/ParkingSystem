@@ -9,6 +9,7 @@ import {
   patchState,
   signalStore,
   withComputed,
+  withFeature,
   withHooks,
   withMethods,
   withProps,
@@ -19,8 +20,8 @@ import { BuildingModel } from '@parking-system/libs';
 import { pipe, switchMap, tap } from 'rxjs';
 import { BuildingService } from '../../features/buildings/services/building.service';
 import { AuthStore } from './auth.store';
-import { withBuildingUsersStore } from './building-users.store';
-import { withBuildingRaffleStore } from './building-raffle.store';
+import { withBuildingRaffles } from './building-raffle.store';
+import { withBuildingUsers } from './building-users.store';
 
 interface BuildingDetailState {
   building: BuildingModel | undefined;
@@ -36,6 +37,7 @@ export const BuildingDetailStore = signalStore(
   withReset(),
   withState(initialState),
   withCallState(),
+
   withProps(() => ({
     _authStore: inject(AuthStore),
     _buildingService: inject(BuildingService),
@@ -46,8 +48,7 @@ export const BuildingDetailStore = signalStore(
       const building = store.building();
       if (!user || !building) return false;
       return (
-        store._authStore.isRootUser() ||
-        user.building?.publicId === building.publicId
+        store._authStore.isRootUser() || user.buildingId === building.publicId
       );
     }),
   })),
@@ -78,8 +79,8 @@ export const BuildingDetailStore = signalStore(
     clearContext: () =>
       patchState(store, { building: undefined, callState: 'loaded' }),
   })),
-  withBuildingUsersStore,
-  withBuildingRaffleStore,
+  withFeature(({ building }) => withBuildingUsers(building)),
+  withFeature(({ building }) => withBuildingRaffles(building)),
 
   withHooks((store) => {
     const authStore = inject(AuthStore);

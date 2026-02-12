@@ -19,9 +19,9 @@ export class TotalResidentCard {
   users = input.required<UserModel[]>();
 
   adminCount = computed(() => {
-    return this.users().filter((f) => f.role?.name === RoleEnum.ADMIN).length;
+    return this.users().filter((f) => f.role === RoleEnum.ADMIN).length;
   });
   residentCount = computed(() => {
-    return this.users().filter((f) => f.role?.name === RoleEnum.USER).length;
+    return this.users().filter((f) => f.role === RoleEnum.USER).length;
   });
 }

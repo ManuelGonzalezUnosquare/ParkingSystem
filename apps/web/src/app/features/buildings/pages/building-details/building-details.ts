@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   input,
   OnInit,
@@ -58,18 +57,6 @@ export class BuildingDetails implements OnInit {
   };
   id = input.required<string>();
 
-  readonly assignedSlotsCount = computed(() => {
-    const cUsers = this.store.usersEntities();
-    if (!cUsers) return 0;
-
-    return cUsers.reduce((total, user) => {
-      const userAssignedVehicles = user.vehicles.filter(
-        (v) => v.slot !== null,
-      ).length;
-      return total + userAssignedVehicles;
-    }, 0);
-  });
-
   ngOnInit(): void {
     this.store.loadById(this.id());
   }
@@ -103,6 +90,7 @@ export class BuildingDetails implements OnInit {
     });
   }
   async raffle() {
-    this.store.runRaffle();
+    console.log('raffle');
+    // this.store.runRaffle();
   }
 }

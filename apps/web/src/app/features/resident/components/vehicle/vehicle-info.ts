@@ -1,5 +1,5 @@
-import { Component, computed, input } from '@angular/core';
-import { VehicleModel } from '@parking-system/libs';
+import { Component, input } from '@angular/core';
+import { UserModel } from '@parking-system/libs';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 
@@ -10,6 +10,5 @@ import { CardModule } from 'primeng/card';
   styleUrl: './vehicle-info.css',
 })
 export class VehicleInfo {
-  vehicle = input<VehicleModel>();
-  slot = computed(() => this.vehicle()?.slot);
+  user = input.required<UserModel>();
 }

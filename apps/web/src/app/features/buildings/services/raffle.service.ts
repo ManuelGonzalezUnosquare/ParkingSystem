@@ -10,8 +10,8 @@ export class RaffleService {
   private readonly request = inject(RequestService);
   private readonly endpoint = '/api/raffle';
 
-  load(): Observable<ApiResponse<RaffleModel[]>> {
-    return this.request.get<RaffleModel[]>(this.endpoint);
+  load(id: string): Observable<ApiResponse<RaffleModel[]>> {
+    return this.request.get<RaffleModel[]>(`${this.endpoint}/${id}`);
   }
 
   //TODO: MOVE THIS

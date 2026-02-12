@@ -74,13 +74,12 @@ export class UserForm implements OnInit {
     this.form.patchValue({ role: RoleEnum.USER });
     this.user = this.config.data.user;
     if (this.user) {
-      const rVehicle = this.user?.vehicles[0] ?? undefined;
       this.form.patchValue({
         firstName: this.user.firstName,
         lastName: this.user.lastName,
         email: this.user.email,
-        licensePlate: rVehicle?.licensePlate,
-        description: rVehicle?.description,
+        licensePlate: this.user.hasVehicle ? this.user.vehiclePlate : '',
+        description: this.user.hasVehicle ? this.user.vehicleDescription : '',
       });
     }
   }
