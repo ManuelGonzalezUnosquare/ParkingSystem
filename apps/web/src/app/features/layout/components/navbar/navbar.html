@@ -30,6 +30,13 @@
       </a>
 
       }
+      <p-button
+        severity="danger"
+        text
+        label="Logout"
+        icon="pi pi-sign-out"
+        (click)="sessionService.logout()"
+      />
     </div>
   </ng-template>
 </p-toolbar>

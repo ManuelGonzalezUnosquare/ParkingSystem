@@ -4,7 +4,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthStore } from '@core/stores';
 import { filter, map, take } from 'rxjs';
 
-export const roleGuard: CanActivateFn = (route, state) => {
+export const roleGuard: CanActivateFn = (route) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
   const expectedRoles = route.data['roles'] as Array<string>;

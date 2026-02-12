@@ -1,11 +1,18 @@
 @if(sessionService.user(); as user){
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
   <section class="col-span-3">
-    <app-banner class="block" [user]="user" />
+    <app-banner
+      class="block"
+      [user]="user"
+      [nextRaffle]="profileStore.nextRaffle()"
+    />
   </section>
 
   <div class="lg:col-span-2 space-y-8">
-    <app-spot-assignament-table class="block" />
+    <app-spot-assignament-table
+      [history]="profileStore.historyRaffle()"
+      class="block"
+    />
   </div>
   <app-vehicle-info class="block" [user]="user" />
 </div>

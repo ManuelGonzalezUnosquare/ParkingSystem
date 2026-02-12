@@ -88,12 +88,10 @@ export class SessionService {
     return items
       .filter((item) => item.allowedRoles.includes(role))
       .map((item) => {
-        // Hacemos destructuring para separar nuestra propiedad de la que quiere PrimeNG
-        const { allowedRoles, items: childItems, ...primeNGProps } = item;
+        const { items: childItems, ...primeNGProps } = item;
 
         const result: MenuItem = {
           ...primeNGProps,
-          // Si hay hijos, los filtramos recursivamente
           items: childItems
             ? this.filterRecursive(childItems, role)
             : undefined,

@@ -1,6 +1,7 @@
 import { CurrentUser, Roles } from '@common/decorators';
 import { SearchBuildingDto } from '@common/dtos';
 import { User } from '@database/entities';
+import { CreateUserDto } from '@modules/auth/dtos';
 import {
   Body,
   Controller,
@@ -15,9 +16,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { RoleEnum } from '@parking-system/libs';
-import { CreateUserDto } from '../auth/dtos/create-user.dto';
-import { UserEntityToModel } from './mappers';
-import { UsersService } from './services/users.service';
+import { UserEntityToModel } from '../mappers';
+import { UsersService } from '../services';
 
 @Controller('users')
 export class UsersController {

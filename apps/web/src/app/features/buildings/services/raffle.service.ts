@@ -1,6 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { RequestService } from '@core/services';
-import { ApiResponse, RaffleModel } from '@parking-system/libs';
+import {
+  ApiResponse,
+  RaffleModel,
+  RaffleResultModel,
+} from '@parking-system/libs';
 import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
@@ -12,6 +16,14 @@ export class RaffleService {
 
   load(id: string): Observable<ApiResponse<RaffleModel[]>> {
     return this.request.get<RaffleModel[]>(`${this.endpoint}/${id}`);
+  }
+
+  loadHistory(): Observable<ApiResponse<RaffleResultModel[]>> {
+    return this.request.get<RaffleResultModel[]>(`${this.endpoint}/history`);
+  }
+
+  loadNext(): Observable<ApiResponse<RaffleModel>> {
+    return this.request.get<RaffleModel>(`${this.endpoint}/next`);
   }
 
   //TODO: MOVE THIS

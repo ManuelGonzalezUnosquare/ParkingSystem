@@ -8,7 +8,6 @@ export type MockUserService = {
 export const createMockUserService = (): MockUserService => ({
   create: jest.fn(),
   findAll: jest.fn(),
-  findOneById: jest.fn(),
   findOneByPublicId: jest.fn(),
   findOneByEmail: jest.fn(),
   update: jest.fn(),

@@ -39,6 +39,7 @@
     </div>
   </div>
   <ng-template #footer>
+    @if(nextRaffle()){
     <div class="mt-4">
       <div
         class="inline-flex items-center gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/20"
@@ -55,10 +56,11 @@
             Next Raffle Process
           </p>
           <time datetime="2026-05-15" class="text-xl font-bold text-white"
-            >May 15, 2026</time
+            >{{nextRaffle()?.executionDate | date}}</time
           >
         </div>
       </div>
     </div>
+    }
   </ng-template>
 </p-card>

@@ -24,8 +24,8 @@ import { InputTextModule } from 'primeng/inputtext';
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  protected readonly sessionService = inject(SessionService);
   items = signal<MenuItem[]>([]);
-  private readonly sessionService = inject(SessionService);
 
   constructor() {
     effect(() => {

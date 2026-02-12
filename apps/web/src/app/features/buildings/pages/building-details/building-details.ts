@@ -90,7 +90,6 @@ export class BuildingDetails implements OnInit {
     });
   }
   async raffle() {
-    console.log('raffle');
-    // this.store.runRaffle();
+    this.store.runRaffle();
   }
 }

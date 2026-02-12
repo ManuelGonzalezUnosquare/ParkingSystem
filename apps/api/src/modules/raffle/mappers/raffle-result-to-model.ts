@@ -5,6 +5,7 @@ export function RaffleResultToModel(result: RaffleResult): RaffleResultModel {
   return {
     publicId: result.publicId,
     raffleId: result.publicId,
+    assignedDate: result.createdAt,
     userName: `${result.user.firstName} ${result.user.lastName}`,
     userScoreAtDraw: result.scoreAtDraw,
     vehicleDescription: result.vehicle.description,

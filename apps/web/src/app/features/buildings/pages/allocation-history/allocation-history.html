@@ -1,1 +1,27 @@
 <p>allocation-history works!</p>
+
+<p-card>
+  <ng-template #title>
+    <div class="flex justify-between items-center">
+      <h2>Allocation History</h2>
+      <p-button label="Export to PDF" text size="small" />
+    </div>
+  </ng-template>
+
+  <p-table [value]="store.rafflesEntities()">
+    <ng-template #header>
+      <tr>
+        <th>Date</th>
+        <th>Ran manually</th>
+        <th>Participation</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-spot>
+      <tr>
+        <td>{{ spot.executionDate }}</td>
+        <td>{{ spot.isManual }}</td>
+        <td>{{ spot.results.length }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

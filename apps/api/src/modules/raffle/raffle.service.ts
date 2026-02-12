@@ -18,9 +18,41 @@ export class RaffleService {
   constructor(
     @InjectRepository(Raffle)
     private readonly raffleRepository: Repository<Raffle>,
+    @InjectRepository(RaffleResult)
+    private readonly raffleResultRepository: Repository<RaffleResult>,
     private readonly dataSource: DataSource,
     private userService: UsersService,
   ) {}
+
+  async findNext(user: User) {
+    const buildingId = user.building.id;
+    return await this.raffleRepository.findOne({
+      where: {
+        executedAt: IsNull(),
+        building: { id: buildingId },
+      },
+      relations: { building: true },
+    });
+  }
+  async findHistory(user: User) {
+    const buildingId = user.building.id;
+    const _buildingId =
+      user.role.name === RoleEnum.ROOT ? buildingId : user.building.publicId;
+    const userId = user.id;
+
+    const query = this.raffleResultRepository
+      .createQueryBuilder('results')
+      .leftJoinAndSelect('results.raffle', 'raffle')
+      .leftJoinAndSelect('results.user', 'users')
+      .leftJoinAndSelect('results.vehicle', 'vehicle')
+      .leftJoinAndSelect('results.slot', 'slot')
+      .leftJoin('raffle.building', 'building')
+      .where('building.publicId = :_buildingId', { _buildingId })
+      .andWhere('users.id = :userId', { userId })
+      .orderBy('results.createdAt', 'DESC');
+
+    return query.getMany();
+  }
 
   async findAll(user: User, buildingId: string) {
     PermissionValidator.validateBuildingAccess(user, buildingId);
@@ -37,7 +69,7 @@ export class RaffleService {
       .leftJoin('raffles.building', 'building')
       .where('building.publicId = :_buildingId', { _buildingId });
 
-    return query.getMany();
+    return await query.getMany();
   }
 
   async executeRaffle(user: User, isManuallyTriggered: boolean) {

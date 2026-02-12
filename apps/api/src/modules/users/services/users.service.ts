@@ -18,13 +18,11 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserModel } from '@parking-system/libs';
 import { CryptoService } from '@utils/services';
 import { Like, Repository } from 'typeorm';
-import { UserEntityToModel } from '../mappers';
 import { RoleService } from './role.service';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -142,25 +140,13 @@ export class UsersService {
 
     return await paginateQuery(query, filters);
   }
-  async findOneById(id: number): Promise<User | null> {
-    this.logger.log(`Searching for user with ID: ${id}`);
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: ['role', 'building', 'vehicles'],
-    });
 
-    if (!user) {
-      this.logger.warn(`User with ID: ${id} not found`);
-    }
-
-    return user;
-  }
   async findOneByPublicId(publicId: string): Promise<User | null> {
     this.logger.log(`Searching for user with ID: ${publicId}`);
 
     const user = await this.userRepository.findOne({
       where: { publicId },
-      relations: ['role', 'building', 'vehicles'],
+      relations: ['role', 'building', 'vehicles', 'vehicles.slot'],
     });
 
     if (!user) {
