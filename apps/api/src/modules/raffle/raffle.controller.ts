@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 import { RaffleService } from './raffle.service';
 import { Roles, CurrentUser } from '@common/decorators';
 import { User } from '@database/entities';
@@ -8,14 +8,17 @@ import { RoleEnum } from '@parking-system/libs';
 export class RaffleController {
   constructor(private readonly raffleService: RaffleService) {}
 
-  @Get()
-  @Roles(RoleEnum.ADMIN)
-  get(@CurrentUser() user: User) {
-    return this.raffleService.findAll(user);
+  @Get(':id')
+  @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
+  findOne(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.raffleService.findAll(user, id);
   }
 
   @Post()
-  @Roles(RoleEnum.ADMIN)
+  @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   create(@CurrentUser() user: User) {
     return this.raffleService.executeRaffle(user, true);
   }

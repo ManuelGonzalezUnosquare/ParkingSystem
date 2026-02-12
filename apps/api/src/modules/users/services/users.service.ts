@@ -8,6 +8,7 @@ import {
 import { User, Vehicle } from '@database/entities';
 import { CreateUserDto, ResetPasswordByCodeDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/buildings.service';
+import { VehiclesService } from '@modules/vehicles/vehicles.service';
 import {
   BadRequestException,
   ConflictException,
@@ -18,10 +19,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserModel } from '@parking-system/libs';
 import { CryptoService } from '@utils/services';
 import { Like, Repository } from 'typeorm';
+import { UserEntityToModel } from '../mappers';
 import { RoleService } from './role.service';
-import { VehiclesService } from '@modules/vehicles/vehicles.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -34,6 +37,7 @@ export class UsersService {
     private readonly vehicleService: VehiclesService,
     private readonly buildingService: BuildingsService,
     private readonly roleService: RoleService,
+    private readonly configService: ConfigService,
   ) {}
 
   async changePassword(newPassword: string, user: User) {
@@ -65,7 +69,7 @@ export class UsersService {
     await queryRunner.startTransaction();
 
     try {
-      const tempPassword = 'abc1234!'; // TODO: generator
+      const tempPassword = this.configService.get<string>('DEFAULT_USER_PWD'); // TODO: generator
       const hashedPassword = await this.cryptoService.hash(tempPassword);
 
       const newUser = this.userRepository.create({
@@ -92,6 +96,7 @@ export class UsersService {
 
       await queryRunner.commitTransaction();
       this.logger.log(`User created with ID: ${savedUser.id}`);
+      //TODO: send email with pass info
       savedUser.vehicles = vehicles;
       return savedUser;
     } catch (error) {

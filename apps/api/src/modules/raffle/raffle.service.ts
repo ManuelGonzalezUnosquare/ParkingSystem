@@ -1,3 +1,4 @@
+import { PermissionValidator } from '@common/utils';
 import {
   ParkingSlot,
   Raffle,
@@ -21,8 +22,11 @@ export class RaffleService {
     private userService: UsersService,
   ) {}
 
-  async findAll(user: User) {
-    const buildingId = user.building.id;
+  async findAll(user: User, buildingId: string) {
+    PermissionValidator.validateBuildingAccess(user, buildingId);
+
+    const _buildingId =
+      user.role.name === RoleEnum.ROOT ? buildingId : user.building.publicId;
 
     const query = this.raffleRepository
       .createQueryBuilder('raffles')
@@ -31,7 +35,7 @@ export class RaffleService {
       .leftJoinAndSelect('results.vehicle', 'vehicle')
       .leftJoinAndSelect('results.slot', 'slot')
       .leftJoin('raffles.building', 'building')
-      .where('building.Id = :buildingId', { buildingId });
+      .where('building.publicId = :_buildingId', { _buildingId });
 
     return query.getMany();
   }

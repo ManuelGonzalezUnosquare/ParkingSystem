@@ -12,15 +12,16 @@ export async function paginate<T>(
   searchDto: SearchDto,
   findOptions: FindManyOptions<T> = {},
 ): Promise<PaginatedResult<T>> {
-  const { first, rows, sortField, sortOrder } = searchDto;
+  const { first, rows } = searchDto;
+
+  const sortField = searchDto.sortField ? searchDto.sortField : 'createdAt';
+  const sortOrder = searchDto.sortOrder === 1 ? 'ASC' : 'DESC';
 
   const [data, total] = await repository.findAndCount({
     ...findOptions,
     skip: first, // Index to start from
     take: rows, // Number of records
-    order: {
-      [sortField]: sortOrder === 1 ? 'ASC' : 'DESC',
-    } as any,
+    order: { [sortField]: sortOrder } as any,
   });
 
   return {

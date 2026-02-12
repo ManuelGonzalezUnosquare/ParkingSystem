@@ -16,6 +16,7 @@ import {
   ResetPasswordByCodeDto,
   ResetPasswordRequestDto,
 } from './dtos';
+import { UserEntityToModel } from '@modules/users/mappers';
 
 @Controller('auth')
 export class AuthController {
@@ -33,12 +34,12 @@ export class AuthController {
       loginDto.password,
     );
 
-    return this.authService.login(user);
+    return this.authService.login(UserEntityToModel(user));
   }
 
   @Get('me')
   async getMe(@CurrentUser() user: User) {
-    return user;
+    return UserEntityToModel(user);
   }
 
   @Post('change-password')
@@ -47,7 +48,11 @@ export class AuthController {
     @Body() dto: { newPassword: string },
     @CurrentUser() user: User,
   ) {
-    return await this.userService.changePassword(dto.newPassword, user);
+    const response = await this.userService.changePassword(
+      dto.newPassword,
+      user,
+    );
+    return UserEntityToModel(response);
   }
 
   @Public()
@@ -62,7 +67,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async resetPasswordConfirm(@Body() dto: ResetPasswordByCodeDto) {
     const user = await this.userService.resetPassword(dto);
-    return this.authService.login(user);
+    return this.authService.login(UserEntityToModel(user));
   }
 
   @Public()

@@ -1,4 +1,5 @@
 import { User } from '@database/entities';
+import { UserEntityToModel } from '@modules/users/mappers';
 import { UsersService } from '@modules/users/services/users.service';
 import {
   forwardRef,
@@ -7,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SessionModel } from '@parking-system/libs';
+import { SessionModel, UserModel } from '@parking-system/libs';
 import { CryptoService } from '@utils/services';
 
 @Injectable()
@@ -50,12 +51,12 @@ export class AuthService {
    * @param user Validated user object
    * @returns Access token and basic user info for the frontend
    */
-  login(user: User): SessionModel {
+  login(user: UserModel): SessionModel {
     const payload = {
       email: user.email,
       sub: user.publicId,
-      role: user.role?.name,
-      buildingId: user.building?.publicId,
+      role: user.role,
+      buildingId: user.buildingId,
     };
 
     return {

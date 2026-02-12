@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { RoleEnum } from '@parking-system/libs';
 import { CreateUserDto } from '../auth/dtos/create-user.dto';
+import { UserEntityToModel } from './mappers';
 import { UsersService } from './services/users.service';
 
 @Controller('users')
@@ -25,14 +26,27 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
-    return this.usersService.create(createUserDto, user);
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @CurrentUser() user: User,
+  ) {
+    const response = await this.usersService.create(createUserDto, user);
+    return UserEntityToModel(response);
   }
 
   @Get()
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  findAll(@Query() searchDto: SearchBuildingDto, @CurrentUser() user: User) {
-    return this.usersService.findAll(searchDto, user);
+  async findAll(
+    @Query() searchDto: SearchBuildingDto,
+    @CurrentUser() user: User,
+  ) {
+    const searchResult = await this.usersService.findAll(searchDto, user);
+    const response = {
+      meta: searchResult.meta,
+      data: searchResult.data.map((user) => UserEntityToModel(user)),
+    };
+
+    return response;
   }
 
   @Get(':id')
