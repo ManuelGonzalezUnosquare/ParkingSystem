@@ -1,6 +1,6 @@
 import { CurrentUser, Public } from '@common/decorators';
 import { User } from '@database/entities';
-import { UsersService } from '@modules/users/services';
+import { UserEntityToModel } from '@modules/users/mappers';
 import {
   Body,
   Controller,
@@ -9,25 +9,25 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SessionModel } from '@parking-system/libs';
 import { AuthService } from './auth.service';
 import {
+  ChangePasswordDto,
   LoginDto,
   ResetPasswordByCodeDto,
   ResetPasswordRequestDto,
 } from './dtos';
-import { UserEntityToModel } from '@modules/users/mappers';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UsersService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'User login' })
   async login(@Body() loginDto: LoginDto): Promise<SessionModel> {
     const user = await this.authService.validateUser(
       loginDto.email,
@@ -38,6 +38,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @ApiOperation({ summary: 'Get current user profile' })
   async getMe(@CurrentUser() user: User) {
     return UserEntityToModel(user);
   }
@@ -45,11 +46,11 @@ export class AuthController {
   @Post('change-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(
-    @Body() dto: { newPassword: string },
+    @Body() dto: ChangePasswordDto,
     @CurrentUser() user: User,
   ) {
-    const response = await this.userService.changePassword(
-      dto.newPassword,
+    const response = await this.authService.resetPassword(
+      { newPassword: dto.newPassword, code: '', email: user.email },
       user,
     );
     return UserEntityToModel(response);
@@ -59,14 +60,14 @@ export class AuthController {
   @Post('reset-password-request')
   @HttpCode(HttpStatus.OK)
   async resetPasswordRequest(@Body() dto: ResetPasswordRequestDto) {
-    return await this.userService.resetPasswordRequest(dto.email);
+    return await this.authService.resetPasswordRequest(dto.email);
   }
 
   @Public()
   @Post('reset-password-confirm')
   @HttpCode(HttpStatus.OK)
   async resetPasswordConfirm(@Body() dto: ResetPasswordByCodeDto) {
-    const user = await this.userService.resetPassword(dto);
+    const user = await this.authService.resetPassword(dto);
     return this.authService.login(UserEntityToModel(user));
   }
 
