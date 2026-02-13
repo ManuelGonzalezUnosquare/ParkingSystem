@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthStore } from '@core/stores';
+import { AuthStore } from '@core/stores/auth.store';
 import { filter, take, map } from 'rxjs';
 
 export const accessBuildingGuard: CanActivateFn = (route) => {
