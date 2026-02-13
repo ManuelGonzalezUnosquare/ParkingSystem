@@ -10,7 +10,7 @@ import { UsersService } from '@modules/users/services';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleEnum, UserStatusEnum } from '@parking-system/libs';
-import { DataSource, Equal, IsNull, Repository } from 'typeorm';
+import { DataSource, Equal, In, IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class RaffleService {
@@ -77,162 +77,98 @@ export class RaffleService {
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    let raffleId = null;
     try {
       // 1. Fetch Raffle and Building context
       const raffle = await queryRunner.manager.findOne(Raffle, {
         where: { building: Equal(user.building.id), executedAt: IsNull() },
-        relations: [
-          'building',
-          'building.users',
-          'building.users.vehicles',
-          'building.users.role',
-          'building.slots',
-        ],
+        relations: ['building'],
       });
 
       if (!raffle) {
         throw new Error('Raffle not found or already executed');
       }
 
-      raffleId = raffle.id;
-      this.logger.log(`Starting transaction for raffle ID: ${raffleId}`);
+      const [candidates, slots] = await Promise.all([
+        queryRunner.manager.find(User, {
+          where: {
+            building: { id: raffle.building.id },
+            status: UserStatusEnum.ACTIVE,
+            role: { name: RoleEnum.USER },
+          },
+          relations: ['vehicles'],
+        }),
+        queryRunner.manager.find(ParkingSlot, {
+          where: { building: { id: raffle.building.id } },
+          order: { slotNumber: 'ASC' },
+        }),
+      ]);
 
-      //clear prev assignations
-      const buildingVehicleIds = raffle.building.users
-        .flatMap((u) => u.vehicles || [])
-        .map((v) => v.id);
+      const activeCandidates = candidates.filter((u) => u.vehicles?.length > 0);
+      const results = this.runSelection(activeCandidates, slots);
 
-      if (buildingVehicleIds.length > 0) {
-        this.logger.log(
-          `Resetting slots for ${buildingVehicleIds.length} vehicles before new assignment...`,
-        );
-        await queryRunner.manager.update(Vehicle, buildingVehicleIds, {
-          slot: null,
-        });
-      }
-      // -------------------------
+      //handle winners
+      if (results.winners.length > 0) {
+        const winnerIds = results.winners.map((w) => w.user.id);
+        const vehicleIds = results.winners.map((w) => w.user.vehicles[0].id);
 
-      // 2. Identify Candidates (Active Users with at least one vehicle)
-      const candidates = raffle.building.users.filter(
-        (u) =>
-          u.role.name === RoleEnum.USER &&
-          u.status === UserStatusEnum.ACTIVE &&
-          u.vehicles?.length > 0,
-      );
+        await queryRunner.manager.update(User, winnerIds, { priorityScore: 0 });
 
-      // 3. Identify  Slots (Sorted by slotNumber)
-      const availableSlots = raffle.building.slots
-        // .filter((s) => s.isAvailable)
-        .sort((a, b) =>
-          a.slotNumber.localeCompare(b.slotNumber, undefined, {
-            numeric: true,
+        const historyRecords = results.winners.map((res) =>
+          queryRunner.manager.create(RaffleResult, {
+            raffle,
+            user: res.user,
+            vehicle: res.user.vehicles[0],
+            slot: res.slot,
+            scoreAtDraw: res.user.priorityScore,
           }),
         );
+        await queryRunner.manager.save(RaffleResult, historyRecords);
 
-      // 4. Run Selection Algorithm
-      const results = this.runSelection(candidates, availableSlots);
-
-      // 5. Apply Changes via Transaction Manager
-      for (const res of results.winners) {
-        // Reset Priority Score
-        await queryRunner.manager.update(User, res.user.id, {
-          priorityScore: 0,
-        });
-
-        // Link Slot to Vehicle (Primary Vehicle)
-        const primaryVehicle = res.user.vehicles[0];
-        await queryRunner.manager.update(Vehicle, primaryVehicle.id, {
-          slot: res.slot,
-        });
-
-        // Save History Record
-        const history = queryRunner.manager.create(RaffleResult, {
-          raffle,
-          user: res.user,
-          vehicle: primaryVehicle,
-          slot: res.slot,
-          scoreAtDraw: res.user.priorityScore,
-        });
-        await queryRunner.manager.save(history);
+        for (const res of results.winners) {
+          await queryRunner.manager.update(Vehicle, res.user.vehicles[0].id, {
+            slot: res.slot,
+          });
+        }
       }
-
-      // 6. Handle Losers (Increment Priority)
-      for (const loser of results.losers) {
+      //handle lossers
+      if (results.losers.length > 0) {
+        const loserIds = results.losers.map((l) => l.id);
         await queryRunner.manager.increment(
           User,
-          { id: loser.id },
+          { id: In(loserIds) },
           'priorityScore',
           1,
         );
 
-        // Ensure no previous slot is linked to their vehicles
-        const primaryVehicle = loser.vehicles[0];
-        await queryRunner.manager.update(Vehicle, primaryVehicle.id, {
+        const loserVehicleIds = results.losers.map((l) => l.vehicles[0].id);
+        await queryRunner.manager.update(Vehicle, loserVehicleIds, {
           slot: null,
         });
       }
 
-      // 7. Mark Raffle as executed and schedule next one
+      //create next
       raffle.executedAt = new Date();
       raffle.isManual = isManuallyTriggered;
       await queryRunner.manager.save(raffle);
 
-      const nextDate = new Date();
-      nextDate.setMonth(nextDate.getMonth() + 3);
       const nextRaffle = queryRunner.manager.create(Raffle, {
         building: raffle.building,
-        executionDate: nextDate,
+        executionDate: this.calculateNextRaffleDate(),
       });
       await queryRunner.manager.save(nextRaffle);
 
-      // COMMIT everything
       await queryRunner.commitTransaction();
-      this.logger.log(
-        `Raffle ${raffle.id} successfully executed and committed.`,
-      );
-    } catch (err) {
-      // ROLLBACK if anything fails
-      this.logger.error(
-        `Raffle ${raffleId} failed. Rolling back changes.`,
-        err.stack,
-      );
+    } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw err;
+      throw error;
     } finally {
-      // Release the runner
       await queryRunner.release();
     }
-
-    ////validate user role
-    //const building = user.building;
-    //const raffle = await this.findActiveRaffleByBuilding(building.id);
-    //
-    //const candidates = raffle.building.users.filter(
-    //  (u) =>
-    //    u.role.name === RoleEnum.USER &&
-    //    u.status === UserStatusEnum.ACTIVE &&
-    //    u.vehicles.length > 0,
-    //);
-    //
-    //const availableSlots = raffle.building.slots
-    //  .filter((s) => s.isAvailable)
-    //  .sort((a, b) => a.slotNumber.localeCompare(b.slotNumber));
-    //
-    //let assignments = [];
-    //
-    //// less candidates than slots
-    //if (candidates.length <= availableSlots.length) {
-    //  assignments = candidates.map((user, index) => ({
-    //    user,
-    //    slot: availableSlots[index],
-    //  }));
-    //} else {
-    //  // more candidates than slots
-    //  assignments = this.runWeightedRaffle(candidates, availableSlots);
-    //}
-    //
-    //return await this.finalizeRaffle(raffle, assignments, candidates, user);
+  }
+  private calculateNextRaffleDate(): Date {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 3);
+    return d;
   }
 
   private runSelection(
@@ -306,62 +242,6 @@ export class RaffleService {
         executedAt: IsNull(),
       },
       relations: ['building', 'building.users', 'building.slots'],
-    });
-  }
-
-  private runWeightedRaffle(candidates: User[], slots: ParkingSlot[]) {
-    const winners = [];
-    const pool = [...candidates];
-    const totalSlots = slots.length;
-
-    for (let i = 0; i < totalSlots; i++) {
-      // Calcular pesos: 1 (base) + priorityScore
-      const weightedPool = pool.flatMap((user) =>
-        Array(user.priorityScore + 1).fill(user),
-      );
-
-      const winner =
-        weightedPool[Math.floor(Math.random() * weightedPool.length)];
-      winners.push({ user: winner, slot: slots[i] });
-
-      // Sacar al ganador del pool para el siguiente slot
-      const index = pool.indexOf(winner);
-      pool.splice(index, 1);
-    }
-
-    return winners;
-  }
-
-  private async finalizeRaffle(
-    raffle: Raffle,
-    assignments: any[],
-    allCandidates: User[],
-  ) {
-    // 1. Marcar ganadores (priorityScore se mantiene en 0 o se resetea)
-    for (const a of assignments) {
-      await this.userService.internalUpdate(a.user.id, {
-        priorityScore: 0,
-      });
-    }
-
-    // 2. Incrementar score de perdedores
-    const winnersIds = assignments.map((a) => a.user.id);
-    const losers = allCandidates.filter((c) => !winnersIds.includes(c.id));
-
-    for (const loser of losers) {
-      await this.userService.incrementPriority(loser.id);
-    }
-
-    // 3. Marcar rifa como ejecutada
-    raffle.executedAt = new Date();
-    await this.raffleRepository.save(raffle);
-
-    // 4. CREAR LA SIGUIENTE RIFA (Automática en 3 meses)
-    const nextDate = new Date();
-    nextDate.setMonth(nextDate.getMonth() + 3);
-    await this.raffleRepository.create({
-      building: raffle.building,
-      executionDate: nextDate,
     });
   }
 }
