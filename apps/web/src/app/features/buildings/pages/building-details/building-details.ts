@@ -45,7 +45,6 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 export class BuildingDetails implements OnInit {
   readonly store = inject(BuildingDetailStore);
   readonly dialogService = inject(DialogService);
-  private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {
     width: '50vw',
     modal: true,
