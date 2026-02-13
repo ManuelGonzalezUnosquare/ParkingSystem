@@ -23,6 +23,12 @@
       },
       "configurations": {
         "production": {
+          "fileReplacement": [
+            {
+              "replace": "apps/web/src/environments/environment.ts",
+              "with": "apps/web/src/environments/environment.production.ts"
+            }
+          ],
           "budgets": [
             {
               "type": "initial",
@@ -58,7 +64,7 @@
       },
       "defaultConfiguration": "development",
       "options": {
-        "proxyConfig": "apps/web/proxy.conf.json"
+        "proxyConfig": "apps/web/proxy.conf.js"
       }
     },
     "lint": {

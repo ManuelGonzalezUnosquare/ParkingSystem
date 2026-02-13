@@ -63,6 +63,7 @@ services:
       - /app/node_modules
     environment:
       NODE_ENV: development
+      IS_DOCKER: true
 
 volumes:
   db_data:
