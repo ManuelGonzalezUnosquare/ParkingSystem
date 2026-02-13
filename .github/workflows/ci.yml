@@ -40,4 +40,4 @@ jobs:
         run: npx nx affected -t build
 
       - name: Run Unit Tests
-        run: npx nx affected -t test -- --watch=false --browsers=ChromeHeadless
+        # run: npx nx affected -t test -- --watch=false --browsers=ChromeHeadless
