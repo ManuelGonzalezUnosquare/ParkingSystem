@@ -9,7 +9,6 @@ export const createMockAuthService = (): MockAuthService => ({
   validateUser: jest.fn(),
   login: jest.fn(),
   validateResetCode: jest.fn(),
-  changePassword: undefined,
   resetPasswordRequest: undefined,
   resetPassword: undefined,
 });
