@@ -1,4 +1,5 @@
 services:
+  # Base de Datos MySQL
   db:
     image: mysql:8.0
     container_name: parking-db
@@ -12,6 +13,42 @@ services:
       - '${DB_PORT}:3306'
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mysqladmin',
+          'ping',
+          '-h',
+          'localhost',
+          '-u${DB_USER}',
+          '-p${DB_PASSWORD}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Backend NestJS (dentro del monorepo Nx)
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api.Dockerfile
+    container_name: parking-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
 
 volumes:
   db_data:

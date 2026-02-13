@@ -43,7 +43,7 @@ import { RaffleModule } from '@modules/raffle/raffle.module';
         console.log('Tentando conexión a DB con:', dbConfig);
         return {
           type: 'mysql',
-          host: dbConfig.host,
+          host: dbConfig.host || 'localhost',
           port: parseInt(config.get<string>('DB_PORT', '3307'), 10),
           username: dbConfig.user,
           password: config.get<string>('DB_PASSWORD'),
