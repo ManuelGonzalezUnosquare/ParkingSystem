@@ -1,4 +1,9 @@
-import { Component, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -25,11 +30,14 @@ import { FormFeedback, FormValidationError } from '@shared/ui/feedback';
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class Login {
-  readonly router = inject(Router);
-  readonly store = inject(AuthStore);
-  readonly form = new FormGroup<ILoginForm>({
+  private readonly router = inject(Router);
+  protected readonly store = inject(AuthStore);
+
+  protected readonly form = new FormGroup<ILoginForm>({
     email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
