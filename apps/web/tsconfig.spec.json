@@ -2,14 +2,16 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "types": ["vitest/globals"],
+    "types": ["jest", "node"],
     "baseUrl": ".",
     "paths": {
       "@parking-system/libs": ["../../libs/src/index.ts"],
       "@core/*": ["src/app/core/*"],
       "@shared/*": ["src/app/shared/*"],
-      "@features/*": ["src/app/features/*"]
+      "@features/*": ["src/app/features/*"],
+      "@env/*": ["src/environments/*"]
     }
   },
+  "files": ["src/test-setup.ts"],
   "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }
