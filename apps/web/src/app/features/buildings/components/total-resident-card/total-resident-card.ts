@@ -18,10 +18,17 @@ import { CardModule } from 'primeng/card';
 export class TotalResidentCard {
   users = input.required<UserModel[]>();
 
-  adminCount = computed(() => {
-    return this.users().filter((f) => f.role === RoleEnum.ADMIN).length;
+  private readonly stats = computed(() => {
+    return this.users().reduce(
+      (acc, user) => {
+        if (user.role === RoleEnum.ADMIN) acc.admins++;
+        if (user.role === RoleEnum.USER) acc.residents++;
+        return acc;
+      },
+      { admins: 0, residents: 0 },
+    );
   });
-  residentCount = computed(() => {
-    return this.users().filter((f) => f.role === RoleEnum.USER).length;
-  });
+
+  protected readonly adminCount = computed(() => this.stats().admins);
+  protected readonly residentCount = computed(() => this.stats().residents);
 }
