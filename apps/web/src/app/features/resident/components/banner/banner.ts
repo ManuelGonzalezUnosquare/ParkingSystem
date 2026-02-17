@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RaffleModel, UserModel } from '@parking-system/libs';
 import { CardModule } from 'primeng/card';
 
@@ -8,6 +8,8 @@ import { CardModule } from 'primeng/card';
   imports: [CardModule, DatePipe],
   templateUrl: './banner.html',
   styleUrl: './banner.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class Banner {
   user = input.required<UserModel>();
