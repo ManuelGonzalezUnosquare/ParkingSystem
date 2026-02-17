@@ -40,7 +40,7 @@ jobs:
         run: npx nx affected -t build
 
       - name: Run API Unit Tests
-        run: npm run test:api
+        run: npx nx test api
 
       - name: Run Web Unit Tests
-        run: npm run test:web
+        run: npx nx test web
