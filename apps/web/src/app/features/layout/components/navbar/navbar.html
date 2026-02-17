@@ -1,42 +1,97 @@
-<p-toolbar>
-  <ng-template #start>
-    <div class="flex items-center gap-3 text-primary">
-      <div class="size-6">
-        <span class="pi pi-car text-2xl text-blue-500"></span>
-      </div>
-      <h2
-        class="text-slate-700 text-lg font-bold leading-tight tracking-[-0.015em]"
-      >
-        Resident Parking Portal
-      </h2>
-    </div>
-  </ng-template>
-  <ng-template #center> </ng-template>
-  <ng-template #end>
-    <div class="flex items-center gap-2">
-      @for(opt of items(); track opt.label){
+<nav class="block shadow-sm" aria-label="Main Navigation">
+  <p-toolbar>
+    <ng-template #start>
       <a
-        pButton
-        severity="secondary"
-        text
-        [routerLink]="opt.routerLink"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{exact:true}"
+        routerLink="/app"
+        class="flex items-center gap-3 no-underline focus:outline-primary focus:outline-offset-4 rounded"
+        aria-label="Resident Parking Portal Home"
       >
-        @if(!opt.label){
-        <span pButtonIcon [class]="opt.icon"></span>
-        }
-        <span pButtonLabel>{{opt.label}}</span>
+        <div
+          class="size-8 flex items-center justify-center bg-blue-50 rounded-lg"
+        >
+          <i class="pi pi-car text-xl text-blue-500" aria-hidden="true"></i>
+        </div>
+        <h2
+          class="text-slate-800 text-lg font-bold leading-tight tracking-tight"
+        >
+          Resident Parking Portal
+        </h2>
       </a>
+    </ng-template>
 
-      }
-      <p-button
-        severity="danger"
-        text
-        label="Logout"
-        icon="pi pi-sign-out"
-        (click)="sessionService.logout()"
-      />
-    </div>
-  </ng-template>
-</p-toolbar>
+    <ng-template #center></ng-template>
+
+    <ng-template #end>
+      <div class="flex items-center gap-2">
+        @for(opt of items(); track opt.label || opt.icon) {
+        <a
+          pButton
+          severity="secondary"
+          [text]="true"
+          [routerLink]="opt.routerLink"
+          routerLinkActive="bg-slate-100 text-primary"
+          [routerLinkActiveOptions]="{exact: true}"
+          [attr.aria-label]="opt.label || 'Notifications'"
+        >
+          @if(opt.icon) {
+          <span pButtonIcon [class]="opt.icon" aria-hidden="true"></span>
+          } @if(opt.label) {
+          <span pButtonLabel>{{ opt.label }}</span>
+          }
+        </a>
+        }
+
+        <p-button
+          severity="danger"
+          [text]="true"
+          label="Logout"
+          icon="pi pi-sign-out"
+          (click)="sessionService.logout()"
+          aria-label="Sign out of your account"
+        />
+      </div>
+    </ng-template>
+  </p-toolbar>
+</nav>
+<!-- <p-toolbar> -->
+<!--   <ng-template #start> -->
+<!--     <div class="flex items-center gap-3 text-primary"> -->
+<!--       <div class="size-6"> -->
+<!--         <span class="pi pi-car text-2xl text-blue-500"></span> -->
+<!--       </div> -->
+<!--       <h2 -->
+<!--         class="text-slate-700 text-lg font-bold leading-tight tracking-[-0.015em]" -->
+<!--       > -->
+<!--         Resident Parking Portal -->
+<!--       </h2> -->
+<!--     </div> -->
+<!--   </ng-template> -->
+<!--   <ng-template #center> </ng-template> -->
+<!--   <ng-template #end> -->
+<!--     <div class="flex items-center gap-2"> -->
+<!--       @for(opt of items(); track opt.label){ -->
+<!--       <a -->
+<!--         pButton -->
+<!--         severity="secondary" -->
+<!--         text -->
+<!--         [routerLink]="opt.routerLink" -->
+<!--         routerLinkActive="active" -->
+<!--         [routerLinkActiveOptions]="{exact:true}" -->
+<!--       > -->
+<!--         @if(!opt.label){ -->
+<!--         <span pButtonIcon [class]="opt.icon"></span> -->
+<!--         } -->
+<!--         <span pButtonLabel>{{opt.label}}</span> -->
+<!--       </a> -->
+<!---->
+<!--       } -->
+<!--       <p-button -->
+<!--         severity="danger" -->
+<!--         text -->
+<!--         label="Logout" -->
+<!--         icon="pi pi-sign-out" -->
+<!--         (click)="sessionService.logout()" -->
+<!--       /> -->
+<!--     </div> -->
+<!--   </ng-template> -->
+<!-- </p-toolbar> -->
