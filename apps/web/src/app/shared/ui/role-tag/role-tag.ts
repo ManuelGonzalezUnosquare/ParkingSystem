@@ -19,6 +19,7 @@ type TagSeverity =
 const ROLE_SEVERITY_MAP: Record<string, TagSeverity> = {
   [RoleEnum.ROOT]: 'danger',
   [RoleEnum.ADMIN]: 'success',
+  [RoleEnum.USER]: 'info',
 };
 
 @Component({

@@ -1,4 +1,10 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -24,11 +30,13 @@ import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
   ],
   templateUrl: './password-recovery.html',
   styleUrl: './password-recovery.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class PasswordRecovery {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
-  isRequestSent = signal<boolean>(false);
+  protected readonly isRequestSent = signal<boolean>(false);
   readonly form = new FormGroup<IPasswordRecovery>({
     email: new FormControl('', {
       nonNullable: true,
@@ -52,6 +60,7 @@ export class PasswordRecovery {
     const { email } = this.form.getRawValue();
 
     const response = await this.store.resetPasswordRequest(email);
+
     if (response) {
       this.isRequestSent.set(response);
     }
