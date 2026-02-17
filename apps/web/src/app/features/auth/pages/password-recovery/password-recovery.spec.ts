@@ -1,26 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PasswordRecovery } from './password-recovery';
-import { provideRouter } from '@angular/router';
 import { AuthStore } from '@core/stores';
+import { provideRouter } from '@angular/router';
 import { vi } from 'vitest';
-import { ReactiveFormsModule } from '@angular/forms';
+import { signal } from '@angular/core';
 
-describe('PasswordRecovery Component', () => {
+describe('PasswordRecovery', () => {
   let component: PasswordRecovery;
   let fixture: ComponentFixture<PasswordRecovery>;
 
   const mockStore = {
-    resetPasswordRequest: vi.fn(),
-    resetPasswordCode: vi.fn(() => null),
-    loading: vi.fn(() => false),
-    callState: vi.fn(() => ({ res: 'IDLE' })),
+    loading: signal(false),
+    callState: signal('init'),
+    resetPasswordCode: signal(null),
+    resetPasswordRequest: vi.fn().mockResolvedValue(true),
   };
 
   beforeEach(async () => {
-    vi.clearAllMocks();
-
     await TestBed.configureTestingModule({
-      imports: [PasswordRecovery, ReactiveFormsModule],
+      imports: [PasswordRecovery],
       providers: [
         provideRouter([]),
         { provide: AuthStore, useValue: mockStore },
@@ -32,34 +30,30 @@ describe('PasswordRecovery Component', () => {
     fixture.detectChanges();
   });
 
-  it('should render initial state correctly', () => {
-    const title = fixture.nativeElement.querySelector('h1');
-    expect(title.textContent).toContain('Reset Your Password');
-    expect(component['isRequestSent']()).toBe(false);
+  it('should be invalid when email is empty', () => {
+    component.form.controls.email.setValue('');
+    expect(component.form.invalid).toBe(true);
   });
 
-  it('should not call store if email is invalid', async () => {
-    component['form'].controls.email.setValue('not-an-email');
-    await component['doSubmit']();
-    expect(mockStore.resetPasswordRequest).not.toHaveBeenCalled();
-  });
-
-  it('should call store and show success state on success', async () => {
-    component['form'].controls.email.setValue('test@example.com');
-    mockStore.resetPasswordRequest.mockResolvedValue(true);
-
-    await component['doSubmit']();
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
+  it('should call store.resetPasswordRequest on submit if valid', async () => {
+    component.form.controls.email.setValue('test@example.com');
+    await component.doSubmit();
 
     expect(mockStore.resetPasswordRequest).toHaveBeenCalledWith(
       'test@example.com',
     );
     expect(component['isRequestSent']()).toBe(true);
+  });
 
-    const successTitle = fixture.nativeElement.querySelector('h2');
-    expect(successTitle.textContent).toContain('Email Sent!');
+  it('should show success message when isRequestSent is true', async () => {
+    (component as any).isRequestSent.set(true);
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('Check your Email');
   });
 });

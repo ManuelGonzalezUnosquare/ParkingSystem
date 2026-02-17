@@ -4,6 +4,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import {
   FormControl,
@@ -36,7 +37,9 @@ import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
 export class PasswordRecovery {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
+
   protected readonly isRequestSent = signal<boolean>(false);
+
   readonly form = new FormGroup<IPasswordRecovery>({
     email: new FormControl('', {
       nonNullable: true,
@@ -46,23 +49,25 @@ export class PasswordRecovery {
 
   constructor() {
     effect(() => {
-      const cCode = this.store.resetPasswordCode();
-      if (!cCode) return;
-
-      this.router.navigateByUrl(`/auth/password-recovery-confirm`);
+      if (this.store.resetPasswordCode()) {
+        untracked(() =>
+          this.router.navigate(['/auth/password-recovery-confirm']),
+        );
+      }
     });
   }
 
   async doSubmit() {
+    if (this.store.loading()) return;
+
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     const { email } = this.form.getRawValue();
+    const success = await this.store.resetPasswordRequest(email);
 
-    const response = await this.store.resetPasswordRequest(email);
-
-    if (response) {
-      this.isRequestSent.set(response);
+    if (success) {
+      this.isRequestSent.set(true);
     }
   }
 }
