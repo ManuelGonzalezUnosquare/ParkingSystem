@@ -1,24 +1,43 @@
 <p-card>
   <ng-template #title>
     <div class="flex justify-between items-start">
-      <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
-        Utilization
+      <p
+        id="utilization-label"
+        class="text-[#4b739b] text-xs font-bold uppercase tracking-widest"
+      >
+        Space Utilization
       </p>
-      <i class="pi pi-id-card text-blue-500"></i>
+      <i class="pi pi-id-card text-blue-500" aria-hidden="true"></i>
     </div>
   </ng-template>
 
   <ng-template #content>
-    <div class="py-[0.85rem]">
-      <p-progressbar [color]="progressColor()" [value]="progressValue()" />
+    <div class="py-4" [attr.aria-labelledby]="'utilization-label'">
+      <div class="flex justify-between items-end mb-2">
+        <span class="text-3xl font-extrabold text-slate-800"
+          >{{ progressValue() }}%</span
+        >
+        <span
+          class="text-xs font-bold uppercase"
+          [style.color]="progressColor()"
+        >
+          {{ utilizationStatus() }}
+        </span>
+      </div>
+      <p-progressbar
+        [color]="progressColor()"
+        [value]="progressValue()"
+        [showValue]="false"
+      />
     </div>
   </ng-template>
+
   <ng-template #footer>
-    <div class="flex gap-2 items-center text-sm font-bold">
-      <span class="text-slate-400 text-xs">
-        {{assignedSlotsCount()}} out of {{availableSpots()}} spots
-        assigned</span
-      >
+    <div class="flex gap-2 items-center pt-2 border-t border-slate-100">
+      <span class="text-slate-500 text-xs font-medium">
+        <b class="text-slate-700">{{ assignedSlotsCount() }}</b> assigned of
+        <b class="text-slate-700">{{ availableSpots() }}</b> total spots
+      </span>
     </div>
   </ng-template>
 </p-card>
