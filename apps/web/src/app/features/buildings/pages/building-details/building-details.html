@@ -26,10 +26,11 @@
   }
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <app-total-resident-card [users]="store.usersEntities()" />
-    <app-vehicles-card [users]="store.usersEntities()" />
-    <app-last-raffle-card [raffle]="store.liveRaffle()" />
+    <app-total-resident-card class="h-full" [users]="store.usersEntities()" />
+    <app-vehicles-card class="h-full" [users]="store.usersEntities()" />
+    <app-last-raffle-card class="h-full" [raffle]="store.liveRaffle()" />
     <app-utilization-card
+      class="h-full"
       [users]="store.usersEntities()"
       [availableSpots]="store.building()?.totalSlots ?? 0"
     />
@@ -55,7 +56,6 @@
           <h3 class="text-lg font-bold text-slate-800">Resident List</h3>
           <div class="flex items-center gap-3 w-full sm:w-auto">
             <span class="p-input-icon-left w-full sm:w-64">
-              <i class="pi pi-search"></i>
               <input
                 pInputText
                 class="w-full"

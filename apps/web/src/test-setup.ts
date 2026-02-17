@@ -1,8 +1,6 @@
-// import 'jest-preset-angular/setup-jest';
 import 'jest-preset-angular/setup-jest';
 declare const jest: any;
 
-// Definimos el mock con tipos para que TS no se queje
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string) => ({
@@ -17,7 +15,6 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
-// Mock necesario para componentes de PrimeNG que usan animaciones o posicionamiento
 Object.defineProperty(window, 'getComputedStyle', {
   value: () => ({
     getPropertyValue: () => '',

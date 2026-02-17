@@ -4,7 +4,7 @@ import {
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
-import { User, Vehicle } from '@database/entities';
+import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
@@ -19,8 +19,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
-import { Brackets, Like, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { RoleService } from './role.service';
+import { RoleEnum } from '@parking-system/libs';
 
 @Injectable()
 export class UsersService {
@@ -53,7 +54,8 @@ export class UsersService {
       .leftJoinAndSelect('users.role', 'role')
       .leftJoin('users.building', 'building')
       .leftJoinAndSelect('users.vehicles', 'vehicles')
-      .leftJoinAndSelect('vehicles.slot', 'slot');
+      .leftJoinAndSelect('vehicles.slot', 'slot')
+      .where('role.name != :rootRoleName', { rootRoleName: RoleEnum.ROOT });
 
     if (globalFilter) {
       query.andWhere(
@@ -269,7 +271,8 @@ export class UsersService {
     const updatedUser = this.userRepository.merge(user, data);
 
     this.logger.log(`Internal update executed for user: ${user.email}`);
-    return await this.userRepository.save(updatedUser);
+    await this.userRepository.save(updatedUser);
+    return this.findOneByPublicId(user.email);
   }
   async incrementPriority(userId: number): Promise<void> {
     this.logger.debug(`Incrementing priority score for user ID: ${userId}`);

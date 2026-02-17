@@ -31,14 +31,12 @@ import { InputTextModule } from 'primeng/inputtext';
 })
 export class Navbar {
   protected readonly sessionService = inject(SessionService);
-  // items = signal<MenuItem[]>([]);
 
   protected readonly items = computed<MenuItem[]>(() => {
     const staticItems: MenuItem[] = [
       {
         icon: 'pi pi-bell',
         routerLink: '/app/notifications',
-        // ariaLabel: 'Notifications' // Podrías extender MenuItem si es necesario
       },
     ];
 
@@ -48,19 +46,4 @@ export class Navbar {
 
     return staticItems;
   });
-
-  // constructor() {
-  //   effect(() => {
-  //     let gItems: MenuItem[] = [
-  //       {
-  //         icon: 'pi pi-bell',
-  //       },
-  //     ];
-  //     if (this.sessionService.isResident()) {
-  //       gItems = [...this.sessionService.sideBarItems(), ...gItems];
-  //     }
-  //
-  //     this.items.set(gItems);
-  //   });
-  // }
 }

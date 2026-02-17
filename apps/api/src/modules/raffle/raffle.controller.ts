@@ -36,7 +36,7 @@ export class RaffleController {
     return results.map(RaffleResultToModel);
   }
 
-  @Get('building/:buildingId')
+  @Get('/:buildingId')
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   @ApiOperation({
     summary: 'Get all raffles associated with a specific building',

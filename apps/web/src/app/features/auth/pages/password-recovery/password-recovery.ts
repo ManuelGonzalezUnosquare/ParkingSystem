@@ -18,6 +18,7 @@ import { ButtonModule } from 'primeng/button';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '@core/stores';
 import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
+import { APP_CONFIG } from '@core/constants';
 
 @Component({
   selector: 'app-password-recovery',
@@ -37,7 +38,7 @@ import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
 export class PasswordRecovery {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
-
+  protected readonly config = inject(APP_CONFIG);
   protected readonly isRequestSent = signal<boolean>(false);
 
   readonly form = new FormGroup<IPasswordRecovery>({

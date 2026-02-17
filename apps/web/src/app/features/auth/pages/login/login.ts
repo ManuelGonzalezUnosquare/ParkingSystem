@@ -17,6 +17,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ILoginForm } from './login-form';
 import { FormFeedback, FormValidationError } from '@shared/ui/feedback';
+import { APP_CONFIG } from '@core/constants';
 
 @Component({
   selector: 'app-login',
@@ -36,6 +37,7 @@ import { FormFeedback, FormValidationError } from '@shared/ui/feedback';
 export class Login {
   private readonly router = inject(Router);
   protected readonly store = inject(AuthStore);
+  protected readonly config = inject(APP_CONFIG);
 
   protected readonly form = new FormGroup<ILoginForm>({
     email: new FormControl('', {

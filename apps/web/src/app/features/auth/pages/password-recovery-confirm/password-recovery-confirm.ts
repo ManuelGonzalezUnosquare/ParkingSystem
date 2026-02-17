@@ -20,6 +20,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { lastValueFrom } from 'rxjs';
 import { IPasswordRecoveryConfirmation } from './password-recovery-form';
+import { APP_CONFIG } from '@core/constants';
 
 @Component({
   selector: 'app-password-recovery-confirm',
@@ -40,6 +41,7 @@ export class PasswordRecoveryConfirm {
   protected readonly store = inject(AuthStore);
   private readonly service = inject(AuthService);
   private readonly router = inject(Router);
+  protected readonly config = inject(APP_CONFIG);
 
   protected readonly step = signal<1 | 2>(1);
   private readonly email = signal<string | undefined>(undefined);

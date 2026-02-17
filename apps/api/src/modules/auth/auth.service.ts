@@ -97,7 +97,8 @@ export class AuthService {
       return this.changePassword(user, newPassword);
     }
 
-    return this.changePassword(sessionUser, newPassword);
+    await this.changePassword(sessionUser, newPassword);
+    return this.userService.findOneByPublicId(sessionUser.publicId);
   }
 
   private async changePassword(user: User, newPassword: string) {

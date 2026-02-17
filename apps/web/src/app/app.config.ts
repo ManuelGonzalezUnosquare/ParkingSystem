@@ -17,6 +17,7 @@ import {
   authInterceptor,
   errorInterceptor,
 } from './core/interceptors';
+import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -40,5 +41,9 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    {
+      provide: APP_CONFIG,
+      useValue: APP_CONFIG_VALUE,
+    },
   ],
 };

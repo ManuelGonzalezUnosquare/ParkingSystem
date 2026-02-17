@@ -8,11 +8,10 @@ import { User } from '@database/entities';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userService: any; // Usaremos tipos 'any' o interfaces de mock para facilitar el espionaje
+  let userService: any;
   let cryptoService: any;
   let jwtService: any;
 
-  // Mock de un usuario de base de datos
   const mockUser = {
     id: 1,
 
@@ -121,7 +120,7 @@ describe('AuthService', () => {
 
       const result = await service.resetPasswordRequest('test@example.com');
 
-      expect(result).toHaveLength(8); // El código generado
+      expect(result).toHaveLength(8);
       expect(userService.internalUpdate).toHaveBeenCalledWith(
         mockUser.id,
         expect.objectContaining({
@@ -173,39 +172,3 @@ describe('AuthService', () => {
     });
   });
 });
-
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { AuthService } from './auth.service';
-//
-// import { JwtService } from '@nestjs/jwt';
-// import { createMockCryptoService, MockUserService } from '@test/mocks/services';
-// import { CryptoService } from '@utils/services';
-//
-// describe('AuthService', () => {
-//   let service: AuthService;
-//   let userService: MockUserService;
-//
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         AuthService,
-//         {
-//           provide: JwtService,
-//           useValue: {
-//             sign: jest.fn(),
-//           },
-//         },
-//         {
-//           provide: CryptoService,
-//           useValue: createMockCryptoService(),
-//         },
-//       ],
-//     }).compile();
-//
-//     service = module.get<AuthService>(AuthService);
-//   });
-//
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
-// });

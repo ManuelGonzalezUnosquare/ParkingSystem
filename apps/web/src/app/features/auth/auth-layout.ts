@@ -18,7 +18,6 @@ import { CardModule } from 'primeng/card';
             class="mt-8 text-center text-[#4b739b] text-xs"
             role="contentinfo"
           >
-            >
             <p>© 2026 Parking Lot Allocation System. All rights reserved.</p>
             <nav
               class="mt-2 flex gap-4 justify-center"
