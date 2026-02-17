@@ -83,7 +83,7 @@ export class BuildingDetails implements OnInit {
       rows: event.rows ?? 10,
       sortField: (event.sortField as string) ?? 'createdAt',
       sortOrder: event.sortOrder ?? -1,
-      globalFilter: (event.globalFilter as string) ?? '',
+      globalFilter: (event.globalFilter as string) ?? undefined,
       buildingId: this.id(),
     };
 
