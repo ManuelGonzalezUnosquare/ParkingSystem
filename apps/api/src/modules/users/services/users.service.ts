@@ -272,7 +272,7 @@ export class UsersService {
 
     this.logger.log(`Internal update executed for user: ${user.email}`);
     await this.userRepository.save(updatedUser);
-    return this.findOneByPublicId(user.email);
+    return await this.findOneByPublicId(user.publicId);
   }
   async incrementPriority(userId: number): Promise<void> {
     this.logger.debug(`Incrementing priority score for user ID: ${userId}`);

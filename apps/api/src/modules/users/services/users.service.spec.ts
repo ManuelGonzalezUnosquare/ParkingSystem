@@ -204,6 +204,10 @@ describe('UsersService', () => {
       repo.findOneBy.mockResolvedValue(mockUser);
       repo.merge.mockReturnValue({ ...mockUser, firstName: 'Updated' });
       repo.save.mockResolvedValue({ ...mockUser, firstName: 'Updated' });
+      repo.findOne.mockResolvedValue({
+        ...mockUser,
+        firstName: 'Updated',
+      });
 
       const result = await service.internalUpdate(1, { firstName: 'Updated' });
 
