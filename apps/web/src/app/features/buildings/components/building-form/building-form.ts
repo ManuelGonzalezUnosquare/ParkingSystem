@@ -1,4 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -26,15 +31,17 @@ import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
   ],
   templateUrl: './building-form.html',
   styleUrl: './building-form.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class BuildingForm implements OnInit {
-  private ref = inject(DynamicDialogRef);
-  private config = inject(DynamicDialogConfig);
-  store = inject(BuildingsStore);
+  private readonly ref = inject(DynamicDialogRef);
+  private readonly config = inject(DynamicDialogConfig);
+  protected readonly store = inject(BuildingsStore);
 
   building?: BuildingModel;
 
-  form = new FormGroup<IBuildingForm>({
+  readonly form = new FormGroup<IBuildingForm>({
     name: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -64,13 +71,12 @@ export class BuildingForm implements OnInit {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const request: ICreateBuilding = this.form.getRawValue();
-    let requestResult = false;
-    if (this.building) {
-      requestResult = await this.store.update(this.building.publicId, request);
-    } else {
-      requestResult = await this.store.create(request);
-    }
+    const payload: ICreateBuilding = this.form.getRawValue();
+
+    const requestResult = this.building
+      ? await this.store.update(this.building.publicId, payload)
+      : await this.store.create(payload);
+
     if (requestResult) {
       this.ref.close(true);
     }
