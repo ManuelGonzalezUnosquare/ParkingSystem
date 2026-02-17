@@ -1,36 +1,43 @@
-<div>
-  <!-- header -->
+<div class="p-6 md:p-10 bg-slate-50 min-h-screen">
+  @if (store.building(); as building) {
   <div
     class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8"
   >
     <div class="flex flex-col gap-2">
       <h1
-        class="text-[#0d141c] text-4xl font-black leading-tight tracking-[-0.033em]"
+        class="text-slate-900 text-4xl font-black leading-tight tracking-tight"
       >
-        {{store.building()?.name}}
+        {{ building.name }}
       </h1>
-      <p class="text-[#4b739b] text-base font-normal">
+      <p class="text-slate-500 text-base font-normal">
         Manage parking allocations and resident data for this building.
       </p>
     </div>
-    <p-button label="Trigger Raffle" (click)="raffle()" />
-  </div>
-  <!-- cards -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-5">
-    <app-total-resident-card class="block" [users]="store.usersEntities()" />
-    <app-vehicles-card class="block" [users]="store.usersEntities()" />
-    <app-last-raffle-card class="block" [raffle]="store.liveRaffle()" />
-    <app-utilization-card
-      class="block"
-      [users]="store.usersEntities()"
-      [availableSpots]="store.building()?.totalSlots || 0"
+    <p-button
+      label="Trigger Raffle"
+      icon="pi pi-bolt"
+      (click)="raffle()"
+      [loading]="store.isLoading()"
+      severity="primary"
     />
   </div>
-  <!-- Resident Management Section -->
+  } @else {
+  <div class="h-24 bg-slate-200 animate-pulse rounded-xl mb-8"></div>
+  }
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <app-total-resident-card [users]="store.usersEntities()" />
+    <app-vehicles-card [users]="store.usersEntities()" />
+    <app-last-raffle-card [raffle]="store.liveRaffle()" />
+    <app-utilization-card
+      [users]="store.usersEntities()"
+      [availableSpots]="store.building()?.totalSlots ?? 0"
+    />
+  </div>
+
   <p-card>
     <p-table
       #dt
-      [filterDelay]="500"
       [value]="store.usersEntities()"
       [lazy]="true"
       (onLazyLoad)="onLazyLoad($event)"
@@ -39,100 +46,99 @@
       [totalRecords]="store.usersPagination()?.total || 0"
       [loading]="store.isLoading()"
       [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings"
-      [rowsPerPageOptions]="[5, 10, 25, 50]"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} residents"
     >
-      >
       <ng-template pTemplate="caption">
-        <div class="flex justify-between items-center">
-          <h3 class="font-semibold">Resident list</h3>
-          <div class="flex gap-2">
-            <input
-              variant="outlined"
-              id="search"
-              pInputText
-              pSize="small"
-              placeholder="Search resident..."
-              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-            />
-
+        <div
+          class="flex flex-col sm:flex-row justify-between items-center gap-4"
+        >
+          <h3 class="text-lg font-bold text-slate-800">Resident List</h3>
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <span class="p-input-icon-left w-full sm:w-64">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                class="w-full"
+                placeholder="Search by name or email..."
+                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              />
+            </span>
             <p-button
-              label="Resident"
+              label="Add Resident"
               icon="pi pi-plus"
               severity="secondary"
-              size="small"
-              variant="outlined"
               (click)="addUser()"
             />
           </div>
         </div>
       </ng-template>
+
       <ng-template #header>
         <tr>
-          <th class="text-xs font-semibold uppercase tracking-wider w-[5%]">
-            Status
-          </th>
-          <th class="text-xs font-semibold uppercase tracking-wider">Name</th>
-          <th class="text-xs font-semibold uppercase tracking-wider">Role</th>
-          <th class="text-xs font-semibold uppercase tracking-wider w-[30%]">
-            Vehicle
-          </th>
-          <th class="text-xs font-semibold uppercase tracking-wider">Spot</th>
-          <th
-            class="text-xs font-semibold uppercase tracking-wider text-center"
-          >
-            Acciones
-          </th>
+          <th class="w-16 text-center">Status</th>
+          <th>Resident</th>
+          <th>Role</th>
+          <th>Vehicle Information</th>
+          <th>Spot</th>
+          <th class="text-center">Actions</th>
         </tr>
       </ng-template>
+
       <ng-template #body let-user>
-        <tr>
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="text-center">
+            <span
+              class="inline-block size-3 rounded-full"
+              [class.bg-emerald-500]="user.isActive"
+              [class.bg-amber-500]="!user.isActive"
+            >
+              <span class="sr-only"
+                >{{ user.isActive ? 'Active' : 'Inactive' }}</span
+              >
+            </span>
+          </td>
           <td>
-            <div class="flex items-center justify-center">
-              <div
-                [title]="user.status"
-                [class.bg-emerald-400]="user.isActive"
-                [class.bg-amber-400]="!user.isActive"
-                class="rounded-full size-4"
-              ></div>
+            <div class="flex flex-col">
+              <span class="font-bold text-slate-700">{{ user.fullName }}</span>
+              <span class="text-xs text-slate-400">{{ user.email }}</span>
             </div>
           </td>
-          <td class="text-sm font-medium">
-            <p class="truncate">{{ user.fullName }}</p>
-            <span class="text-slate-400">{{user.email}}</span>
-          </td>
-          <td class="text-sm font-medium">
-            <app-role-tag [role]="user.role" />
-          </td>
-          <td class="text-sm font-medium w-10 max-w-30">
-            <div class="hover:cursor-pointer" [title]="user.vehicleDescription">
-              <p class="truncate">{{user.vehicleDescription}}</p>
-              <span class="text-slate-400">{{user.vehiclePlate}}</span>
-            </div>
-          </td>
-
-          <td class="text-sm font-medium">{{user.assignedSlotNumber}}</td>
-
+          <td><app-role-tag [role]="user.role" /></td>
           <td>
-            <div class="text-center">
-              <p-button
-                icon="pi pi-search"
-                severity="secondary"
-                size="small"
-                text
-              />
+            @if (user.vehiclePlate) {
+            <div class="flex flex-col text-xs">
+              <span class="font-medium text-slate-600"
+                >{{ user.vehicleDescription }}</span
+              >
+              <span class="font-mono text-blue-600"
+                >{{ user.vehiclePlate }}</span
+              >
+            </div>
+            } @else {
+            <span class="text-slate-300 italic text-xs"
+              >No vehicle registered</span
+            >
+            }
+          </td>
+          <td class="font-mono font-bold">
+            {{ user.assignedSlotNumber || '-' }}
+          </td>
+          <td>
+            <div class="flex justify-center gap-1">
               <p-button
                 icon="pi pi-pencil"
-                severity="secondary"
-                size="small"
                 text
+                rounded
+                severity="secondary"
                 (click)="update(user)"
+                pTooltip="Edit resident"
               />
               <p-button
                 icon="pi pi-trash"
-                severity="secondary"
-                size="small"
                 text
+                rounded
+                severity="danger"
+                pTooltip="Delete resident"
               />
             </div>
           </td>
