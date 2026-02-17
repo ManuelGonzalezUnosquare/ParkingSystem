@@ -4,18 +4,29 @@
       <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
         Total Vehicles
       </p>
-      <i class="pi pi-car text-blue-500"></i>
+      <i class="pi pi-car text-blue-500" aria-hidden="true"></i>
     </div>
   </ng-template>
   <ng-template #subtitle>
-    <p class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight">
-      {{usersWithVehicle()}}
-    </p>
+    <div class="flex flex-col" [attr.aria-labelledby]="'vehicle-card-label'">
+      <p
+        class="text-[#0d141c] tracking-tight text-4xl font-extrabold leading-tight"
+      >
+        {{ usersWithVehicle() }}
+      </p>
+      <p class="text-slate-500 text-sm font-medium">Registered Vehicles</p>
+    </div>
   </ng-template>
   <ng-template #footer>
-    <div class="flex gap-2 items-center text-sm font-bold">
-      <span class="text-cyan-600">{{usersWithoutVehicle()}} </span>
-      <span class="text-slate-400 text-xs"> user(s) without vehicle</span>
+    <div class="flex gap-2 items-center pt-2 border-t border-slate-100">
+      <span
+        class="inline-flex items-center rounded-md bg-cyan-50 px-2 py-1 text-xs font-bold text-cyan-700 ring-1 ring-inset ring-cyan-600/20"
+      >
+        {{ usersWithoutVehicle() }}
+      </span>
+      <span class="text-slate-400 text-xs font-medium"
+        >Residents without vehicle</span
+      >
     </div>
   </ng-template>
 </p-card>
