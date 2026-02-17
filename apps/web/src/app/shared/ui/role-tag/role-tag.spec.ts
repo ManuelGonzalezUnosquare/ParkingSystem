@@ -5,7 +5,6 @@ import { By } from '@angular/platform-browser';
 import { Tag } from 'primeng/tag';
 
 describe('RoleTag', () => {
-  let component: RoleTag;
   let fixture: ComponentFixture<RoleTag>;
 
   beforeEach(async () => {
@@ -14,7 +13,6 @@ describe('RoleTag', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(RoleTag);
-    component = fixture.componentInstance;
   });
 
   it('should render the role in uppercase', async () => {

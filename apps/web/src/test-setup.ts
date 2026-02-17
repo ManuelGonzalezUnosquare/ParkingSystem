@@ -1,4 +1,5 @@
 import 'jest-preset-angular/setup-jest';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const jest: any;
 
 Object.defineProperty(window, 'matchMedia', {
@@ -7,7 +8,7 @@ Object.defineProperty(window, 'matchMedia', {
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // Ahora Jest debería ser reconocido
+    addListener: jest.fn(),
     removeListener: jest.fn(),
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
