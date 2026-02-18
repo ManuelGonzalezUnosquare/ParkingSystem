@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
+import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 
 describe('PasswordRecoveryConfirm', () => {
   let component: PasswordRecoveryConfirm;
@@ -29,6 +30,10 @@ describe('PasswordRecoveryConfirm', () => {
         provideRouter([]), // SOLUCIÓN AL NG0201
         { provide: AuthStore, useValue: mockAuthStore },
         { provide: AuthService, useValue: mockAuthService },
+        {
+          provide: APP_CONFIG,
+          useValue: APP_CONFIG_VALUE,
+        },
       ],
     }).compileComponents();
 

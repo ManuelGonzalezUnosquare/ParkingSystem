@@ -4,6 +4,7 @@ import { AuthStore } from '@core/stores';
 import { provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 import { signal } from '@angular/core';
+import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 
 describe('PasswordRecovery', () => {
   let component: PasswordRecovery;
@@ -22,6 +23,10 @@ describe('PasswordRecovery', () => {
       providers: [
         provideRouter([]),
         { provide: AuthStore, useValue: mockStore },
+        {
+          provide: APP_CONFIG,
+          useValue: APP_CONFIG_VALUE,
+        },
       ],
     }).compileComponents();
 

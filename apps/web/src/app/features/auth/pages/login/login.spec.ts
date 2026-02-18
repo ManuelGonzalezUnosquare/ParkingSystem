@@ -7,6 +7,7 @@ import { Button } from 'primeng/button';
 import { vi } from 'vitest';
 import { Login } from './login';
 import { mock } from 'node:test';
+import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 
 describe('Login Component', () => {
   let component: Login;
@@ -27,6 +28,10 @@ describe('Login Component', () => {
       providers: [
         provideRouter([]),
         { provide: AuthStore, useValue: mockStore },
+        {
+          provide: APP_CONFIG,
+          useValue: APP_CONFIG_VALUE,
+        },
       ],
     }).compileComponents();
 
