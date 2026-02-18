@@ -1,13 +1,10 @@
-import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 import { AuthStore } from '@core/stores';
-import { Button } from 'primeng/button';
 import { vi } from 'vitest';
 import { Login } from './login';
-import { mock } from 'node:test';
-import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 
 describe('Login Component', () => {
   let component: Login;

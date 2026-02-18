@@ -26,6 +26,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  //throttler config
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1); // trust on first proxy (docker/nginx)
 
   // --- Swagger ---
   const config = new DocumentBuilder()

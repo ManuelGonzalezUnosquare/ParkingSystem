@@ -25,6 +25,7 @@ import { AppService } from './app.service';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard, RolesGuard } from '../modules/auth/guards';
 import { RaffleModule } from '@modules/raffle/raffle.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -63,6 +64,12 @@ import { RaffleModule } from '@modules/raffle/raffle.module';
         };
       },
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // life time ms
+        limit: 10,
+      },
+    ]),
     TypeOrmModule.forFeature([Building, Role, User]),
     AuthModule,
     UsersModule,
@@ -76,6 +83,11 @@ import { RaffleModule } from '@modules/raffle/raffle.module';
     AppService,
     BuildingSubscriber,
     DatabaseSeederService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
