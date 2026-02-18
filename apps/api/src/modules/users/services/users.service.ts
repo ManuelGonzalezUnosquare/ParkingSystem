@@ -1,12 +1,11 @@
 import { SearchBuildingDto } from '@common/dtos';
 import {
-  generateSecureCode,
   PaginatedResult,
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
-import { User, Vehicle } from '@database/entities';
-import { CreateUserDto, ResetPasswordByCodeDto } from '@modules/auth/dtos';
+import { User } from '@database/entities';
+import { CreateUserDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
 import {
@@ -16,13 +15,13 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
-import { Like, Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { RoleService } from './role.service';
+import { RoleEnum } from '@parking-system/libs';
 
 @Injectable()
 export class UsersService {
@@ -31,23 +30,51 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly cryptoService: CryptoService,
     private readonly vehicleService: VehiclesService,
     private readonly buildingService: BuildingsService,
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
-  async changePassword(newPassword: string, user: User) {
-    const hashedPassword = await this.cryptoService.hash(newPassword);
-    await this.userRepository.update(user.id, {
-      password: hashedPassword,
-      requirePasswordChange: false,
-    });
-    user.requirePasswordChange = false;
-    return user;
-  }
+  async findAll(
+    filters: SearchBuildingDto,
+    user: User,
+  ): Promise<PaginatedResult<User>> {
+    PermissionValidator.validateBuildingAccess(user, filters.buildingId);
 
+    const { buildingId, globalFilter } = filters;
+
+    if (!buildingId) {
+      throw new BadRequestException('Target building ID is required');
+    }
+
+    const query = this.userRepository
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.role', 'role')
+      .leftJoin('users.building', 'building')
+      .leftJoinAndSelect('users.vehicles', 'vehicles')
+      .leftJoinAndSelect('vehicles.slot', 'slot')
+      .where('role.name != :rootRoleName', { rootRoleName: RoleEnum.ROOT });
+
+    if (globalFilter) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('users.firstName LIKE :filter', {
+            filter: `%${globalFilter}%`,
+          })
+            .orWhere('users.lastName LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            })
+            .orWhere('users.email LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            });
+        }),
+      );
+    }
+
+    return await paginateQuery(query, filters);
+  }
   async create(dto: CreateUserDto, creator: User): Promise<User> {
     PermissionValidator.validateBuildingAccess(creator, dto.buildingId);
 
@@ -71,32 +98,25 @@ export class UsersService {
       const hashedPassword = await this.cryptoService.hash(tempPassword);
 
       const newUser = this.userRepository.create({
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
+        ...dto,
         password: hashedPassword,
         role,
         building,
       });
 
       const savedUser = await queryRunner.manager.save(newUser);
-      const vehicles: Vehicle[] = [];
       if (dto.description && dto.licensePlate) {
-        const newVehicle = await this.vehicleService.create(
+        await this.vehicleService.create(
           { description: dto.description, licensePlate: dto.licensePlate },
           savedUser,
           queryRunner.manager,
         );
-        if (newVehicle) {
-          vehicles.push(newVehicle);
-        }
       }
 
       await queryRunner.commitTransaction();
-      this.logger.log(`User created with ID: ${savedUser.id}`);
+      this.logger.log(`User created successfully: ${savedUser.email}`);
       //TODO: send email with pass info
-      savedUser.vehicles = vehicles;
-      return savedUser;
+      return this.findOneByPublicId(savedUser.publicId);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Failed to create user: ${error.message}`);
@@ -105,42 +125,6 @@ export class UsersService {
       await queryRunner.release();
     }
   }
-
-  async findAll(
-    filters: SearchBuildingDto,
-    user: User,
-  ): Promise<PaginatedResult<User>> {
-    PermissionValidator.validateBuildingAccess(user, filters.buildingId);
-    const publicId = filters.buildingId;
-
-    const { globalFilter } = filters;
-
-    if (!publicId) {
-      throw new BadRequestException('Target not found');
-    }
-
-    const query = this.userRepository
-      .createQueryBuilder('users')
-      .leftJoinAndSelect('users.role', 'role')
-      .leftJoin('users.building', 'building')
-      .leftJoinAndSelect('users.vehicles', 'vehicles')
-      .leftJoinAndSelect('vehicles.slot', 'slot')
-      .where('building.publicId = :publicId', { publicId });
-
-    if (globalFilter) {
-      const queryOptions: any = [
-        { firstName: Like(`%${globalFilter}%`) },
-        { lastName: Like(`%${globalFilter}%`) },
-        { email: Like(`%${globalFilter}%`) },
-      ];
-      console.log(query, query.getQueryAndParameters());
-
-      query.andWhere(queryOptions);
-    }
-
-    return await paginateQuery(query, filters);
-  }
-
   async findOneByPublicId(publicId: string): Promise<User | null> {
     this.logger.log(`Searching for user with ID: ${publicId}`);
 
@@ -275,52 +259,6 @@ export class UsersService {
       throw new InternalServerErrorException('Could not remove user');
     }
   }
-  async resetPasswordRequest(email: string): Promise<string> {
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    // 8 digits code
-    const resetCode = generateSecureCode(8);
-
-    user.passwordResetCode = resetCode;
-    await this.userRepository.save(user);
-
-    this.logger.log(`Password reset code generated for: ${email}`);
-
-    return resetCode;
-  }
-  async resetPassword(dto: ResetPasswordByCodeDto): Promise<User> {
-    const { email, code, newPassword } = dto;
-
-    const user = await this.userRepository.findOne({
-      where: { email, passwordResetCode: code },
-      relations: ['role', 'building'],
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or reset code');
-    }
-
-    try {
-      const hashedPassword = await this.cryptoService.hash(newPassword);
-
-      user.password = hashedPassword;
-      user.passwordResetCode = null;
-      await this.userRepository.save(user);
-      return user;
-    } catch (error) {
-      this.logger.error(`Error resetting password: ${error.message}`);
-      throw new InternalServerErrorException('Could not reset password');
-    }
-  }
-  async cleanRecoveryCode(id: number) {
-    await this.userRepository.update(id, { passwordResetCode: null });
-  }
-
-  /**
-   * 1. internalUpdate
-   * Updates any user property internally.
-   * Designed for automated processes like the raffle system, bypassing DTO constraints.
-   */
   async internalUpdate(id: number, data: Partial<User>): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
@@ -333,14 +271,9 @@ export class UsersService {
     const updatedUser = this.userRepository.merge(user, data);
 
     this.logger.log(`Internal update executed for user: ${user.email}`);
-    return await this.userRepository.save(updatedUser);
+    await this.userRepository.save(updatedUser);
+    return await this.findOneByPublicId(user.publicId);
   }
-
-  /**
-   * 2. incrementPriority
-   * Increments the priorityScore of a user by 1.
-   * Typically used for "losers" of a raffle to increase their future probability.
-   */
   async incrementPriority(userId: number): Promise<void> {
     this.logger.debug(`Incrementing priority score for user ID: ${userId}`);
 

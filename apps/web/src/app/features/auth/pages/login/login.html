@@ -1,8 +1,7 @@
-<!-- Welcome Header -->
-<div class="pt-10 pb-6 px-8 text-center">
+<header class="pt-10 pb-6 px-8 text-center">
   <div class="flex justify-center mb-4">
-    <span class="material-symbols-outlined text-primary text-5xl"
-      >PLAS Portal</span
+    <span class="text-primary text-5xl" aria-hidden="true"
+      >{{config.appName}}</span
     >
   </div>
   <h1
@@ -15,9 +14,14 @@
   >
     H Sign in to your account to manage your parking allocation.
   </p>
-</div>
+</header>
 
-<form class="px-8 pb-10 space-y-5" [formGroup]="form" (submit)="doSubmit()">
+<form
+  class="px-8 pb-10 space-y-5"
+  [formGroup]="form"
+  (submit)="doSubmit()"
+  novalidate
+>
   <!-- email -->
   <div class="form-control">
     <label class="form-label" for="email">Email</label>
@@ -31,8 +35,11 @@
       tabindex="1"
       type="email"
       [invalid]="form.controls.email.invalid && form.controls.email.touched"
+      [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+      [attr.aria-describedby]="form.controls.email.touched && form.controls.email.errors ? 'email-error' : null"
     />
     <app-form-validation-error
+      id="email-errors"
       [touched]="form.controls.email.touched"
       [errors]="form.controls.email.errors"
       label="Email"
@@ -50,8 +57,11 @@
       placeholder="********"
       type="password"
       [invalid]="form.controls.password.invalid && form.controls.password.touched"
+      [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+      [attr.aria-describedby]="form.controls.password.touched && form.controls.password.errors ? 'password-error' : null"
     />
     <app-form-validation-error
+      id="password-error"
       [touched]="form.controls.password.touched"
       [errors]="form.controls.password.errors"
       label="Password"
@@ -66,11 +76,18 @@
       severity="info"
       text
       [routerLink]="['/auth/password-recovery']"
+      aria-label="Recover your forgotten password"
     >
       <span pButtonLabel>Forgot password!</span>
     </a>
   </div>
   <app-form-feedback [callState]="store.callState()" />
   <!-- options -->
-  <p-button fluid label="Entrar" type="submit" severity="primary" />
+  <p-button
+    fluid
+    label="Entrar"
+    type="submit"
+    severity="primary"
+    [loading]="store.isLoading()"
+  />
 </form>

@@ -41,12 +41,10 @@ export class UsersController {
     @CurrentUser() user: User,
   ) {
     const searchResult = await this.usersService.findAll(searchDto, user);
-    const response = {
+    return {
       meta: searchResult.meta,
       data: searchResult.data.map((user) => UserEntityToModel(user)),
     };
-
-    return response;
   }
 
   @Get(':id')

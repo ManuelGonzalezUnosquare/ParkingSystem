@@ -1,6 +1,10 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { ToolbarModule } from 'primeng/toolbar';
-
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SessionService } from '@core/services';
 import { MenuItem } from 'primeng/api';
@@ -22,23 +26,24 @@ import { InputTextModule } from 'primeng/inputtext';
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Navbar {
   protected readonly sessionService = inject(SessionService);
-  items = signal<MenuItem[]>([]);
 
-  constructor() {
-    effect(() => {
-      let gItems: MenuItem[] = [
-        {
-          icon: 'pi pi-bell',
-        },
-      ];
-      if (this.sessionService.isResident()) {
-        gItems = [...this.sessionService.sideBarItems(), ...gItems];
-      }
+  protected readonly items = computed<MenuItem[]>(() => {
+    const staticItems: MenuItem[] = [
+      {
+        icon: 'pi pi-bell',
+        routerLink: '/app/notifications',
+      },
+    ];
 
-      this.items.set(gItems);
-    });
-  }
+    if (this.sessionService.isResident()) {
+      return [...this.sessionService.sideBarItems(), ...staticItems];
+    }
+
+    return staticItems;
+  });
 }

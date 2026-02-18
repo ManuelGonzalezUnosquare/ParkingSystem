@@ -1,9 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VehiclesCard } from './vehicles-card';
+import { UserModel } from '@parking-system/libs';
 
 describe('VehiclesCard', () => {
   let component: VehiclesCard;
   let fixture: ComponentFixture<VehiclesCard>;
+
+  const mockUsers: Partial<UserModel>[] = [
+    { hasVehicle: true },
+    { hasVehicle: true },
+    { hasVehicle: false },
+    { hasVehicle: true },
+    { hasVehicle: false },
+  ];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -12,10 +21,43 @@ describe('VehiclesCard', () => {
 
     fixture = TestBed.createComponent(VehiclesCard);
     component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should correctly count users with and without vehicles', async () => {
+    fixture.componentRef.setInput('users', mockUsers);
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component['usersWithVehicle']()).toBe(3);
+    expect(component['usersWithoutVehicle']()).toBe(2);
+  });
+
+  it('should display the correct values in the UI', async () => {
+    fixture.componentRef.setInput('users', mockUsers);
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const totalDisplay = compiled
+      .querySelector('.text-4xl')
+      ?.textContent?.trim();
+    const withoutDisplay = compiled
+      .querySelector('.text-cyan-700')
+      ?.textContent?.trim();
+
+    expect(totalDisplay).toBe('3');
+    expect(withoutDisplay).toBe('2');
+  });
+
+  it('should return zeros when user list is empty', async () => {
+    fixture.componentRef.setInput('users', []);
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component['usersWithVehicle']()).toBe(0);
+    expect(component['usersWithoutVehicle']()).toBe(0);
   });
 });

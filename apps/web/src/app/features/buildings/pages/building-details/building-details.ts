@@ -68,15 +68,23 @@ export class BuildingDetails implements OnInit {
     this.openBuildingDialog('Update User', user);
   }
 
+  async delete(user: UserModel) {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to remove ${user.fullName} from this building?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      // accept: () => this.store.deleteUser(user.publicId),
+    });
+  }
+
   onLazyLoad(event: TableLazyLoadEvent) {
-    if (!this.store.building()) return;
     const searchParams: SearchBuildingUsers = {
       first: event.first ?? 0,
       rows: event.rows ?? 10,
       sortField: (event.sortField as string) ?? 'createdAt',
       sortOrder: event.sortOrder ?? -1,
       globalFilter: (event.globalFilter as string) ?? undefined,
-      buildingId: this.store.building()?.publicId,
+      buildingId: this.id(),
     };
 
     this.store.loadUsers(searchParams);

@@ -4,17 +4,62 @@ import { RaffleService } from './raffle.service';
 
 describe('RaffleController', () => {
   let controller: RaffleController;
+  let service: jest.Mocked<RaffleService>;
+  let testingModule: TestingModule;
+
+  const mockUser: any = { id: 1, building: { id: 10, publicId: 'b-123' } };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    testingModule = await Test.createTestingModule({
       controllers: [RaffleController],
-      providers: [RaffleService],
+      providers: [
+        {
+          provide: RaffleService,
+          useValue: {
+            findNext: jest.fn(),
+            findHistory: jest.fn(),
+            findAll: jest.fn(),
+            executeRaffle: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    controller = module.get<RaffleController>(RaffleController);
+    controller = testingModule.get<RaffleController>(RaffleController);
+    service = testingModule.get(RaffleService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('execute', () => {
+    it('should call executeRaffle with manual trigger flag', async () => {
+      service.executeRaffle.mockResolvedValue(undefined);
+
+      const result = await controller.execute(mockUser);
+
+      expect(service.executeRaffle).toHaveBeenCalledWith(mockUser, true);
+      expect(result.message).toContain('successfully');
+    });
+  });
+
+  describe('findNext', () => {
+    it('should return a mapped raffle model', async () => {
+      const mockRaffle = { id: 1, building: { id: 10 } };
+      service.findNext.mockResolvedValue(mockRaffle as any);
+
+      const result = await controller.findNext(mockUser);
+
+      expect(service.findNext).toHaveBeenCalledWith(mockUser);
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('findByBuilding', () => {
+    it('should call findAll with buildingId from param', async () => {
+      const buildingId = 'uuid-building';
+      service.findAll.mockResolvedValue([]);
+
+      await controller.findByBuilding(buildingId, mockUser);
+
+      expect(service.findAll).toHaveBeenCalledWith(mockUser, buildingId);
+    });
   });
 });

@@ -1,4 +1,11 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -11,6 +18,7 @@ import { ButtonModule } from 'primeng/button';
 import { Router, RouterLink } from '@angular/router';
 import { AuthStore } from '@core/stores';
 import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
+import { APP_CONFIG } from '@core/constants';
 
 @Component({
   selector: 'app-password-recovery',
@@ -24,11 +32,15 @@ import { FormValidationError, FormFeedback } from '@shared/ui/feedback';
   ],
   templateUrl: './password-recovery.html',
   styleUrl: './password-recovery.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class PasswordRecovery {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
-  isRequestSent = signal<boolean>(false);
+  protected readonly config = inject(APP_CONFIG);
+  protected readonly isRequestSent = signal<boolean>(false);
+
   readonly form = new FormGroup<IPasswordRecovery>({
     email: new FormControl('', {
       nonNullable: true,
@@ -38,22 +50,25 @@ export class PasswordRecovery {
 
   constructor() {
     effect(() => {
-      const cCode = this.store.resetPasswordCode();
-      if (!cCode) return;
-
-      this.router.navigateByUrl(`/auth/password-recovery-confirm`);
+      if (this.store.resetPasswordCode()) {
+        untracked(() =>
+          this.router.navigate(['/auth/password-recovery-confirm']),
+        );
+      }
     });
   }
 
   async doSubmit() {
+    if (this.store.loading()) return;
+
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     const { email } = this.form.getRawValue();
+    const success = await this.store.resetPasswordRequest(email);
 
-    const response = await this.store.resetPasswordRequest(email);
-    if (response) {
-      this.isRequestSent.set(response);
+    if (success) {
+      this.isRequestSent.set(true);
     }
   }
 }

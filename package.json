@@ -2,7 +2,11 @@
   "name": "@parking-system/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "eslint . --ext .ts,.html",
+    "lint:fix": "eslint . --ext .ts,.html --fix"
+  },
   "private": true,
   "devDependencies": {
     "@angular-devkit/core": "~21.1.0",
@@ -11,6 +15,8 @@
     "@angular/cli": "~21.1.0",
     "@angular/compiler-cli": "~21.1.0",
     "@angular/language-service": "~21.1.0",
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
@@ -38,11 +44,14 @@
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-cypress": "^3.5.0",
-    "jest": "^30.0.2",
+    "husky": "^8.0.0",
+    "jest": "^30.2.0",
     "jest-environment-node": "^30.0.2",
+    "jest-preset-angular": "^16.0.0",
     "jest-util": "^30.0.2",
     "jsdom": "^27.1.0",
     "jsonc-eslint-parser": "^2.1.0",
+    "lint-staged": "^16.2.7",
     "nx": "22.4.5",
     "postcss": "^8.5.6",
     "prettier": "~3.6.2",
@@ -72,6 +81,7 @@
     "@nestjs/swagger": "^11.2.6",
     "@nestjs/typeorm": "^11.0.0",
     "@ngrx/operators": "^21.0.1",
+    "@ngrx/signals": "^21.0.1",
     "@primeuix/themes": "^2.0.3",
     "axios": "^1.6.0",
     "bcrypt": "^6.0.0",
@@ -85,5 +95,11 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.8.0",
     "typeorm": "^0.3.28"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

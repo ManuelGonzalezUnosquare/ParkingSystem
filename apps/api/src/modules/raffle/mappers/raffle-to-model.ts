@@ -8,6 +8,6 @@ export function RaffleToModel(raffle: Raffle): RaffleModel {
     executionDate: raffle.executionDate,
     executedAt: raffle.executedAt,
     isManual: raffle.isManual,
-    results: raffle.results.map((res) => RaffleResultToModel(res)),
+    results: (raffle.results || []).map((res) => RaffleResultToModel(res)),
   };
 }

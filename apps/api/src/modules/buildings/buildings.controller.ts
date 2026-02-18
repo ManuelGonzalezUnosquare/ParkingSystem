@@ -29,7 +29,6 @@ export class BuildingsController {
   @Roles(RoleEnum.ROOT)
   @ApiOperation({ summary: 'Create a new building and generate its slots' })
   @ApiCreatedResponse({
-    description: 'The building has been successfully created.',
     type: Building,
   })
   @ApiConflictResponse({

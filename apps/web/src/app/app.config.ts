@@ -12,7 +12,12 @@ import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 import { MyPreset } from '../preset';
 import { appRoutes } from './app.routes';
-import { authInterceptor, errorInterceptor } from './core/interceptors';
+import {
+  apiInterceptor,
+  authInterceptor,
+  errorInterceptor,
+} from './core/interceptors';
+import { APP_CONFIG, APP_CONFIG_VALUE } from '@core/constants';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,7 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes, withComponentInputBinding()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, errorInterceptor]),
+      withInterceptors([apiInterceptor, authInterceptor, errorInterceptor]),
     ),
     MessageService,
     providePrimeNG({
@@ -36,5 +41,9 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    {
+      provide: APP_CONFIG,
+      useValue: APP_CONFIG_VALUE,
+    },
   ],
 };

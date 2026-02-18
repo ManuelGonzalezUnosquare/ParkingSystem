@@ -1,3 +1,6 @@
+import { SearchDto } from '@common/dtos';
+import { PaginatedResult, paginateQuery } from '@common/utils';
+import { Building } from '@database/entities';
 import {
   ConflictException,
   Injectable,
@@ -6,11 +9,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateBuildingDto } from './dtos/create-building.dto';
-import { SearchDto } from '@common/dtos';
-import { PaginatedResult, paginate } from '@common/utils';
-import { Building } from '@database/entities';
 
 @Injectable()
 export class BuildingsService {
@@ -22,11 +22,10 @@ export class BuildingsService {
   ) {}
 
   async create(dto: CreateBuildingDto): Promise<Building> {
-    this.logger.log(`Creating building: ${dto.name}`);
-
     const existing = await this.buildingRepository.findOneBy({
       name: dto.name,
     });
+
     if (existing) {
       throw new ConflictException(
         `Building with name "${dto.name}" already exists`,
@@ -35,9 +34,14 @@ export class BuildingsService {
 
     try {
       const newBuilding = this.buildingRepository.create(dto);
-      return await this.buildingRepository.save(newBuilding);
+      const saved = await this.buildingRepository.save(newBuilding);
+      this.logger.log(`Building created: ${saved.publicId}`);
+      return saved;
     } catch (error) {
-      this.logger.error(`Error creating building: ${error.message}`);
+      this.logger.error(
+        `Failed to create building: ${error.message}`,
+        error.stack,
+      );
       throw new InternalServerErrorException('Failed to create building');
     }
   }
@@ -46,24 +50,15 @@ export class BuildingsService {
     publicId: string,
     updateData: Partial<CreateBuildingDto>,
   ): Promise<Building> {
-    this.logger.log(`Attempting to update building ID: ${publicId}`);
-
     const building = await this.findOneByPublicId(publicId);
 
-    if (!building) {
-      this.logger.warn(`Building with ID: ${publicId} not found`);
-      throw new NotFoundException(`Building with ID "${publicId}" not found`);
-    }
-
-    const updatedBuilding = Object.assign(building, updateData);
+    const updatedBuilding = this.buildingRepository.merge(building, updateData);
 
     try {
-      const saved = await this.buildingRepository.save(updatedBuilding);
-      this.logger.log(`Building ID: ${publicId} successfully updated`);
-      return saved;
+      return await this.buildingRepository.save(updatedBuilding);
     } catch (error) {
       this.logger.error(
-        `Error updating building ID: ${publicId} - ${error.message}`,
+        `Error updating building ${publicId}: ${error.message}`,
       );
       throw new InternalServerErrorException('Error updating building record');
     }
@@ -72,37 +67,34 @@ export class BuildingsService {
   async findAll(search: SearchDto): Promise<PaginatedResult<Building>> {
     const { globalFilter } = search;
 
-    const queryOptions: any = {};
+    const query = this.buildingRepository.createQueryBuilder('building');
 
     if (globalFilter) {
-      queryOptions.where = [
-        { name: Like(`%${globalFilter}%`) },
-        { address: Like(`%${globalFilter}%`) },
-      ];
+      query.where(
+        'building.name LIKE :filter OR building.address LIKE :filter',
+        {
+          filter: `%${globalFilter}%`,
+        },
+      );
     }
 
-    return await paginate(this.buildingRepository, search, queryOptions);
+    return await paginateQuery(query, search);
   }
 
   async findOneByPublicId(publicId: string): Promise<Building> {
     const building = await this.buildingRepository.findOneBy({ publicId });
     if (!building) {
+      this.logger.warn(`Building not found: ${publicId}`);
       throw new NotFoundException(`Building with ID "${publicId}" not found`);
     }
     return building;
   }
 
   async remove(publicId: string): Promise<void> {
-    this.logger.log(`Initiating removal for building ID: ${publicId}`);
     const building = await this.findOneByPublicId(publicId);
 
-    if (!building) {
-      this.logger.warn(`Building with ID: ${publicId} not found`);
-      throw new NotFoundException(`Building with ID "${publicId}" not found`);
-    }
-
     try {
-      await this.buildingRepository.softDelete({ publicId });
+      await this.buildingRepository.softDelete(building.id);
       this.logger.log(`building ID: ${publicId} successfully removed`);
     } catch (error) {
       this.logger.error(

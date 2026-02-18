@@ -75,6 +75,7 @@ export const AuthStore = signalStore(
       patchState(store, {
         token: session.access_token,
         user: session.user,
+        callState: 'loaded',
       });
     };
     return {
@@ -87,12 +88,9 @@ export const AuthStore = signalStore(
                 next: (res: ApiResponse<SessionModel>) =>
                   handleAuthSuccess(res.data),
                 error: (err: any) => {
+                  patchState(store, { callState: 'loaded' });
                   const errorMessage = err.error?.message || 'Login failed';
                   patchState(store, { callState: { error: errorMessage } });
-                },
-                complete: () => {
-                  console.log('ENTRO AL COMPLETE DEL LOGIN');
-                  patchState(store, { callState: 'loaded' });
                 },
               }),
             ),

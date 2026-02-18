@@ -1,26 +1,65 @@
 <p-card>
   <ng-template #title>
     <div class="flex justify-between items-center">
-      <h2>Assignament History</h2>
-      <p-button label="Export to PDF" text size="small" />
+      <h3 id="table-title" class="text-lg font-semibold text-[#0d141c]">
+        Assignment History
+      </h3>
+      <p-button
+        label="Export to PDF"
+        icon="pi pi-file-pdf"
+        text
+        size="small"
+        aria-label="Export history to PDF"
+      />
     </div>
   </ng-template>
 
-  <p-table [value]="history()">
+  <p-table
+    [value]="history()"
+    [responsiveLayout]="'stack'"
+    breakpoint="960px"
+    aria-describedby="table-title"
+    styleClass="p-datatable-sm"
+  >
     <ng-template #header>
       <tr>
-        <th>Date</th>
-        <th>Assigned Spot</th>
-        <th>Outcome</th>
+        <th scope="col">Date</th>
+        <th scope="col">Assigned Spot</th>
+        <th scope="col">Outcome</th>
       </tr>
     </ng-template>
-    <ng-template #body let-spot>
+
+    <ng-template #body let-item>
       <tr>
-        <td>{{ spot.assignedDate }}</td>
-        <td>{{ spot.slotNumber }}</td>
-        <td>
-          <p>Gano</p>
-          <p>No seleccionado</p>
+        <td class="text-sm">
+          <span class="p-column-title font-bold">Date</span>
+          {{ item.assignedDate | date: 'dd/MM/yyyy' }}
+        </td>
+        <td class="text-sm">
+          <span class="p-column-title font-bold">Assigned Spot</span>
+          <span class="font-medium text-primary">#{{ item.slotNumber }}</span>
+        </td>
+        <td class="text-sm">
+          <span class="p-column-title font-bold">Outcome</span>
+          @if (item.won) {
+          <span class="flex items-center gap-2 text-green-600 font-semibold">
+            <i class="pi pi-check-circle" aria-hidden="true"></i>
+            Won
+          </span>
+          } @else {
+          <span class="flex items-center gap-2 text-gray-500 italic">
+            <i class="pi pi-times-circle" aria-hidden="true"></i>
+            Not selected
+          </span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="3" class="text-center py-8 text-gray-400">
+          No assignment history available.
         </td>
       </tr>
     </ng-template>

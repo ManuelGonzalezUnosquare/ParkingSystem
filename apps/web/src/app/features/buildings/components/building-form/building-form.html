@@ -1,70 +1,83 @@
-<form [formGroup]="form" (submit)="doSubmit()" class="space-y-5">
-  <!-- name -->
+<form [formGroup]="form" (submit)="doSubmit()" class="space-y-6" novalidate>
   <div class="form-control">
-    <label class="form-label" for="name">Name</label>
+    <label class="form-label" for="building-name">Building Name</label>
     <input
-      fluid
-      formControlName="name"
-      id="name"
       pInputText
-      placeholder="Clock tower west"
+      id="building-name"
+      formControlName="name"
+      placeholder="e.g. Clock Tower West"
+      fluid
       [invalid]="form.controls.name.invalid && form.controls.name.touched"
+      [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+      aria-describedby="name-error"
     />
-
     <app-form-validation-error
+      id="name-error"
       [touched]="form.controls.name.touched"
       [errors]="form.controls.name.errors"
       label="Name"
     />
   </div>
-  <!-- address -->
+
   <div class="form-control">
-    <label class="form-label" for="address">Address</label>
+    <label class="form-label" for="building-address">Address</label>
     <input
-      fluid
-      formControlName="address"
-      id="address"
       pInputText
-      placeholder="123 Main Street"
+      id="building-address"
+      formControlName="address"
+      placeholder="e.g. 123 Main Street"
+      fluid
       [invalid]="form.controls.address.invalid && form.controls.address.touched"
+      [attr.aria-invalid]="form.controls.address.invalid && form.controls.address.touched"
+      aria-describedby="address-error"
     />
     <app-form-validation-error
+      id="address-error"
       [touched]="form.controls.address.touched"
       [errors]="form.controls.address.errors"
       label="Address"
     />
   </div>
-  <!-- slots number -->
+
   <div class="form-control">
-    <label class="form-label" for="totSlots">Available slots</label>
+    <label class="form-label" for="total-slots">Available Parking Slots</label>
     <p-inputnumber
-      inputId="totSlots"
-      fluid
+      id="total-slots"
       formControlName="totalSlots"
-      id="totSlots"
+      [min]="0"
+      [showButtons]="true"
+      buttonLayout="horizontal"
+      spinnerMode="horizontal"
+      incrementButtonIcon="pi pi-plus"
+      decrementButtonIcon="pi pi-minus"
+      fluid
       [invalid]="form.controls.totalSlots.invalid && form.controls.totalSlots.touched"
+      aria-describedby="slots-error"
     />
     <app-form-validation-error
+      id="slots-error"
       [touched]="form.controls.totalSlots.touched"
       [errors]="form.controls.totalSlots.errors"
-      label="Slots"
+      label="Available slots"
     />
   </div>
 
   <app-form-feedback [callState]="store.callState()" />
 
-  <div class="mt-10 flex gap-3 items-center justify-end">
+  <div class="mt-10 flex flex-col sm:flex-row gap-3 items-center justify-end">
     <p-button
       label="Cancel"
       severity="secondary"
+      [outlined]="true"
       (click)="doCancel()"
       [disabled]="store.isLoading()"
+      class="w-full sm:w-auto"
     />
     <p-button
-      label="Submit"
+      label="Save Building"
       type="submit"
-      class="w-30"
-      fluid
+      severity="primary"
+      class="w-full sm:w-32"
       [loading]="store.isLoading()"
     />
   </div>

@@ -21,65 +21,135 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 })
 export class Buildings {
   readonly buildingStore = inject(BuildingsStore);
-  readonly dialogService = inject(DialogService);
-  readonly router = inject(Router);
+  private readonly dialogService = inject(DialogService);
+  private readonly router = inject(Router);
   private readonly confirmationService = inject(ConfirmationService);
+
   private readonly dialogConfig = {
-    width: '30vw',
+    width: '450px',
     modal: true,
     closable: true,
     breakpoints: {
       '960px': '75vw',
-      '640px': '90vw',
+      '640px': '95vw',
     },
   };
 
-  add() {
-    this.openBuildingDialog('Create Building');
+  add(): void {
+    this.openBuildingDialog('Create New Building');
   }
-  update(building: BuildingModel) {
-    this.openBuildingDialog('Update Building', building);
+
+  update(building: BuildingModel): void {
+    this.openBuildingDialog(`Edit: ${building.name}`, building);
   }
-  remove(building: BuildingModel) {
+
+  remove(building: BuildingModel): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${building.name}"?`,
-      header: 'Confirm Deletion',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
-      acceptButtonProps: {
-        disabled: this.buildingStore.isLoading(),
-      },
-      closeButtonProps: {
-        disabled: this.buildingStore.isLoading(),
-      },
+      message: `You are about to delete <b>${building.name}</b>. This action will also affect all residents and parking slots assigned. Are you sure?`,
+      header: 'Critical Action',
+      icon: 'pi pi-exclamation-circle',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger p-button-text',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text',
       accept: async () => {
-        const success = await this.buildingStore.delete(building.publicId);
-        if (success) {
-          console.log('success');
-        }
+        await this.buildingStore.delete(building.publicId);
       },
     });
   }
-  viewDetails(building: BuildingModel) {
-    this.router.navigate([`/app/buildings`, building.publicId, 'details']);
+
+  viewDetails(building: BuildingModel): void {
+    this.router.navigate(['/app/buildings', building.publicId, 'details']);
   }
-  onLazyLoad(event: TableLazyLoadEvent) {
+
+  onLazyLoad(event: TableLazyLoadEvent): void {
     const searchParams: Search = {
       first: event.first ?? 0,
       rows: event.rows ?? 10,
       sortField: (event.sortField as string) ?? 'createdAt',
       sortOrder: event.sortOrder ?? -1,
-      globalFilter: (event.globalFilter as string) ?? undefined,
+      globalFilter: (event.globalFilter as string) ?? '',
     };
 
     this.buildingStore.loadAll(searchParams);
   }
 
-  private openBuildingDialog(header: string, building?: BuildingModel) {
-    this.dialogService.open(BuildingForm, {
+  private openBuildingDialog(header: string, building?: BuildingModel): void {
+    const ref = this.dialogService.open(BuildingForm, {
       ...this.dialogConfig,
       header,
       data: { building },
     });
+
+    ref?.onClose.subscribe((result) => {
+      if (result) {
+        this.buildingStore.loadAll({ first: 0, rows: 10 });
+      }
+    });
   }
 }
+
+// export class Buildings {
+//   readonly buildingStore = inject(BuildingsStore);
+//   readonly dialogService = inject(DialogService);
+//   readonly router = inject(Router);
+//   private readonly confirmationService = inject(ConfirmationService);
+//   private readonly dialogConfig = {
+//     width: '30vw',
+//     modal: true,
+//     closable: true,
+//     breakpoints: {
+//       '960px': '75vw',
+//       '640px': '90vw',
+//     },
+//   };
+//
+//   add() {
+//     this.openBuildingDialog('Create Building');
+//   }
+//   update(building: BuildingModel) {
+//     this.openBuildingDialog('Update Building', building);
+//   }
+//   remove(building: BuildingModel) {
+//     this.confirmationService.confirm({
+//       message: `Are you sure you want to delete "${building.name}"?`,
+//       header: 'Confirm Deletion',
+//       icon: 'pi pi-exclamation-triangle',
+//       acceptButtonStyleClass: 'p-button-danger',
+//       acceptButtonProps: {
+//         disabled: this.buildingStore.isLoading(),
+//       },
+//       closeButtonProps: {
+//         disabled: this.buildingStore.isLoading(),
+//       },
+//       accept: async () => {
+//         const success = await this.buildingStore.delete(building.publicId);
+//         if (success) {
+//           console.log('success');
+//         }
+//       },
+//     });
+//   }
+//   viewDetails(building: BuildingModel) {
+//     this.router.navigate([`/app/buildings`, building.publicId, 'details']);
+//   }
+//   onLazyLoad(event: TableLazyLoadEvent) {
+//     const searchParams: Search = {
+//       first: event.first ?? 0,
+//       rows: event.rows ?? 10,
+//       sortField: (event.sortField as string) ?? 'createdAt',
+//       sortOrder: event.sortOrder ?? -1,
+//       globalFilter: (event.globalFilter as string) ?? undefined,
+//     };
+//
+//     this.buildingStore.loadAll(searchParams);
+//   }
+//
+//   private openBuildingDialog(header: string, building?: BuildingModel) {
+//     this.dialogService.open(BuildingForm, {
+//       ...this.dialogConfig,
+//       header,
+//       data: { building },
+//     });
+//   }
+// }

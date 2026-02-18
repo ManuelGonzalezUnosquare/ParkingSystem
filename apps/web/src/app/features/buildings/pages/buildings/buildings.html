@@ -1,24 +1,25 @@
 <p-confirmDialog />
-<!-- PageHeading -->
-<header class="flex flex-wrap items-center justify-between gap-4 pb-4">
+
+<header
+  class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6"
+>
   <div class="flex flex-col gap-1">
-    <h2 class="text-[#0d141c] text-3xl font-black leading-tight tracking-tight">
-      Buildings
-    </h2>
-    <p class="text-[#4b739b] text-base font-normal">
-      Manage all infrastructure and system administrators in one place.
+    <h1 class="text-slate-900 text-3xl font-black tracking-tight">Buildings</h1>
+    <p class="text-slate-500 text-base">
+      Manage infrastructure and system administrators.
     </p>
   </div>
-  <div class="flex items-center gap-3">
-    <p-button label="Building" icon="pi pi-plus" (click)="add()" />
-  </div>
+  <p-button
+    label="New Building"
+    icon="pi pi-plus"
+    (click)="add()"
+    styleClass="p-button-raised"
+  />
 </header>
 
-<!-- Data Table Container -->
-<div class="pt-4">
+<div class="card border-none shadow-sm rounded-xl overflow-hidden bg-white">
   <p-table
     #dt
-    [filterDelay]="500"
     [value]="buildingStore.entities()"
     [lazy]="true"
     (onLazyLoad)="onLazyLoad($event)"
@@ -27,66 +28,188 @@
     [totalRecords]="buildingStore.pagination()?.total || 0"
     [loading]="buildingStore.isLoading()"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings"
-    [rowsPerPageOptions]="[5, 10, 25, 50]"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+    [rowsPerPageOptions]="[10, 20, 50]"
   >
-    >
     <ng-template pTemplate="caption">
-      <div class="flex justify-between items-center">
-        <h3 class="font-semibold">Inventory</h3>
-        <input
-          variant="outlined"
-          id="search"
-          pInputText
-          placeholder="Search building..."
-          (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-        />
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <h3 class="text-lg font-bold text-slate-700">
+          Infrastructure Inventory
+        </h3>
+        <span class="p-input-icon-left w-full md:w-80">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            class="w-full"
+            placeholder="Search by name or address..."
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          />
+        </span>
       </div>
     </ng-template>
+
     <ng-template #header>
       <tr>
-        <th class="text-xs font-semibold uppercase tracking-wider">Name</th>
-        <th class="text-xs font-semibold uppercase tracking-wider">Address</th>
-        <th class="text-xs font-semibold uppercase tracking-wider">
-          Total Spots
+        <th
+          pSortableColumn="name"
+          class="bg-slate-50 text-xs font-bold uppercase text-slate-600"
+        >
+          Name <p-sortIcon field="name" />
         </th>
-
-        <th class="text-xs font-semibold uppercase tracking-wider text-center">
-          Acciones
+        <th
+          pSortableColumn="address"
+          class="bg-slate-50 text-xs font-bold uppercase text-slate-600"
+        >
+          Address <p-sortIcon field="address" />
+        </th>
+        <th
+          pSortableColumn="totalSlots"
+          class="bg-slate-50 text-xs font-bold uppercase text-slate-600 w-32 text-center"
+        >
+          Spots <p-sortIcon field="totalSlots" />
+        </th>
+        <th
+          class="bg-slate-50 text-xs font-bold uppercase text-slate-600 w-40 text-center"
+        >
+          Actions
         </th>
       </tr>
     </ng-template>
+
     <ng-template #body let-building>
-      <tr>
-        <td class="text-sm font-medium">{{ building.name }}</td>
-        <td class="text-sm font-medium">{{ building.address }}</td>
-        <td class="text-sm font-medium">{{ building.totalSlots }}</td>
+      <tr class="hover:bg-blue-50/30 transition-colors">
+        <td class="text-sm font-semibold text-slate-700">
+          {{ building.name }}
+        </td>
+        <td class="text-sm text-slate-600">{{ building.address }}</td>
+        <td class="text-sm text-center font-mono font-bold">
+          {{ building.totalSlots }}
+        </td>
         <td>
-          <div class="text-center">
+          <div class="flex justify-center gap-1">
             <p-button
-              icon="pi pi-search"
-              severity="secondary"
-              size="small"
-              text
+              icon="pi pi-eye"
+              [text]="true"
+              severity="info"
               (click)="viewDetails(building)"
+              pTooltip="View Details"
             />
             <p-button
               icon="pi pi-pencil"
+              [text]="true"
               severity="secondary"
-              size="small"
-              text
               (click)="update(building)"
+              pTooltip="Edit Building"
             />
             <p-button
               icon="pi pi-trash"
-              severity="secondary"
-              size="small"
-              text
+              [text]="true"
+              severity="danger"
               (click)="remove(building)"
+              pTooltip="Delete Building"
             />
           </div>
         </td>
       </tr>
     </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="text-center py-8 text-slate-400">
+          <i class="pi pi-building text-4xl mb-3 block"></i>
+          No buildings found. Click "New Building" to start.
+        </td>
+      </tr>
+    </ng-template>
   </p-table>
 </div>
+<!-- <p-confirmDialog /> -->
+<!-- <header class="flex flex-wrap items-center justify-between gap-4 pb-4"> -->
+<!--   <div class="flex flex-col gap-1"> -->
+<!--     <h2 class="text-[#0d141c] text-3xl font-black leading-tight tracking-tight"> -->
+<!--       Buildings -->
+<!--     </h2> -->
+<!--     <p class="text-[#4b739b] text-base font-normal"> -->
+<!--       Manage all infrastructure and system administrators in one place. -->
+<!--     </p> -->
+<!--   </div> -->
+<!--   <div class="flex items-center gap-3"> -->
+<!--     <p-button label="Building" icon="pi pi-plus" (click)="add()" /> -->
+<!--   </div> -->
+<!-- </header> -->
+<!---->
+<!-- <div class="pt-4"> -->
+<!--   <p-table -->
+<!--     #dt -->
+<!--     [filterDelay]="500" -->
+<!--     [value]="buildingStore.entities()" -->
+<!--     [lazy]="true" -->
+<!--     (onLazyLoad)="onLazyLoad($event)" -->
+<!--     [paginator]="true" -->
+<!--     [rows]="10" -->
+<!--     [totalRecords]="buildingStore.pagination()?.total || 0" -->
+<!--     [loading]="buildingStore.isLoading()" -->
+<!--     [showCurrentPageReport]="true" -->
+<!--     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings" -->
+<!--     [rowsPerPageOptions]="[5, 10, 25, 50]" -->
+<!--   > -->
+<!--     > -->
+<!--     <ng-template pTemplate="caption"> -->
+<!--       <div class="flex justify-between items-center"> -->
+<!--         <h3 class="font-semibold">Inventory</h3> -->
+<!--         <input -->
+<!--           variant="outlined" -->
+<!--           id="search" -->
+<!--           pInputText -->
+<!--           placeholder="Search building..." -->
+<!--           (input)="dt.filterGlobal($any($event.target).value, 'contains')" -->
+<!--         /> -->
+<!--       </div> -->
+<!--     </ng-template> -->
+<!--     <ng-template #header> -->
+<!--       <tr> -->
+<!--         <th class="text-xs font-semibold uppercase tracking-wider">Name</th> -->
+<!--         <th class="text-xs font-semibold uppercase tracking-wider">Address</th> -->
+<!--         <th class="text-xs font-semibold uppercase tracking-wider"> -->
+<!--           Total Spots -->
+<!--         </th> -->
+<!---->
+<!--         <th class="text-xs font-semibold uppercase tracking-wider text-center"> -->
+<!--           Acciones -->
+<!--         </th> -->
+<!--       </tr> -->
+<!--     </ng-template> -->
+<!--     <ng-template #body let-building> -->
+<!--       <tr> -->
+<!--         <td class="text-sm font-medium">{{ building.name }}</td> -->
+<!--         <td class="text-sm font-medium">{{ building.address }}</td> -->
+<!--         <td class="text-sm font-medium">{{ building.totalSlots }}</td> -->
+<!--         <td> -->
+<!--           <div class="text-center"> -->
+<!--             <p-button -->
+<!--               icon="pi pi-search" -->
+<!--               severity="secondary" -->
+<!--               size="small" -->
+<!--               text -->
+<!--               (click)="viewDetails(building)" -->
+<!--             /> -->
+<!--             <p-button -->
+<!--               icon="pi pi-pencil" -->
+<!--               severity="secondary" -->
+<!--               size="small" -->
+<!--               text -->
+<!--               (click)="update(building)" -->
+<!--             /> -->
+<!--             <p-button -->
+<!--               icon="pi pi-trash" -->
+<!--               severity="secondary" -->
+<!--               size="small" -->
+<!--               text -->
+<!--               (click)="remove(building)" -->
+<!--             /> -->
+<!--           </div> -->
+<!--         </td> -->
+<!--       </tr> -->
+<!--     </ng-template> -->
+<!--   </p-table> -->
+<!-- </div> -->
