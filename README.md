@@ -1,96 +1,102 @@
-# ParkingSystem
+# 🅿️ Parking System - Enterprise Monorepo
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+[![Nx](https://img.shields.io/badge/nx-workspace-blue?logo=nx)](https://nx.dev)
+[![NestJS](https://img.shields.io/badge/backend-nestjs-red?logo=nestjs)](https://nestjs.com)
+[![Angular](https://img.shields.io/badge/frontend-angular-dd0031?logo=angular)](https://angular.io)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+An enterprise-grade parking management and raffle system built on an **Nx Monorepo** architecture. This project manages users, buildings, and vehicle parking assignments using a priority-based algorithm.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+---
 
-## Run tasks
+## 📖 Documentation Portal
 
-To run tasks with Nx use:
+Navigate through our detailed documentation modules to understand the system's inner workings:
 
-```sh
-npx nx <target> <project-name>
+| Module            | Description                                         | Link                                    |
+| :---------------- | :-------------------------------------------------- | :-------------------------------------- |
+| **Requirements**  | Business rules, user roles, and core objectives.    | [View Docs](./docs/01-requirements.md)  |
+| **Tech Stack**    | Full list of languages, frameworks, and tools.      | [View Docs](./docs/02-stack.md)         |
+| **Architecture**  | Nx structure, apps, and shared libraries.           | [View Docs](./docs/03-architecture.md)  |
+| **Database**      | Schema details and **Entity Relationship Diagram**. | [View Docs](./docs/04-database.md)      |
+| **API Guide**     | Backend standards, security, and Rate Limiting.     | [View Docs](./docs/05-api-guide.md)     |
+| **Web Guide**     | Angular frontend development and shared models.     | [View Docs](./docs/06-web-guide.md)     |
+| **Collaboration** | Branching strategy, PR flow, and Git hooks.         | [View Docs](./docs/07-collaboration.md) |
+
+---
+
+## 🚀 Quick Start & Onboarding
+
+Welcome to the team! Follow these steps to set up your local development environment.
+
+### A) Repository Setup
+
+First, clone the repository and enter the project folder:
+
+```bash
+git clone [https://github.com/unosquare/ParkingSystem.git](https://github.com/unosquare/ParkingSystem.git)
+cd ParkingSystem
 ```
 
-For example:
+### B) Local Environment Setup
 
-```sh
-npx nx build myproject
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+2. **Environment Variables:**
+   Create a .env file in the root directory based on .env.example:
+   ```bash
+   cp .env.example .env
+   ```
+3. **Database:**
+   Ensure your MySQL service is running and the database name matches your .env configuration.
+
+### C) Running the Apps
+
+Since this is an **Nx Monorepo**, you can run both the API and the Web app simultaneously:
+
+- **Start Backend (API):** `npx nx serve api`
+- **Start Frontend (Web):** `npx nx serve web`
+
+### D) Automated Documentation
+
+If you modify any TypeORM entity, you **must** update the database schema documentation to keep the ERD synchronized:
+
+```bash
+npm run doc:db
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+_Note: Our Husky hooks will prevent commits if the docs/database-schema.md is not updated._
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Add new projects
+## 🛠 Collaboration Instructions
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+To maintain high code quality, please adhere to the following standards:
 
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
-```
+- **Linter:** Run `npx nx lint` before pushing your changes.
+- **Format:** We use Prettier for consistent styling across the monorepo.
+- **Testing:** Run unit tests with `npx nx test api` or `npx nx test web`.
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+### Branching Strategy
 
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
+We follow a strict branching model to ensure stability:
 
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
+- `main` ➔ Production stable.
+- `develop` ➔ Integration for features.
+- `feature/NAME-description` ➔ Individual task branches.
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+---
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🛡 Security & Reliability
 
-## Set up CI!
+This project includes built-in protection mechanisms:
 
-### Step 1
+- **Rate Limiting:** All API endpoints are protected by NestJS Throttler.
+- **Validation:** Strict `class-validator` pipes for all incoming DTOs.
+- **Auditability:** Soft-delete (`deletedAt`) implemented across all primary tables to preserve historical data.
 
-To connect to Nx Cloud, run the following command:
+---
 
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+_Created by the Unosquare Parking System Team - 2026_
