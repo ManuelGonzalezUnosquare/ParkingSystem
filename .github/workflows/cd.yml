@@ -33,8 +33,10 @@ jobs:
           file: ./docker/api.Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_LC }}/api:latest
-            ghcr.io/${{ env.REPO_LC }}/api:${{ github.sha }}
+            ghcr.io/${{ toLower(github.repository) }}/api:latest
+            ghcr.io/${{ toLower(github.repository) }}/api:${{ github.sha }}
+          env:
+            REPOSITORY_OWNER: ${{ github.repository_owner }}
 
       - name: Build and Push Web Image
         uses: docker/build-push-action@v5
@@ -43,5 +45,5 @@ jobs:
           file: ./docker/web.Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/web:latest
-            ghcr.io/${{ github.repository }}/web:${{ github.sha }}
+            ghcr.io/${{ toLower(github.repository) }}/web:latest
+            ghcr.io/${{ toLower(github.repository) }}/web:${{ github.sha }}
