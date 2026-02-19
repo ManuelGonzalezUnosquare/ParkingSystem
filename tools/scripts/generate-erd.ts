@@ -6,6 +6,12 @@ import * as fs from 'fs';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
+const envPath = path.join(__dirname, '../../.env');
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
+
 async function generate() {
   const mockConfig = {
     get: (key: string, defaultValue?: any) => {
