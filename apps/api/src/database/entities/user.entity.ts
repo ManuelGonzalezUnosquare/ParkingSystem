@@ -37,6 +37,9 @@ export class User extends BaseEntity {
   @Column({ type: 'int', default: 0 })
   priorityScore: number;
 
+  @Column({ type: 'int', default: 0 })
+  hola: number;
+
   @Column({
     type: 'enum',
     enum: UserStatusEnum,
