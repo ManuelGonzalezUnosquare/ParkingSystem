@@ -14,3 +14,9 @@ The visual representation of the database schema, including tables, columns, and
 
 - **User:** Central entity linked to a Role and a Building.
 - **RaffleResult:** Pivot table that stores the history of winners, linking a User, Vehicle, and Slot to a specific Raffle event.
+
+## Seeding
+
+As part of the implementation, data seeding was included. This creates a default building and an admin user ready to start creating residents.
+
+👉 **[View Seeding](./08-database-seeding.md)**

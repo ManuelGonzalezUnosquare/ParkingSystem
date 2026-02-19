@@ -20,8 +20,8 @@ The system follows a hierarchical RBAC (Role-Based Access Control) model:
 
 On the first run, a default superuser is created if it doesn't already exist:
 
-- **Email**: `root@unosquare.com`
-- **Password**: `Admin123!` (Stored as a Bcrypt hash)
+- **Email**: `root@test.com`
+- **Password**: `1234567` (Stored as a Bcrypt hash)
 - **Role**: `ROOT`
 - **Building**: `null` (Global scope)
 
