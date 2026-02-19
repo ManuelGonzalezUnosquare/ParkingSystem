@@ -28,6 +28,16 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Check for Outdated Documentation
+        run: |
+          if [ -n "$(git status --porcelain docs/database-schema.md)" ]; then
+            echo "❌ Error: The database schema is outdated."
+            echo "Please run 'npm run doc:db' locally and commit the changes in docs/database-schema.md"
+            exit 1
+          else
+            echo "✅ Documentation is up to date."
+          fi
+
       - name: set Nx SHAs
         uses: nrwl/nx-set-shas@v4
         with:
