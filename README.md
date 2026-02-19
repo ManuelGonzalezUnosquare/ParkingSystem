@@ -89,4 +89,82 @@ This project includes built-in protection mechanisms:
 
 ---
 
+# 🐳 Docker Deployment Guide
+
+This project is fully containerized using **Docker** and **Docker Compose**, allowing you to spin up the entire stack (Database, Backend, and Frontend) without manual local configuration.
+
+---
+
+## 1. Prerequisites
+
+Before starting, ensure you have the following installed:
+
+- **Docker Desktop** (v4.0.0+)
+- **Docker Compose** (v2.0.0+)
+- **Git**
+
+## 2. Environment Configuration
+
+Docker uses the `.env` file at the root of the project to configure the services. Make sure you have created yours:
+
+```bash
+cp .env.example .env
+```
+
+_Note: Ensure `DB_HOST` is set to `db` (the service name in docker-compose) for container-to-container communication._
+
+---
+
+## 3. Essential Commands
+
+### 🚀 Start the Entire Stack
+
+To build the images and start all services in the background:
+
+```bash
+docker compose up -d --build
+```
+
+### 🛑 Stop Services
+
+To stop and remove all containers defined in the compose file:
+
+```bash
+docker compose down
+```
+
+### 📝 View Logs
+
+If you need to debug the API or the Web app in real-time:
+
+```bash
+docker compose logs -f api
+docker compose logs -f web
+```
+
+### 🧹 Deep Clean
+
+If you experience dependency or cache issues, use this command to reset the environment:
+
+```bash
+docker compose down --volumes --remove-orphans
+```
+
+---
+
+## 4. Services Map
+
+Once the containers are running, you can access the services at:
+
+- **Frontend (Angular)**: [http://localhost:4200](http://localhost:4200)
+- **Backend (NestJS API)**: [http://localhost:3000/api](http://localhost:3000/api)
+- **Database (MySQL)**: `localhost:3306`
+
+## 5. Troubleshooting
+
+- **Dependency Conflicts**: If the build fails during `npm install`, the project is configured to use `--legacy-peer-deps` automatically within the Dockerfiles.
+- **Database Connectivity**: The API container waits for the MySQL container to be healthy before starting the NestJS application.
+
+---
+
 _Created by the Unosquare Parking System Team - 2026_
