@@ -15,6 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Downcase Repo Name
+        run: |
+          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -29,8 +33,8 @@ jobs:
           file: ./docker/api.Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/api:latest
-            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+            ghcr.io/${{ env.REPO_LC }}/api:latest
+            ghcr.io/${{ env.REPO_LC }}/api:${{ github.sha }}
 
       - name: Build and Push Web Image
         uses: docker/build-push-action@v5
