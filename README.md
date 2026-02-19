@@ -34,7 +34,7 @@ Welcome to the team! Follow these steps to set up your local development environ
 First, clone the repository and enter the project folder:
 
 ```bash
-git clone [https://github.com/unosquare/ParkingSystem.git](https://github.com/unosquare/ParkingSystem.git)
+git clone https://github.com/ManuelGonzalezUnosquare/ParkingSystem.git
 cd ParkingSystem
 ```
 
@@ -47,7 +47,7 @@ cd ParkingSystem
 2. **Environment Variables:**
    Create a .env file in the root directory based on .env.example:
    ```bash
-   cp .env.example .env
+   cp .dev.env .env
    ```
 3. **Database:**
    Ensure your MySQL service is running and the database name matches your .env configuration.
@@ -58,16 +58,6 @@ Since this is an **Nx Monorepo**, you can run both the API and the Web app simul
 
 - **Start Backend (API):** `npx nx serve api`
 - **Start Frontend (Web):** `npx nx serve web`
-
-### D) Automated Documentation
-
-If you modify any TypeORM entity, you **must** update the database schema documentation to keep the ERD synchronized:
-
-```bash
-npm run doc:db
-```
-
-_Note: Our Husky hooks will prevent commits if the docs/database-schema.md is not updated._
 
 ---
 
