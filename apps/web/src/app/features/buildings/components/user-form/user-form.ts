@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -17,6 +17,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { IUserForm } from './iUser-form';
 import { requireVehicleDetails } from './vehicle-details.validator';
 import { FormFeedback, FormValidationError } from '@shared/ui/feedback';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-user-form',
@@ -59,9 +60,11 @@ export class UserForm implements OnInit {
       }),
       licensePlate: new FormControl('', {
         nonNullable: true,
+        validators: [Validators.required],
       }),
       description: new FormControl('', {
         nonNullable: true,
+        validators: [Validators.required],
       }),
     },
     {
@@ -69,6 +72,21 @@ export class UserForm implements OnInit {
       updateOn: 'blur',
     },
   );
+  selectedRole = toSignal(this.form.controls.role.valueChanges);
+  constructor() {
+    effect(() => {
+      const cSelectedRole = this.selectedRole();
+      if (cSelectedRole === RoleEnum.ADMIN) {
+        this.form.patchValue({ licensePlate: '', description: '' });
+        this.form.controls.licensePlate.clearValidators();
+        this.form.controls.description.clearValidators();
+      } else {
+        this.form.controls.licensePlate.addValidators(Validators.required);
+        this.form.controls.description.addValidators(Validators.required);
+      }
+      this.form.updateValueAndValidity();
+    });
+  }
   //add role
   ngOnInit(): void {
     this.form.patchValue({ role: RoleEnum.USER });
@@ -83,7 +101,6 @@ export class UserForm implements OnInit {
       });
     }
   }
-
   async doSubmit() {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;

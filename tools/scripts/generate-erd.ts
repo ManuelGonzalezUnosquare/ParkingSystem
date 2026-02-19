@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataSource } from 'typeorm';
 import { getDatabaseConfig } from '../../apps/api/src/database/data-source';
 import * as dotenv from 'dotenv';

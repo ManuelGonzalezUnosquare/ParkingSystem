@@ -1,149 +1,140 @@
-<div class="p-6 md:p-10 bg-slate-50 min-h-screen">
-  @if (store.building(); as building) {
-  <div
-    class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8"
+@if (store.building(); as building) {
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+  <div class="flex flex-col gap-2">
+    <h1 class="text-slate-900 text-4xl font-black leading-tight tracking-tight">
+      {{ building.name }}
+    </h1>
+    <p class="text-slate-500 text-base font-normal">
+      Manage parking allocations and resident data for this building.
+    </p>
+  </div>
+  <p-button
+    label="Trigger Raffle"
+    icon="pi pi-bolt"
+    (click)="raffle()"
+    [disabled]="store.residentCount() === 0"
+    [loading]="store.isLoading()"
+    severity="primary"
+  />
+</div>
+} @else {
+<div class="h-24 bg-slate-200 animate-pulse rounded-xl mb-8"></div>
+}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <app-total-resident-card class="h-full" [users]="store.usersEntities()" />
+  <app-vehicles-card class="h-full" [users]="store.usersEntities()" />
+  <app-last-raffle-card class="h-full" [raffle]="store.liveRaffle()" />
+  <app-utilization-card
+    class="h-full"
+    [users]="store.usersEntities()"
+    [availableSpots]="store.building()?.totalSlots ?? 0"
+  />
+</div>
+
+<p-card>
+  <p-table
+    #dt
+    [value]="store.usersEntities()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="10"
+    [totalRecords]="store.usersPagination()?.total || 0"
+    [loading]="store.isLoading()"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} residents"
   >
-    <div class="flex flex-col gap-2">
-      <h1
-        class="text-slate-900 text-4xl font-black leading-tight tracking-tight"
-      >
-        {{ building.name }}
-      </h1>
-      <p class="text-slate-500 text-base font-normal">
-        Manage parking allocations and resident data for this building.
-      </p>
-    </div>
-    <p-button
-      label="Trigger Raffle"
-      icon="pi pi-bolt"
-      (click)="raffle()"
-      [loading]="store.isLoading()"
-      severity="primary"
-    />
-  </div>
-  } @else {
-  <div class="h-24 bg-slate-200 animate-pulse rounded-xl mb-8"></div>
-  }
+    <ng-template pTemplate="caption">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h3 class="text-lg font-bold text-slate-800">Resident List</h3>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <span class="p-input-icon-left w-full sm:w-64">
+            <input
+              pInputText
+              class="w-full"
+              placeholder="Search by name or email..."
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </span>
+          <p-button
+            label="Add Resident"
+            icon="pi pi-plus"
+            severity="secondary"
+            (click)="addUser()"
+          />
+        </div>
+      </div>
+    </ng-template>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <app-total-resident-card class="h-full" [users]="store.usersEntities()" />
-    <app-vehicles-card class="h-full" [users]="store.usersEntities()" />
-    <app-last-raffle-card class="h-full" [raffle]="store.liveRaffle()" />
-    <app-utilization-card
-      class="h-full"
-      [users]="store.usersEntities()"
-      [availableSpots]="store.building()?.totalSlots ?? 0"
-    />
-  </div>
+    <ng-template #header>
+      <tr>
+        <th class="w-16 text-center">Status</th>
+        <th>Resident</th>
+        <th>Role</th>
+        <th>Vehicle Information</th>
+        <th>Spot</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </ng-template>
 
-  <p-card>
-    <p-table
-      #dt
-      [value]="store.usersEntities()"
-      [lazy]="true"
-      (onLazyLoad)="onLazyLoad($event)"
-      [paginator]="true"
-      [rows]="10"
-      [totalRecords]="store.usersPagination()?.total || 0"
-      [loading]="store.isLoading()"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} residents"
-    >
-      <ng-template pTemplate="caption">
-        <div
-          class="flex flex-col sm:flex-row justify-between items-center gap-4"
-        >
-          <h3 class="text-lg font-bold text-slate-800">Resident List</h3>
-          <div class="flex items-center gap-3 w-full sm:w-auto">
-            <span class="p-input-icon-left w-full sm:w-64">
-              <input
-                pInputText
-                class="w-full"
-                placeholder="Search by name or email..."
-                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
-              />
-            </span>
+    <ng-template #body let-user>
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="text-center">
+          <span
+            class="inline-block size-3 rounded-full"
+            [class.bg-emerald-500]="user.isActive"
+            [class.bg-amber-500]="!user.isActive"
+          >
+            <span class="sr-only"
+              >{{ user.isActive ? 'Active' : 'Inactive' }}</span
+            >
+          </span>
+        </td>
+        <td>
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-700">{{ user.fullName }}</span>
+            <span class="text-xs text-slate-400">{{ user.email }}</span>
+          </div>
+        </td>
+        <td><app-role-tag [role]="user.role" /></td>
+        <td>
+          @if (user.vehiclePlate) {
+          <div class="flex flex-col text-xs">
+            <span class="font-medium text-slate-600"
+              >{{ user.vehicleDescription }}</span
+            >
+            <span class="font-mono text-blue-600">{{ user.vehiclePlate }}</span>
+          </div>
+          } @else {
+          <span class="text-slate-300 italic text-xs"
+            >No vehicle registered</span
+          >
+          }
+        </td>
+        <td class="font-mono font-bold">
+          {{ user.assignedSlotNumber || '-' }}
+        </td>
+        <td>
+          <div class="flex justify-center gap-1">
             <p-button
-              label="Add Resident"
-              icon="pi pi-plus"
+              icon="pi pi-pencil"
+              text
+              rounded
               severity="secondary"
-              (click)="addUser()"
+              (click)="update(user)"
+              pTooltip="Edit resident"
+            />
+            <p-button
+              icon="pi pi-trash"
+              text
+              rounded
+              severity="danger"
+              pTooltip="Delete resident"
             />
           </div>
-        </div>
-      </ng-template>
-
-      <ng-template #header>
-        <tr>
-          <th class="w-16 text-center">Status</th>
-          <th>Resident</th>
-          <th>Role</th>
-          <th>Vehicle Information</th>
-          <th>Spot</th>
-          <th class="text-center">Actions</th>
-        </tr>
-      </ng-template>
-
-      <ng-template #body let-user>
-        <tr class="hover:bg-slate-50 transition-colors">
-          <td class="text-center">
-            <span
-              class="inline-block size-3 rounded-full"
-              [class.bg-emerald-500]="user.isActive"
-              [class.bg-amber-500]="!user.isActive"
-            >
-              <span class="sr-only"
-                >{{ user.isActive ? 'Active' : 'Inactive' }}</span
-              >
-            </span>
-          </td>
-          <td>
-            <div class="flex flex-col">
-              <span class="font-bold text-slate-700">{{ user.fullName }}</span>
-              <span class="text-xs text-slate-400">{{ user.email }}</span>
-            </div>
-          </td>
-          <td><app-role-tag [role]="user.role" /></td>
-          <td>
-            @if (user.vehiclePlate) {
-            <div class="flex flex-col text-xs">
-              <span class="font-medium text-slate-600"
-                >{{ user.vehicleDescription }}</span
-              >
-              <span class="font-mono text-blue-600"
-                >{{ user.vehiclePlate }}</span
-              >
-            </div>
-            } @else {
-            <span class="text-slate-300 italic text-xs"
-              >No vehicle registered</span
-            >
-            }
-          </td>
-          <td class="font-mono font-bold">
-            {{ user.assignedSlotNumber || '-' }}
-          </td>
-          <td>
-            <div class="flex justify-center gap-1">
-              <p-button
-                icon="pi pi-pencil"
-                text
-                rounded
-                severity="secondary"
-                (click)="update(user)"
-                pTooltip="Edit resident"
-              />
-              <p-button
-                icon="pi pi-trash"
-                text
-                rounded
-                severity="danger"
-                pTooltip="Delete resident"
-              />
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </p-card>
-</div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

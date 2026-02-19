@@ -20,6 +20,6 @@ export const getDatabaseConfig = (
   password: configService.get<string>('DB_PASSWORD'),
   database: configService.get<string>('DB_NAME'),
   synchronize: true, //TODO: change it for prod
-  logging: true,
+  logging: false,
   entities: [User, Building, Role, Vehicle, Raffle, ParkingSlot, RaffleResult],
 });

@@ -60,6 +60,12 @@
       [errors]="form.controls.totalSlots.errors"
       label="Available slots"
     />
+    <div class="rounded-lg bg-gray-100 p-3 my-3">
+      <span class="text-xs text-wrap text-gray-600">
+        <i class="pi pi-info-circle"></i> Currently, parking slots are set
+        during building setup and cannot be changed later.
+      </span>
+    </div>
   </div>
 
   <app-form-feedback [callState]="store.callState()" />

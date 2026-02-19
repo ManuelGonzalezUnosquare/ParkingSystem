@@ -37,7 +37,6 @@ export const BuildingDetailStore = signalStore(
   withReset(),
   withState(initialState),
   withCallState(),
-
   withProps(() => ({
     _authStore: inject(AuthStore),
     _buildingService: inject(BuildingService),

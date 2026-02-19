@@ -55,6 +55,15 @@ export class BuildingDetails implements OnInit {
       '640px': '90vw',
     },
   };
+  searchParams: SearchBuildingUsers = {
+    first: 0,
+    rows: 10,
+    sortField: 'createdAt',
+    sortOrder: -1,
+    globalFilter: undefined,
+    buildingId: undefined,
+  };
+
   id = input.required<string>();
 
   ngOnInit(): void {
@@ -78,7 +87,7 @@ export class BuildingDetails implements OnInit {
   }
 
   onLazyLoad(event: TableLazyLoadEvent) {
-    const searchParams: SearchBuildingUsers = {
+    this.searchParams = {
       first: event.first ?? 0,
       rows: event.rows ?? 10,
       sortField: (event.sortField as string) ?? 'createdAt',
@@ -87,7 +96,7 @@ export class BuildingDetails implements OnInit {
       buildingId: this.id(),
     };
 
-    this.store.loadUsers(searchParams);
+    this.store.loadUsers(this.searchParams);
   }
 
   private openBuildingDialog(header: string, user?: UserModel) {
@@ -98,6 +107,14 @@ export class BuildingDetails implements OnInit {
     });
   }
   async raffle() {
-    this.store.runRaffle();
+    const success = await this.store.runRaffle();
+    if (success) {
+      this.store.loadUsers({
+        ...this.searchParams,
+        first: 0,
+        sortField: 'createdAt',
+        sortOrder: -1,
+      });
+    }
   }
 }

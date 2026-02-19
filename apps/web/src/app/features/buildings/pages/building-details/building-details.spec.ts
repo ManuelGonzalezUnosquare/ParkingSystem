@@ -16,6 +16,7 @@ describe('BuildingDetails', () => {
     isLoading: vi.fn(() => false),
     isRaffling: vi.fn(() => false),
     liveRaffle: vi.fn(() => null),
+    residentCount: vi.fn(() => 0),
   };
 
   beforeEach(async () => {

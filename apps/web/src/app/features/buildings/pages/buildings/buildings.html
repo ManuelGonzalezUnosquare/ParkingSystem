@@ -1,5 +1,4 @@
 <p-confirmDialog />
-
 <header
   class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6"
 >
@@ -16,6 +15,43 @@
     styleClass="p-button-raised"
   />
 </header>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+  <p-card>
+    <ng-template #title>
+      <div class="flex justify-between items-start">
+        <p
+          id="card-label"
+          class="text-[#4b739b] text-xs font-bold uppercase tracking-widest"
+        >
+          Total Buildings
+        </p>
+        <i class="pi pi-building text-blue-500" aria-hidden="true"></i>
+      </div>
+    </ng-template>
+
+    <ng-template #subtitle>
+      <div class="flex flex-col" [attr.aria-labelledby]="'card-label'">
+        <p
+          class="text-[#0d141c] tracking-tight text-4xl font-extrabold leading-tight"
+        >
+          {{buildingStore.pagination()?.total || 0}}
+        </p>
+        <p class="text-slate-500 text-sm font-medium">Lorem ipsum dolor ...</p>
+      </div>
+    </ng-template>
+  </p-card>
+  <p-card>
+    <div class="text-center">
+      <span class="text-gray-400">placeholder card</span>
+    </div>
+  </p-card>
+  <p-card>
+    <div class="text-center">
+      <span class="text-gray-400">placeholder card</span>
+    </div>
+  </p-card>
+</div>
 
 <div class="card border-none shadow-sm rounded-xl overflow-hidden bg-white">
   <p-table
@@ -37,7 +73,6 @@
           Infrastructure Inventory
         </h3>
         <span class="p-input-icon-left w-full md:w-80">
-          <i class="pi pi-search"></i>
           <input
             pInputText
             class="w-full"
@@ -123,93 +158,3 @@
     </ng-template>
   </p-table>
 </div>
-<!-- <p-confirmDialog /> -->
-<!-- <header class="flex flex-wrap items-center justify-between gap-4 pb-4"> -->
-<!--   <div class="flex flex-col gap-1"> -->
-<!--     <h2 class="text-[#0d141c] text-3xl font-black leading-tight tracking-tight"> -->
-<!--       Buildings -->
-<!--     </h2> -->
-<!--     <p class="text-[#4b739b] text-base font-normal"> -->
-<!--       Manage all infrastructure and system administrators in one place. -->
-<!--     </p> -->
-<!--   </div> -->
-<!--   <div class="flex items-center gap-3"> -->
-<!--     <p-button label="Building" icon="pi pi-plus" (click)="add()" /> -->
-<!--   </div> -->
-<!-- </header> -->
-<!---->
-<!-- <div class="pt-4"> -->
-<!--   <p-table -->
-<!--     #dt -->
-<!--     [filterDelay]="500" -->
-<!--     [value]="buildingStore.entities()" -->
-<!--     [lazy]="true" -->
-<!--     (onLazyLoad)="onLazyLoad($event)" -->
-<!--     [paginator]="true" -->
-<!--     [rows]="10" -->
-<!--     [totalRecords]="buildingStore.pagination()?.total || 0" -->
-<!--     [loading]="buildingStore.isLoading()" -->
-<!--     [showCurrentPageReport]="true" -->
-<!--     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} buildings" -->
-<!--     [rowsPerPageOptions]="[5, 10, 25, 50]" -->
-<!--   > -->
-<!--     > -->
-<!--     <ng-template pTemplate="caption"> -->
-<!--       <div class="flex justify-between items-center"> -->
-<!--         <h3 class="font-semibold">Inventory</h3> -->
-<!--         <input -->
-<!--           variant="outlined" -->
-<!--           id="search" -->
-<!--           pInputText -->
-<!--           placeholder="Search building..." -->
-<!--           (input)="dt.filterGlobal($any($event.target).value, 'contains')" -->
-<!--         /> -->
-<!--       </div> -->
-<!--     </ng-template> -->
-<!--     <ng-template #header> -->
-<!--       <tr> -->
-<!--         <th class="text-xs font-semibold uppercase tracking-wider">Name</th> -->
-<!--         <th class="text-xs font-semibold uppercase tracking-wider">Address</th> -->
-<!--         <th class="text-xs font-semibold uppercase tracking-wider"> -->
-<!--           Total Spots -->
-<!--         </th> -->
-<!---->
-<!--         <th class="text-xs font-semibold uppercase tracking-wider text-center"> -->
-<!--           Acciones -->
-<!--         </th> -->
-<!--       </tr> -->
-<!--     </ng-template> -->
-<!--     <ng-template #body let-building> -->
-<!--       <tr> -->
-<!--         <td class="text-sm font-medium">{{ building.name }}</td> -->
-<!--         <td class="text-sm font-medium">{{ building.address }}</td> -->
-<!--         <td class="text-sm font-medium">{{ building.totalSlots }}</td> -->
-<!--         <td> -->
-<!--           <div class="text-center"> -->
-<!--             <p-button -->
-<!--               icon="pi pi-search" -->
-<!--               severity="secondary" -->
-<!--               size="small" -->
-<!--               text -->
-<!--               (click)="viewDetails(building)" -->
-<!--             /> -->
-<!--             <p-button -->
-<!--               icon="pi pi-pencil" -->
-<!--               severity="secondary" -->
-<!--               size="small" -->
-<!--               text -->
-<!--               (click)="update(building)" -->
-<!--             /> -->
-<!--             <p-button -->
-<!--               icon="pi pi-trash" -->
-<!--               severity="secondary" -->
-<!--               size="small" -->
-<!--               text -->
-<!--               (click)="remove(building)" -->
-<!--             /> -->
-<!--           </div> -->
-<!--         </td> -->
-<!--       </tr> -->
-<!--     </ng-template> -->
-<!--   </p-table> -->
-<!-- </div> -->

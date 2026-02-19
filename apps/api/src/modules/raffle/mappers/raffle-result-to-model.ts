@@ -8,8 +8,9 @@ export function RaffleResultToModel(result: RaffleResult): RaffleResultModel {
     assignedDate: result.createdAt,
     userName: `${result.user.firstName} ${result.user.lastName}`,
     userScoreAtDraw: result.scoreAtDraw,
-    vehicleDescription: result.vehicle.description,
-    vehiclePlate: result.vehicle.licensePlate,
-    slotNumber: result.slot.slotNumber,
+    vehicleDescription: result.vehicle?.description,
+    vehiclePlate: result.vehicle?.licensePlate,
+    slotNumber: result.slot?.slotNumber,
+    status: result.status,
   };
 }

@@ -44,11 +44,11 @@ export class BuildingForm implements OnInit {
   readonly form = new FormGroup<IBuildingForm>({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(3)],
     }),
     address: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(5)],
     }),
     totalSlots: new FormControl(0, {
       nonNullable: true,
@@ -64,6 +64,7 @@ export class BuildingForm implements OnInit {
         address: this.building.address,
         totalSlots: this.building.totalSlots,
       });
+      this.form.controls.totalSlots.disable();
     }
   }
 

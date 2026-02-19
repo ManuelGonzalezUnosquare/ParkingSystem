@@ -21,7 +21,7 @@ export class UtilizationCard {
   users = input.required<UserModel[]>();
 
   protected readonly assignedSlotsCount = computed(() => {
-    return this.users().filter((u) => u.hasVehicle).length;
+    return this.users().filter((u) => u.hasSlot).length;
   });
 
   protected readonly progressValue = computed(() => {

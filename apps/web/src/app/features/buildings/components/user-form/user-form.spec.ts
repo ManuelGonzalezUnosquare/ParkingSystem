@@ -5,13 +5,12 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { BuildingDetailStore } from '@core/stores';
 import { SessionService } from '@core/services';
 import { RoleEnum } from '@parking-system/libs';
-import { vi } from 'vitest'; // <--- Importamos vi de vitest
+import { vi } from 'vitest';
 
 describe('UserForm', () => {
   let component: UserForm;
   let fixture: ComponentFixture<UserForm>;
 
-  // Usamos vi.fn() en lugar de jest.fn()
   const mockDialogRef = { close: vi.fn() };
   const mockDialogConfig = { data: { user: null } };
 
@@ -27,7 +26,6 @@ describe('UserForm', () => {
   };
 
   beforeEach(async () => {
-    // Limpiamos los mocks antes de cada test para evitar interferencias
     vi.clearAllMocks();
 
     await TestBed.configureTestingModule({
@@ -44,8 +42,6 @@ describe('UserForm', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
-
-  // ... (El resto de los tests usan 'vi' de la misma forma)
 
   it('should call store.create when no user is provided', async () => {
     component.form.patchValue({

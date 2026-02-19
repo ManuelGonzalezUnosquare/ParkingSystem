@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VehiclesCard } from './vehicles-card';
-import { UserModel } from '@parking-system/libs';
+import { RoleEnum, UserModel } from '@parking-system/libs';
 
 describe('VehiclesCard', () => {
   let component: VehiclesCard;
   let fixture: ComponentFixture<VehiclesCard>;
 
   const mockUsers: Partial<UserModel>[] = [
-    { hasVehicle: true },
-    { hasVehicle: true },
-    { hasVehicle: false },
-    { hasVehicle: true },
-    { hasVehicle: false },
+    { hasVehicle: true, role: RoleEnum.USER },
+    { hasVehicle: true, role: RoleEnum.USER },
+    { hasVehicle: false, role: RoleEnum.USER },
+    { hasVehicle: true, role: RoleEnum.USER },
+    { hasVehicle: false, role: RoleEnum.USER },
   ];
 
   beforeEach(async () => {

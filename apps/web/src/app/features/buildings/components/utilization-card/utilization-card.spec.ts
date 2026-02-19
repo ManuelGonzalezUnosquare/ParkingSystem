@@ -37,8 +37,8 @@ describe('UtilizationCard', () => {
   it('should return Red color and Full status for 100% utilization', () => {
     fixture.componentRef.setInput('availableSpots', 2);
     fixture.componentRef.setInput('users', [
-      { hasVehicle: true },
-      { hasVehicle: true },
+      { hasSlot: true },
+      { hasSlot: true },
     ]); // 100%
 
     fixture.detectChanges();

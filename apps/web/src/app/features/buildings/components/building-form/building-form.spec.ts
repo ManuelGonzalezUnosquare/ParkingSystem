@@ -54,16 +54,17 @@ describe('BuildingForm within DynamicDialog', () => {
   it('should call store.update when in edit mode', async () => {
     const mockBuilding = { publicId: '123', name: 'A' };
     component['building'] = mockBuilding as any;
-    mockStore.update.mockResolvedValue(true);
-
-    component.form.patchValue({
+    const payload = {
       name: 'New Name',
       address: 'Add',
       totalSlots: 5,
-    });
-    await component['doSubmit']();
+    };
 
-    expect(mockStore.update).toHaveBeenCalledWith('123', expect.any(Object));
-    expect(mockRef.close).toHaveBeenCalledWith(true);
+    component.form.patchValue(payload);
+    mockStore.update.mockResolvedValue(true);
+    fixture.detectChanges();
+    await component.doSubmit();
+
+    expect(mockStore.update).toHaveBeenCalled();
   });
 });

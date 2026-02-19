@@ -16,6 +16,7 @@ export function UserEntityToModel(user: User): UserModel {
     priorityScore: user.priorityScore,
     isActive: user.status === UserStatusEnum.ACTIVE,
     hasVehicle: !!primaryVehicle,
+    hasSlot: !!primaryVehicle?.slot,
     vehicleDescription: primaryVehicle?.description || 'No vehicle',
     vehiclePlate: primaryVehicle?.licensePlate || 'N/A',
     assignedSlotNumber: primaryVehicle?.slot?.slotNumber || 'None',
