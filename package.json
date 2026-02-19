@@ -5,7 +5,8 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "eslint . --ext .ts,.html",
-    "lint:fix": "eslint . --ext .ts,.html --fix"
+    "lint:fix": "eslint . --ext .ts,.html --fix",
+    "doc:db": "npx ts-node -r tsconfig-paths/register -P apps/api/tsconfig.app.json tools/scripts/generate-erd.ts"
   },
   "private": true,
   "devDependencies": {
@@ -59,6 +60,7 @@
     "tailwindcss": "^4.1.18",
     "ts-jest": "^29.4.0",
     "ts-node": "10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",

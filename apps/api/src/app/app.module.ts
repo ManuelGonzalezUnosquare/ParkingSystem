@@ -1,16 +1,11 @@
+import { getDatabaseConfig } from '@database/data-source';
+import { RaffleModule } from '@modules/raffle/raffle.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {
-  Building,
-  ParkingSlot,
-  PasswordResetToken,
-  Raffle,
-  RaffleResult,
-  Role,
-  User,
-  Vehicle,
-} from '../database/entities';
+import { Building, Role, User } from '../database/entities';
 import { DatabaseSeederService } from '../database/seeder.service';
 import {
   AuthModule,
@@ -19,13 +14,10 @@ import {
   UsersModule,
   UtilsModule,
 } from '../modules';
+import { JwtAuthGuard, RolesGuard } from '../modules/auth/guards';
 import { BuildingSubscriber } from '../subscribers/building.subscriber';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard, RolesGuard } from '../modules/auth/guards';
-import { RaffleModule } from '@modules/raffle/raffle.module';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -35,34 +27,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const dbConfig = {
-          host: config.get<string>('DB_HOST'),
-          port: config.get<number>('DB_PORT'),
-          user: config.get<string>('DB_USER'),
-        };
-        console.log('Tentando conexión a DB con:', dbConfig);
-        return {
-          type: 'mysql',
-          host: dbConfig.host || 'localhost',
-          port: parseInt(config.get<string>('DB_PORT', '3307'), 10),
-          username: dbConfig.user,
-          password: config.get<string>('DB_PASSWORD'),
-          database: config.get<string>('DB_NAME'),
-          autoLoadEntities: true,
-          synchronize: true,
-          entities: [
-            User,
-            Building,
-            Role,
-            Vehicle,
-            PasswordResetToken,
-            Raffle,
-            ParkingSlot,
-            RaffleResult,
-          ],
-        };
-      },
+      useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
     ThrottlerModule.forRoot([
       {
