@@ -9,7 +9,11 @@ import {
 import { UsersService } from '@modules/users/services';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RoleEnum, UserStatusEnum } from '@parking-system/libs';
+import {
+  RoleEnum,
+  UserRaffleResultEnum,
+  UserStatusEnum,
+} from '@parking-system/libs';
 import { DataSource, Equal, In, IsNull, Repository } from 'typeorm';
 
 @Injectable()
@@ -73,6 +77,11 @@ export class RaffleService {
   }
 
   async executeRaffle(user: User, isManuallyTriggered: boolean) {
+    PermissionValidator.validateBuildingAccess(
+      user,
+      user.building?.publicId || '',
+      false,
+    );
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -103,52 +112,99 @@ export class RaffleService {
         }),
       ]);
 
+      //clean old raffle assignations
+      //
+      const allVehiclesInBuilding = await queryRunner.manager.find(Vehicle, {
+        where: { user: { building: { id: raffle.building.id } } },
+      });
+
+      if (allVehiclesInBuilding.length > 0) {
+        const allVehicleIds = allVehiclesInBuilding.map((v) => v.id);
+        await queryRunner.manager.update(Vehicle, allVehicleIds, {
+          slot: null,
+        });
+      }
+
       const activeCandidates = candidates.filter((u) => u.vehicles?.length > 0);
-      const results = this.runSelection(activeCandidates, slots);
+      const excludedUsers = candidates.filter(
+        (u) => !u.vehicles || u.vehicles.length === 0,
+      );
 
-      //handle winners
-      if (results.winners.length > 0) {
-        const winnerIds = results.winners.map((w) => w.user.id);
-        const vehicleIds = results.winners.map((w) => w.user.vehicles[0].id);
+      const selection = this.runSelection(activeCandidates, slots);
 
-        await queryRunner.manager.update(User, winnerIds, { priorityScore: 0 });
+      const historyRecords: RaffleResult[] = [];
 
-        const historyRecords = results.winners.map((res) =>
-          queryRunner.manager.create(RaffleResult, {
-            raffle,
-            user: res.user,
-            vehicle: res.user.vehicles[0],
-            slot: res.slot,
-            scoreAtDraw: res.user.priorityScore,
-          }),
-        );
-        await queryRunner.manager.save(RaffleResult, historyRecords);
-
-        for (const res of results.winners) {
+      //winners
+      if (selection.winners.length > 0) {
+        for (const res of selection.winners) {
+          // Resetear prioridad y asignar slot al vehículo
+          await queryRunner.manager.update(User, res.user.id, {
+            priorityScore: 0,
+          });
           await queryRunner.manager.update(Vehicle, res.user.vehicles[0].id, {
             slot: res.slot,
           });
+
+          historyRecords.push(
+            queryRunner.manager.create(RaffleResult, {
+              raffle,
+              user: res.user,
+              vehicle: res.user.vehicles[0],
+              slot: res.slot,
+              scoreAtDraw: res.user.priorityScore,
+              status: UserRaffleResultEnum.WINNER,
+            }),
+          );
         }
       }
-      //handle lossers
-      if (results.losers.length > 0) {
-        const loserIds = results.losers.map((l) => l.id);
-        await queryRunner.manager.increment(
-          User,
-          { id: In(loserIds) },
-          'priorityScore',
-          1,
-        );
 
-        const loserVehicleIds = results.losers.map((l) => l.vehicles[0].id);
-        await queryRunner.manager.update(Vehicle, loserVehicleIds, {
-          slot: null,
-        });
+      //loosers
+      if (selection.losers.length > 0) {
+        for (const loser of selection.losers) {
+          await queryRunner.manager.increment(
+            User,
+            { id: loser.id },
+            'priorityScore',
+            1,
+          );
+          await queryRunner.manager.update(Vehicle, loser.vehicles[0].id, {
+            slot: null,
+          });
+
+          historyRecords.push(
+            queryRunner.manager.create(RaffleResult, {
+              raffle,
+              user: loser,
+              vehicle: loser.vehicles[0],
+              slot: null,
+              scoreAtDraw: loser.priorityScore,
+              status: UserRaffleResultEnum.LOSER,
+            }),
+          );
+        }
+      }
+      //excluded
+      for (const excluded of excludedUsers) {
+        historyRecords.push(
+          queryRunner.manager.create(RaffleResult, {
+            raffle,
+            user: excluded,
+            vehicle: null,
+            slot: null,
+            scoreAtDraw: excluded.priorityScore,
+            status: UserRaffleResultEnum.EXCLUDED_NO_VEHICLE,
+          }),
+        );
+      }
+
+      if (historyRecords.length > 0) {
+        await queryRunner.manager.save(RaffleResult, historyRecords);
       }
 
       //create next
       raffle.executedAt = new Date();
       raffle.isManual = isManuallyTriggered;
+      raffle.executedBy = isManuallyTriggered ? user : null;
       await queryRunner.manager.save(raffle);
 
       const nextRaffle = queryRunner.manager.create(Raffle, {

@@ -8,4 +8,5 @@ export class RaffleResultModel extends BaseModel {
   vehicleDescription: string;
   vehiclePlate: string;
   slotNumber: string;
+  status: string;
 }

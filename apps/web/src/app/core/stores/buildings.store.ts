@@ -127,7 +127,6 @@ export const BuildingsStore = signalStore(
         return false;
       }
     },
-
     delete: async (id: string): Promise<boolean> => {
       patchState(store, { callState: 'loading' });
       try {

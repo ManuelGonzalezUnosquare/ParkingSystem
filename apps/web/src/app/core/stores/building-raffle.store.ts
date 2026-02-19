@@ -1,5 +1,6 @@
 import { withCallState, withReset } from '@angular-architects/ngrx-toolkit';
 import { computed, inject, Signal } from '@angular/core';
+import { FeedbackService } from '@core/services';
 import { RaffleService } from '@features/buildings/services';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -46,6 +47,7 @@ export function withBuildingRaffles(
     withCallState(),
     withProps(() => ({
       _raffleService: inject(RaffleService),
+      _feedbackService: inject(FeedbackService),
     })),
     withComputed((store) => ({
       liveRaffle: computed(() => {
@@ -82,6 +84,10 @@ export function withBuildingRaffles(
             store._raffleService.executeRaffle(),
           );
           patchState(store, { callState: 'loaded' });
+          store._feedbackService.showSuccess(
+            'Raffle Completed',
+            'All parking spots have been assigned and history records updated.',
+          );
           return true;
         } catch (err: any) {
           patchState(store, {

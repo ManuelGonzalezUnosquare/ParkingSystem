@@ -74,6 +74,7 @@ export class SessionService {
         label: 'My Account',
         icon: 'pi pi-cog',
         routerLink: '/app/account',
+        disabled: true,
         allowedRoles: [RoleEnum.USER, RoleEnum.ROOT, RoleEnum.ADMIN],
         routerLinkActiveOptions: {
           exact: true,

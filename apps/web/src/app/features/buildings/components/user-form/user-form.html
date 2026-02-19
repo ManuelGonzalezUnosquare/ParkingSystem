@@ -76,13 +76,12 @@
       label="Role"
     />
   </div>
-  }
+  } @if(selectedRole() === 'USER'){
 
   <!---- vehicle info ---->
   <p-divider class="hidden! md:flex!"
     ><b class="text-slate-500">Vehicle information</b></p-divider
   >
-
   <!-- Licence Plate -->
   <div class="form-control">
     <label class="form-label" for="lPlate">License Plate</label>
@@ -120,6 +119,7 @@
       label="Description"
     />
   </div>
+  }
 
   <app-form-feedback [callState]="store.callState()" />
 

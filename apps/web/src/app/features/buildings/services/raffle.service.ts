@@ -28,6 +28,6 @@ export class RaffleService {
 
   //TODO: MOVE THIS
   executeRaffle() {
-    return this.request.post<boolean>('/api/raffle', {});
+    return this.request.post<boolean>('/api/raffle/execute', {});
   }
 }

@@ -24,6 +24,7 @@ import {
   ApiPaginationMeta,
   BuildingModel,
   ICreateUser,
+  RoleEnum,
   SearchBuildingUsers,
   UserModel,
 } from '@parking-system/libs';
@@ -53,6 +54,11 @@ export function withBuildingUsers(building: Signal<BuildingModel | undefined>) {
     withComputed((store) => ({
       isLoading: computed(() => {
         return store.callState() === 'loading';
+      }),
+
+      residentCount: computed(() => {
+        return store.usersEntities().filter((f) => f.role === RoleEnum.USER)
+          .length;
       }),
     })),
     withMethods((store) => ({

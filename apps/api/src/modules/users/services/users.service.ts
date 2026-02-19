@@ -78,15 +78,17 @@ export class UsersService {
   async create(dto: CreateUserDto, creator: User): Promise<User> {
     PermissionValidator.validateBuildingAccess(creator, dto.buildingId);
 
-    const [emailExists, building, role] = await Promise.all([
+    const [emailExists, building, role, vehicle] = await Promise.all([
       this.userRepository.exists({ where: { email: dto.email } }),
       this.buildingService.findOneByPublicId(dto.buildingId),
       this.roleService.findByName(dto.role),
+      this.vehicleService.findByPlate(dto.licensePlate),
     ]);
 
     if (emailExists) throw new ConflictException('User already exists');
     if (!building) throw new NotFoundException('Building not found');
     if (!role) throw new NotFoundException(`Role ${dto.role} not found.`);
+    if (vehicle) throw new ConflictException('License plate already exists');
 
     const queryRunner =
       this.userRepository.manager.connection.createQueryRunner();

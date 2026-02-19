@@ -11,7 +11,8 @@ import { TransformInterceptor } from '@common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    // logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    logger: ['error', 'log'],
   });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
@@ -26,6 +27,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  //throttler config
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1); // trust on first proxy (docker/nginx)
 
   // --- Swagger ---
   const config = new DocumentBuilder()

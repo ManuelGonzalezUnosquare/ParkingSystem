@@ -38,6 +38,10 @@ export class VehiclesService {
     return repo.findOneBy({ id });
   }
 
+  async findByPlate(licensePlate: string) {
+    return this.vehicleRepository.findOne({ where: { licensePlate } });
+  }
+
   async assignSlot(id: number, slot: ParkingSlot) {
     const vehicle = await this.vehicleRepository.findOneBy({ id });
     if (!vehicle) {

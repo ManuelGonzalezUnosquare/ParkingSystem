@@ -4,8 +4,8 @@ import { BuildingsService } from '@modules/buildings/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
 import {
   ConflictException,
+  ForbiddenException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -21,6 +21,7 @@ describe('UsersService', () => {
   let testingModule: TestingModule;
   let buildingService: BuildingsService;
   let roleService: RoleService;
+  let vehicleService: VehiclesService;
 
   const mockBuilding = {
     id: 1,
@@ -52,6 +53,16 @@ describe('UsersService', () => {
     building: { publicId: 'b-1' },
     role: mockRole,
   };
+  const mockVehicle = {
+    id: 1,
+    publicId: '123',
+    licensePlate: '123',
+    description: 'lorem',
+    slot: null,
+    createdAt: '',
+    updatedAt: '',
+    deletedAt: '',
+  } as any;
   const createMockQueryRunner = () => ({
     connect: jest.fn(),
     startTransaction: jest.fn(),
@@ -90,7 +101,11 @@ describe('UsersService', () => {
         },
         {
           provide: VehiclesService,
-          useValue: { create: jest.fn(), update: jest.fn() },
+          useValue: {
+            create: jest.fn(),
+            update: jest.fn(),
+            findByPlate: jest.fn(),
+          },
         },
         {
           provide: BuildingsService,
@@ -112,6 +127,7 @@ describe('UsersService', () => {
     repo = testingModule.get(getRepositoryToken(User));
     buildingService = testingModule.get<BuildingsService>(BuildingsService);
     roleService = testingModule.get<RoleService>(RoleService);
+    vehicleService = testingModule.get<VehiclesService>(VehiclesService);
   });
 
   describe('findOneByEmail', () => {
@@ -137,6 +153,7 @@ describe('UsersService', () => {
         .spyOn(buildingService, 'findOneByPublicId')
         .mockResolvedValue(mockBuilding);
       jest.spyOn(roleService, 'findByName').mockResolvedValue(mockRole);
+      jest.spyOn(vehicleService, 'findByPlate').mockResolvedValue(null);
 
       repo.create.mockReturnValue(mockUser);
       queryRunner.manager.save.mockResolvedValue(mockUser);
@@ -174,12 +191,23 @@ describe('UsersService', () => {
         service.create(createUserDto, mockUser as any),
       ).rejects.toThrow(ConflictException);
     });
+
+    it('should throw ConflictException if licensePlate exists', async () => {
+      jest
+        .spyOn(buildingService, 'findOneByPublicId')
+        .mockResolvedValue(mockBuilding);
+      jest.spyOn(roleService, 'findByName').mockResolvedValue(mockRole);
+      jest.spyOn(vehicleService, 'findByPlate').mockResolvedValue(mockVehicle);
+      await expect(
+        service.create(createUserDto, mockUser as any),
+      ).rejects.toThrow(ConflictException);
+    });
   });
 
   describe('findAll', () => {
     it('should throw BadRequestException if buildingId is missing', async () => {
       await expect(service.findAll({} as any, mockUser as any)).rejects.toThrow(
-        UnauthorizedException,
+        ForbiddenException,
       );
     });
   });

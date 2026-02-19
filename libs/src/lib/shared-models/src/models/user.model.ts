@@ -14,6 +14,7 @@ export interface UserModel extends BaseModel {
   buildingName?: string;
 
   hasVehicle: boolean;
+  hasSlot: boolean;
   vehicleDescription?: string;
   vehiclePlate?: string;
   assignedSlotNumber?: string;

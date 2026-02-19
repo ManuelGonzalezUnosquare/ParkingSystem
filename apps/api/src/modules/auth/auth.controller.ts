@@ -18,6 +18,7 @@ import {
   ResetPasswordByCodeDto,
   ResetPasswordRequestDto,
 } from './dtos';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -26,6 +27,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 per min
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User login' })
   async login(@Body() loginDto: LoginDto): Promise<SessionModel> {
@@ -57,6 +59,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 per min
   @Post('reset-password-request')
   @HttpCode(HttpStatus.OK)
   async resetPasswordRequest(@Body() dto: ResetPasswordRequestDto) {
@@ -64,6 +67,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 per min
   @Post('reset-password-confirm')
   @HttpCode(HttpStatus.OK)
   async resetPasswordConfirm(@Body() dto: ResetPasswordByCodeDto) {
@@ -72,6 +76,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 per min
   @Post('validate-reset-code')
   async validateCode(@Body() payload: { code: string }) {
     const email = await this.authService.validateResetCode(payload.code);

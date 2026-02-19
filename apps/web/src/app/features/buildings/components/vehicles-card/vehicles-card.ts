@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { UserModel } from '@parking-system/libs';
+import { RoleEnum, UserModel } from '@parking-system/libs';
 import { CardModule } from 'primeng/card';
 
 @Component({
@@ -19,17 +19,19 @@ export class VehiclesCard {
   users = input.required<UserModel[]>();
 
   private readonly vehicleStats = computed(() => {
-    return this.users().reduce(
-      (acc, user) => {
-        if (user.hasVehicle) {
-          acc.withVehicle++;
-        } else {
-          acc.withoutVehicle++;
-        }
-        return acc;
-      },
-      { withVehicle: 0, withoutVehicle: 0 },
-    );
+    return this.users()
+      .filter((f) => f.role === RoleEnum.USER)
+      .reduce(
+        (acc, user) => {
+          if (user.hasVehicle) {
+            acc.withVehicle++;
+          } else {
+            acc.withoutVehicle++;
+          }
+          return acc;
+        },
+        { withVehicle: 0, withoutVehicle: 0 },
+      );
   });
 
   protected readonly usersWithVehicle = computed(
