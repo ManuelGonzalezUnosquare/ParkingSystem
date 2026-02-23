@@ -1,4 +1,12 @@
-<p>allocation-history works!</p>
+<div class="mb-8">
+  <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+    Raffle History
+  </h2>
+  <p class="text-slate-500 mt-1">
+    Review past parking lot allocations and download detailed performance
+    reports.
+  </p>
+</div>
 
 <p-card>
   <ng-template #title>
@@ -11,15 +19,19 @@
   <p-table [value]="store.rafflesEntities()">
     <ng-template #header>
       <tr>
-        <th>Date</th>
+        <th>Planned date</th>
         <th>Ran manually</th>
+        <th>Executed date</th>
         <th>Participation</th>
       </tr>
     </ng-template>
     <ng-template #body let-spot>
       <tr>
-        <td>{{ spot.executionDate }}</td>
-        <td>{{ spot.isManual }}</td>
+        <td>{{ spot.executionDate | date }}</td>
+        <td>
+          <p-toggleswitch [(ngModel)]="spot.isManual" readonly="true" />
+        </td>
+        <td>{{ spot.executedAt | date }}</td>
         <td>{{ spot.results.length }}</td>
       </tr>
     </ng-template>

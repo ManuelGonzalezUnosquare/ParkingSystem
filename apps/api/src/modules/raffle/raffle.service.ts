@@ -14,7 +14,8 @@ import {
   UserRaffleResultEnum,
   UserStatusEnum,
 } from '@parking-system/libs';
-import { DataSource, Equal, In, IsNull, Repository } from 'typeorm';
+import { Between, DataSource, Equal, IsNull, Repository } from 'typeorm';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class RaffleService {
@@ -38,6 +39,19 @@ export class RaffleService {
       relations: { building: true },
     });
   }
+  async findRafflesToExecuteToday() {
+    const today = new Date();
+    const startOfToday = startOfDay(today);
+    const endOfToday = endOfDay(today);
+
+    return await this.raffleRepository.find({
+      where: {
+        executionDate: Between(startOfToday, endOfToday),
+        executedAt: IsNull(),
+      },
+      relations: { building: true },
+    });
+  }
   async findHistory(user: User) {
     const buildingId = user.building.id;
     const _buildingId =
@@ -50,6 +64,7 @@ export class RaffleService {
       .leftJoinAndSelect('results.user', 'users')
       .leftJoinAndSelect('results.vehicle', 'vehicle')
       .leftJoinAndSelect('results.slot', 'slot')
+      .leftJoinAndSelect('results.executedBy', 'exBy')
       .leftJoin('raffle.building', 'building')
       .where('building.publicId = :_buildingId', { _buildingId })
       .andWhere('users.id = :userId', { userId })
@@ -76,12 +91,30 @@ export class RaffleService {
     return await query.getMany();
   }
 
-  async executeRaffle(user: User, isManuallyTriggered: boolean) {
+  async executeRaffleManually(user: User) {
     PermissionValidator.validateBuildingAccess(
       user,
       user.building?.publicId || '',
       false,
     );
+
+    const raffle = await this.raffleRepository.findOne({
+      where: { building: Equal(user.building.id), executedAt: IsNull() },
+      relations: ['building'],
+    });
+
+    return this.executeRaffle(user, true, raffle.id);
+  }
+
+  async executeRaffleAutomatically(user: User, raffleId: number) {
+    return this.executeRaffle(user, false, raffleId);
+  }
+
+  private async executeRaffle(
+    user: User,
+    isManuallyTriggered: boolean,
+    raffleId: number,
+  ) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -89,7 +122,7 @@ export class RaffleService {
     try {
       // 1. Fetch Raffle and Building context
       const raffle = await queryRunner.manager.findOne(Raffle, {
-        where: { building: Equal(user.building.id), executedAt: IsNull() },
+        where: { id: Equal(raffleId) },
         relations: ['building'],
       });
 
@@ -202,10 +235,12 @@ export class RaffleService {
       }
 
       //create next
-      raffle.executedAt = new Date();
-      raffle.isManual = isManuallyTriggered;
-      raffle.executedBy = isManuallyTriggered ? user : null;
-      await queryRunner.manager.save(raffle);
+      const updatedData = {
+        executedAt: new Date(),
+        isManual: isManuallyTriggered,
+        executedBy: isManuallyTriggered ? user : null,
+      };
+      await queryRunner.manager.update(Raffle, raffle.id, updatedData);
 
       const nextRaffle = queryRunner.manager.create(Raffle, {
         building: raffle.building,
@@ -214,6 +249,7 @@ export class RaffleService {
       await queryRunner.manager.save(nextRaffle);
 
       await queryRunner.commitTransaction();
+      return raffle;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

@@ -18,6 +18,7 @@ import { JwtAuthGuard, RolesGuard } from '../modules/auth/guards';
 import { BuildingSubscriber } from '../subscribers/building.subscriber';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AppService } from './app.service';
       },
     ]),
     TypeOrmModule.forFeature([Building, Role, User]),
+    ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
     BuildingsModule,

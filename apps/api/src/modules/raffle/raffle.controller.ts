@@ -54,7 +54,7 @@ export class RaffleController {
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   @ApiOperation({ summary: 'Manually trigger the current pending raffle' })
   async execute(@CurrentUser() user: User) {
-    await this.raffleService.executeRaffle(user, true);
+    await this.raffleService.executeRaffleManually(user);
     return {
       message: 'Raffle executed successfully',
       timestamp: new Date().toISOString(),
