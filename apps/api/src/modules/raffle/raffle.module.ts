@@ -5,6 +5,7 @@ import { Raffle, RaffleResult } from '@database/entities';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from '@modules/users/users.module';
 import { VehiclesModule } from '@modules/vehicles/vehicles.module';
+import { RaffleCron } from './raffle.cron';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { VehiclesModule } from '@modules/vehicles/vehicles.module';
     VehiclesModule,
   ],
   controllers: [RaffleController],
-  providers: [RaffleService],
+  providers: [RaffleService, RaffleCron],
 })
 export class RaffleModule {}

@@ -13,6 +13,8 @@ services:
       - '${DB_PORT}:3306'
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - parking-network
     healthcheck:
       test:
         [
@@ -42,12 +44,11 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      JWT_SECRET: ${JWT_SECRET}
+      RAFFLE_CRON_SCHEDULE: ${RAFFLE_CRON_SCHEDULE:-0 0 1 */3 *}
     ports:
       - '3000:3000'
-    volumes:
-      - .:/app
-      - /app/node_modules
+    networks:
+      - parking-network
 
   web:
     build:
@@ -64,6 +65,13 @@ services:
     environment:
       NODE_ENV: development
       IS_DOCKER: true
+      API_URL: http://localhost:3000
+    networks:
+      - parking-network
+
+networks:
+  parking-network:
+    driver: bridge
 
 volumes:
   db_data:

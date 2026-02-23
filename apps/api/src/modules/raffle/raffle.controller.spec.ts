@@ -19,7 +19,7 @@ describe('RaffleController', () => {
             findNext: jest.fn(),
             findHistory: jest.fn(),
             findAll: jest.fn(),
-            executeRaffle: jest.fn(),
+            executeRaffleManually: jest.fn(),
           },
         },
       ],
@@ -30,12 +30,12 @@ describe('RaffleController', () => {
   });
 
   describe('execute', () => {
-    it('should call executeRaffle with manual trigger flag', async () => {
-      service.executeRaffle.mockResolvedValue(undefined);
+    it('should call executeRaffleManually', async () => {
+      service.executeRaffleManually.mockResolvedValue(undefined);
 
       const result = await controller.execute(mockUser);
 
-      expect(service.executeRaffle).toHaveBeenCalledWith(mockUser, true);
+      expect(service.executeRaffleManually).toHaveBeenCalledWith(mockUser);
       expect(result.message).toContain('successfully');
     });
   });
