@@ -10,7 +10,12 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
-import { RaffleModel, RaffleResultModel, RoleEnum } from '@parking-system/libs';
+import {
+  RaffleExecutionResultModel,
+  RaffleModel,
+  RaffleResultModel,
+  RoleEnum,
+} from '@parking-system/libs';
 import { RaffleResultToModel, RaffleToModel } from './mappers';
 import { RaffleService } from './raffle.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -54,10 +59,14 @@ export class RaffleController {
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   @ApiOperation({ summary: 'Manually trigger the current pending raffle' })
   async execute(@CurrentUser() user: User) {
-    await this.raffleService.executeRaffleManually(user);
-    return {
-      message: 'Raffle executed successfully',
-      timestamp: new Date().toISOString(),
+    const executionResult =
+      await this.raffleService.executeRaffleManually(user);
+
+    const result: RaffleExecutionResultModel = {
+      executed: RaffleToModel(executionResult.executed),
+      upcoming: RaffleToModel(executionResult.upcoming),
     };
+
+    return result;
   }
 }

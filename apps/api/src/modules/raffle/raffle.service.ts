@@ -17,6 +17,11 @@ import {
 import { Between, DataSource, Equal, IsNull, Repository } from 'typeorm';
 import { endOfDay, startOfDay } from 'date-fns';
 
+interface ExecutionResult {
+  executed: Raffle;
+  upcoming: Raffle;
+}
+
 @Injectable()
 export class RaffleService {
   private readonly logger = new Logger(RaffleService.name);
@@ -91,7 +96,7 @@ export class RaffleService {
     return await query.getMany();
   }
 
-  async executeRaffleManually(user: User) {
+  async executeRaffleManually(user: User): Promise<ExecutionResult> {
     PermissionValidator.validateBuildingAccess(
       user,
       user.building?.publicId || '',
@@ -100,10 +105,9 @@ export class RaffleService {
 
     const raffle = await this.raffleRepository.findOne({
       where: { building: Equal(user.building.id), executedAt: IsNull() },
-      relations: ['building'],
     });
 
-    return this.executeRaffle(user, true, raffle.id);
+    return await this.executeRaffle(user, true, raffle.id);
   }
 
   async executeRaffleAutomatically(user: User, raffleId: number) {
@@ -235,21 +239,24 @@ export class RaffleService {
       }
 
       //create next
-      const updatedData = {
-        executedAt: new Date(),
-        isManual: isManuallyTriggered,
-        executedBy: isManuallyTriggered ? user : null,
-      };
-      await queryRunner.manager.update(Raffle, raffle.id, updatedData);
+
+      raffle.executedAt = new Date();
+      raffle.isManual = isManuallyTriggered;
+      raffle.executedBy = isManuallyTriggered ? user : null;
+
+      const executedRaffle = await queryRunner.manager.save(Raffle, raffle);
 
       const nextRaffle = queryRunner.manager.create(Raffle, {
         building: raffle.building,
         executionDate: this.calculateNextRaffleDate(),
       });
-      await queryRunner.manager.save(nextRaffle);
+      const upcomingRaffle = await queryRunner.manager.save(nextRaffle);
 
       await queryRunner.commitTransaction();
-      return raffle;
+      return {
+        executed: executedRaffle,
+        upcoming: upcomingRaffle,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
