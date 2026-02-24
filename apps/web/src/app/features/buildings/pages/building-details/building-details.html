@@ -1,9 +1,10 @@
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
     <h1 class="text-slate-900 text-4xl font-black leading-tight tracking-tight">
       {{ store.building()?.name }}
     </h1>
-    <p class="text-slate-500 text-base font-normal">
+    <p class="text-slate-500 text-md">{{store.building()?.address}}</p>
+    <p class="text-slate-400 text-sm">
       Manage parking allocations and resident data for this building.
     </p>
   </div>
@@ -34,17 +35,19 @@
     [value]="store.usersEntities()"
     [lazy]="true"
     (onLazyLoad)="onLazyLoad($event)"
-    [paginator]="true"
+    [paginator]="existsUsers()"
     [rows]="10"
     [totalRecords]="store.usersPagination()?.total || 0"
     [loading]="store.isLoading()"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} residents"
+    [rowsPerPageOptions]="[10, 20, 50]"
   >
     <ng-template pTemplate="caption">
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h3 class="text-lg font-bold text-slate-800">Resident List</h3>
         <div class="flex items-center gap-3 w-full sm:w-auto">
+          @if(existsUsers()){
           <span class="p-input-icon-left w-full sm:w-64">
             <input
               pInputText
@@ -53,6 +56,7 @@
               (input)="dt.filterGlobal($any($event.target).value, 'contains')"
             />
           </span>
+          }
           <p-button
             label="Add Resident"
             icon="pi pi-plus"
@@ -64,18 +68,21 @@
     </ng-template>
 
     <ng-template #header>
+      @if(existsUsers()){
       <tr>
         <th class="w-16 text-center">Status</th>
         <th>Resident</th>
         <th>Role</th>
         <th>Vehicle Information</th>
         <th>Spot</th>
+        <th>Created By</th>
         <th class="text-center">Actions</th>
       </tr>
+      }
     </ng-template>
 
     <ng-template #body let-user>
-      <tr class="hover:bg-slate-50 transition-colors">
+      <tr class="hover:bg-blue-50/30 transition-colors">
         <td class="text-center">
           <span
             class="inline-block size-3 rounded-full"
@@ -111,6 +118,7 @@
         <td class="font-mono font-bold">
           {{ user.assignedSlotNumber || '-' }}
         </td>
+        <td class="text-slate-400">{{ user.createdBy?.fullName || '--' }}</td>
         <td>
           <div class="flex justify-center gap-1">
             <p-button
@@ -129,6 +137,15 @@
               pTooltip="Delete resident"
             />
           </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7" class="text-center py-8 text-slate-400">
+          <i class="pi pi-user text-4xl mb-3 block"></i>
+          No users found. Click "Add Resident" to start.
         </td>
       </tr>
     </ng-template>

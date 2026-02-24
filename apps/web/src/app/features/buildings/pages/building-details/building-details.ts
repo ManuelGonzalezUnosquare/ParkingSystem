@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   input,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
 import { BuildingDetailStore } from '@core/stores';
@@ -42,7 +44,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
   providers: [DialogService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BuildingDetails implements OnInit {
+export class BuildingDetails implements OnInit, OnDestroy {
   readonly store = inject(BuildingDetailStore);
   readonly dialogService = inject(DialogService);
   private readonly confirmationService = inject(ConfirmationService);
@@ -65,9 +67,15 @@ export class BuildingDetails implements OnInit {
   };
 
   id = input.required<string>();
+  protected readonly existsUsers = computed(() => {
+    return (this.store.usersPagination()?.total || 0) !== 0;
+  });
 
   ngOnInit(): void {
     this.store.loadById(this.id());
+  }
+  ngOnDestroy(): void {
+    this.store.resetState();
   }
 
   addUser() {
@@ -107,6 +115,7 @@ export class BuildingDetails implements OnInit {
     });
   }
   async raffle() {
+    //TODO: modal to confirm
     const success = await this.store.runRaffle();
     if (success) {
       this.store.loadUsers({
