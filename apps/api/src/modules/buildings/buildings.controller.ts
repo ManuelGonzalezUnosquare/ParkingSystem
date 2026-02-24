@@ -17,9 +17,9 @@ import {
   ApiConflictResponse,
 } from '@nestjs/swagger';
 import { CreateBuildingDto } from './dtos/create-building.dto';
-import { Roles } from '@common/decorators';
+import { CurrentUser, Roles } from '@common/decorators';
 import { SearchDto } from '@common/dtos';
-import { Building } from '@database/entities';
+import { Building, User } from '@database/entities';
 
 @Controller('buildings')
 export class BuildingsController {
@@ -34,8 +34,11 @@ export class BuildingsController {
   @ApiConflictResponse({
     description: 'A building with this name already exists.',
   })
-  create(@Body() createBuildingDto: CreateBuildingDto) {
-    return this.buildingsService.create(createBuildingDto);
+  create(
+    @Body() createBuildingDto: CreateBuildingDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.buildingsService.create(createBuildingDto, user);
   }
 
   @Get()

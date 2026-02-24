@@ -55,7 +55,11 @@ export class UsersService {
       .leftJoin('users.building', 'building')
       .leftJoinAndSelect('users.vehicles', 'vehicles')
       .leftJoinAndSelect('vehicles.slot', 'slot')
-      .where('role.name != :rootRoleName', { rootRoleName: RoleEnum.ROOT });
+      .leftJoinAndSelect('users.createdBy', 'createdBy')
+      .where('role.name != :rootRoleName', { rootRoleName: RoleEnum.ROOT })
+      .andWhere('building.publicId = :buildingId', {
+        buildingId: filters.buildingId,
+      });
 
     if (globalFilter) {
       query.andWhere(
@@ -104,6 +108,7 @@ export class UsersService {
         password: hashedPassword,
         role,
         building,
+        createdBy: creator,
       });
 
       const savedUser = await queryRunner.manager.save(newUser);
@@ -132,7 +137,7 @@ export class UsersService {
 
     const user = await this.userRepository.findOne({
       where: { publicId },
-      relations: ['role', 'building', 'vehicles', 'vehicles.slot'],
+      relations: ['role', 'building', 'vehicles', 'vehicles.slot', 'createdBy'],
     });
 
     if (!user) {
@@ -144,7 +149,7 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<User | null> {
     const result = await this.userRepository.findOne({
       where: { email },
-      relations: ['role', 'building', 'vehicles'],
+      relations: ['role', 'building', 'vehicles', 'vehicles.slot', 'createdBy'],
     });
     return result;
   }

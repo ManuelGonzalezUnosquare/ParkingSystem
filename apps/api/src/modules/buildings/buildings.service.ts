@@ -1,6 +1,6 @@
 import { SearchDto } from '@common/dtos';
 import { PaginatedResult, paginateQuery } from '@common/utils';
-import { Building } from '@database/entities';
+import { Building, User } from '@database/entities';
 import {
   ConflictException,
   Injectable,
@@ -21,7 +21,7 @@ export class BuildingsService {
     private readonly buildingRepository: Repository<Building>,
   ) {}
 
-  async create(dto: CreateBuildingDto): Promise<Building> {
+  async create(dto: CreateBuildingDto, creator: User): Promise<Building> {
     const existing = await this.buildingRepository.findOneBy({
       name: dto.name,
     });
@@ -33,7 +33,10 @@ export class BuildingsService {
     }
 
     try {
-      const newBuilding = this.buildingRepository.create(dto);
+      const newBuilding = this.buildingRepository.create({
+        ...dto,
+        createdBy: creator,
+      });
       const saved = await this.buildingRepository.save(newBuilding);
       this.logger.log(`Building created: ${saved.publicId}`);
       return saved;

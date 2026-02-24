@@ -30,12 +30,12 @@ import { ScheduleModule } from '@nestjs/schedule';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000, // life time ms
-        limit: 10,
-      },
-    ]),
+    // ThrottlerModule.forRoot([
+    //   {
+    //     ttl: 60000, // life time ms
+    //     limit: 10,
+    //   },
+    // ]),
     TypeOrmModule.forFeature([Building, Role, User]),
     ScheduleModule.forRoot(),
     AuthModule,
@@ -50,10 +50,10 @@ import { ScheduleModule } from '@nestjs/schedule';
     AppService,
     BuildingSubscriber,
     DatabaseSeederService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
 
     {
       provide: APP_GUARD,
