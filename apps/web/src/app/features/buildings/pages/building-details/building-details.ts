@@ -7,8 +7,10 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
+import { SessionService } from '@core/services';
 import { BuildingDetailStore } from '@core/stores';
 import {
+  RunRaffle,
   TotalResidentCard,
   UserForm,
   UtilizationCard,
@@ -23,6 +25,7 @@ import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { map, take } from 'rxjs';
 
 @Component({
   selector: 'app-building-details',
@@ -47,6 +50,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 export class BuildingDetails implements OnInit, OnDestroy {
   readonly store = inject(BuildingDetailStore);
   readonly dialogService = inject(DialogService);
+  private readonly sessionService = inject(SessionService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {
     width: '50vw',
@@ -72,10 +76,14 @@ export class BuildingDetails implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.store.loadById(this.id());
+    if (!this.store.building()) {
+      this.store.loadById(this.id());
+    }
   }
   ngOnDestroy(): void {
-    this.store.resetState();
+    if (!this.sessionService.isAdmin()) {
+      this.store.resetState();
+    }
   }
 
   addUser() {
@@ -114,16 +122,27 @@ export class BuildingDetails implements OnInit, OnDestroy {
       data: { user },
     });
   }
-  async raffle() {
-    //TODO: modal to confirm
-    const success = await this.store.runRaffle();
-    if (success) {
-      this.store.loadUsers({
-        ...this.searchParams,
-        first: 0,
-        sortField: 'createdAt',
-        sortOrder: -1,
-      });
-    }
+  runRaffle() {
+    const ref = this.dialogService.open(RunRaffle, {
+      ...this.dialogConfig,
+      closable: false,
+      showHeader: false,
+    });
+    ref?.onClose
+      .pipe(
+        take(1),
+        map((res) => {
+          if (res) {
+            this.store.loadUsers({
+              ...this.searchParams,
+              first: 0,
+              sortField: 'createdAt',
+              sortOrder: -1,
+              buildingId: this.id(),
+            });
+          }
+        }),
+      )
+      .subscribe();
   }
 }

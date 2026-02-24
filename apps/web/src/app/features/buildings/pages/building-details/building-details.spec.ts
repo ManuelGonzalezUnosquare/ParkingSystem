@@ -31,9 +31,11 @@ describe('BuildingDetails', () => {
     fixture.componentRef.setInput('id', '123');
   });
 
-  it('should load building data on init', () => {
+  it('should load building data on init if not loaded', () => {
     fixture.detectChanges();
-    expect(mockStore.loadById).toHaveBeenCalledWith('123');
+    if (!mockStore.building()) {
+      expect(mockStore.loadById).toHaveBeenCalledWith('123');
+    }
   });
 
   it('should trigger store.loadUsers when table signals lazy load', () => {

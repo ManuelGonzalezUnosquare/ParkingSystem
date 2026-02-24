@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { RequestService } from '@core/services';
 import {
   ApiResponse,
+  RaffleExecutionResultModel,
   RaffleModel,
   RaffleResultModel,
 } from '@parking-system/libs';
@@ -27,7 +28,10 @@ export class RaffleService {
   }
 
   //TODO: MOVE THIS
-  executeRaffle() {
-    return this.request.post<boolean>('/api/raffle/execute', {});
+  executeRaffle(): Observable<ApiResponse<RaffleExecutionResultModel>> {
+    return this.request.post<RaffleExecutionResultModel>(
+      '/api/raffle/execute',
+      {},
+    );
   }
 }

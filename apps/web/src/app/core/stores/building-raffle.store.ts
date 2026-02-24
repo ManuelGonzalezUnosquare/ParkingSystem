@@ -13,8 +13,10 @@ import {
   withState,
 } from '@ngrx/signals';
 import {
+  addEntity,
   entityConfig,
   setAllEntities,
+  updateEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -83,7 +85,15 @@ export function withBuildingRaffles(
           const response = await lastValueFrom(
             store._raffleService.executeRaffle(),
           );
-          patchState(store, { callState: 'loaded' });
+          const { executed, upcoming } = response.data;
+          patchState(
+            store,
+            updateEntity({ id: executed.publicId, changes: executed }, config),
+            addEntity(upcoming, config),
+            {
+              callState: 'loaded',
+            },
+          );
           store._feedbackService.showSuccess(
             'Raffle Completed',
             'All parking spots have been assigned and history records updated.',

@@ -11,7 +11,7 @@
   <p-button
     label="Trigger Raffle"
     icon="pi pi-bolt"
-    (click)="raffle()"
+    (click)="runRaffle()"
     [disabled]="store.residentCount() === 0"
     [loading]="store.isLoading()"
     severity="primary"
@@ -34,6 +34,7 @@
     #dt
     [value]="store.usersEntities()"
     [lazy]="true"
+    [lazyLoadOnInit]="false"
     (onLazyLoad)="onLazyLoad($event)"
     [paginator]="existsUsers()"
     [rows]="10"
