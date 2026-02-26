@@ -15,22 +15,27 @@ export class RaffleService {
   private readonly request = inject(RequestService);
   private readonly endpoint = '/api/raffle';
 
-  load(id: string): Observable<ApiResponse<RaffleModel[]>> {
-    return this.request.get<RaffleModel[]>(`${this.endpoint}/${id}`);
+  loadAllRaffles(buildingId: string): Observable<ApiResponse<RaffleModel[]>> {
+    return this.request.get<RaffleModel[]>(`${this.endpoint}/${buildingId}`);
   }
 
-  loadHistory(): Observable<ApiResponse<RaffleResultModel[]>> {
-    return this.request.get<RaffleResultModel[]>(`${this.endpoint}/history`);
+  loadHistory(
+    buildingId: string,
+  ): Observable<ApiResponse<RaffleResultModel[]>> {
+    return this.request.get<RaffleResultModel[]>(
+      `${this.endpoint}/${buildingId}/history`,
+    );
   }
 
-  loadNext(): Observable<ApiResponse<RaffleModel>> {
-    return this.request.get<RaffleModel>(`${this.endpoint}/next`);
+  loadNext(buildingId: string): Observable<ApiResponse<RaffleModel>> {
+    return this.request.get<RaffleModel>(`${this.endpoint}/${buildingId}/next`);
   }
 
-  //TODO: MOVE THIS
-  executeRaffle(): Observable<ApiResponse<RaffleExecutionResultModel>> {
+  executeRaffle(
+    buildingId: string,
+  ): Observable<ApiResponse<RaffleExecutionResultModel>> {
     return this.request.post<RaffleExecutionResultModel>(
-      '/api/raffle/execute',
+      `${this.endpoint}/${buildingId}/execute`,
       {},
     );
   }

@@ -62,7 +62,7 @@ export function withBuildingRaffles(
         pipe(
           tap(() => patchState(store, { callState: 'loading' })),
           switchMap(() =>
-            store._raffleService.load(building()?.publicId || '').pipe(
+            store._raffleService.loadAllRaffles(building()!.publicId).pipe(
               tapResponse({
                 next: (response) =>
                   patchState(store, setAllEntities(response.data, config), {
@@ -83,7 +83,7 @@ export function withBuildingRaffles(
         patchState(store, { callState: 'loading' });
         try {
           const response = await lastValueFrom(
-            store._raffleService.executeRaffle(),
+            store._raffleService.executeRaffle(building()!.publicId),
           );
           const { executed, upcoming } = response.data;
           patchState(

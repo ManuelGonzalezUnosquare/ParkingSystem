@@ -40,26 +40,29 @@ export const ProfileStore = signalStore(
   withCallState(),
   withProps(() => ({
     _raffleService: inject(RaffleService),
+    _authStore: inject(AuthStore),
   })),
   withMethods((store) => ({
     loadHistory: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { callState: 'loading' })),
         switchMap(() =>
-          store._raffleService.loadHistory().pipe(
-            tapResponse({
-              next: (res: ApiResponse<RaffleResultModel[]>) =>
-                patchState(store, {
-                  historyRaffle: res.data,
-                  callState: 'loaded',
-                }),
-              error: (err: any) => {
-                const errorMessage =
-                  err.error?.message || 'Load history failed';
-                patchState(store, { callState: { error: errorMessage } });
-              },
-            }),
-          ),
+          store._raffleService
+            .loadHistory(store._authStore.user()!.buildingId || '')
+            .pipe(
+              tapResponse({
+                next: (res: ApiResponse<RaffleResultModel[]>) =>
+                  patchState(store, {
+                    historyRaffle: res.data,
+                    callState: 'loaded',
+                  }),
+                error: (err: any) => {
+                  const errorMessage =
+                    err.error?.message || 'Load history failed';
+                  patchState(store, { callState: { error: errorMessage } });
+                },
+              }),
+            ),
         ),
       ),
     ),
@@ -67,19 +70,21 @@ export const ProfileStore = signalStore(
       pipe(
         tap(() => patchState(store, { callState: 'loading' })),
         switchMap(() =>
-          store._raffleService.loadNext().pipe(
-            tapResponse({
-              next: (res: ApiResponse<RaffleModel>) =>
-                patchState(store, {
-                  nextRaffle: res.data,
-                  callState: 'loaded',
-                }),
-              error: (err: any) => {
-                const errorMessage = err.error?.message || 'Load next failed';
-                patchState(store, { callState: { error: errorMessage } });
-              },
-            }),
-          ),
+          store._raffleService
+            .loadNext(store._authStore.user()!.buildingId || '')
+            .pipe(
+              tapResponse({
+                next: (res: ApiResponse<RaffleModel>) =>
+                  patchState(store, {
+                    nextRaffle: res.data,
+                    callState: 'loaded',
+                  }),
+                error: (err: any) => {
+                  const errorMessage = err.error?.message || 'Load next failed';
+                  patchState(store, { callState: { error: errorMessage } });
+                },
+              }),
+            ),
         ),
       ),
     ),
