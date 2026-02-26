@@ -18,7 +18,7 @@ import {
 } from '@features/buildings/components';
 import { LastRaffleCard } from '@features/buildings/components/last-raffle-card/last-raffle-card';
 import { SearchBuildingUsers, UserModel } from '@parking-system/libs';
-import { RoleTag } from '@shared/ui';
+import { PageHeader, RoleTag } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -35,6 +35,7 @@ import { map, take } from 'rxjs';
     RoleTag,
     CardModule,
     InputTextModule,
+    PageHeader,
     //cards
     TotalResidentCard,
     VehiclesCard,

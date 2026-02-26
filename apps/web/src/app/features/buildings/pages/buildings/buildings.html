@@ -1,13 +1,10 @@
 <p-confirmDialog />
-<header
-  class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6"
->
-  <div class="flex flex-col gap-1">
-    <h1 class="text-slate-900 text-3xl font-black tracking-tight">Buildings</h1>
-    <p class="text-slate-500 text-base">
-      Manage infrastructure and system administrators.
-    </p>
-  </div>
+<!-- header -->
+<header class="flex items-center justify-between">
+  <app-page-header
+    title="Buildings"
+    subTitle="Manage infrastructure and system administrators."
+  />
   <p-button
     label="New Building"
     icon="pi pi-plus"
@@ -41,6 +38,7 @@
       </div>
     </ng-template>
   </p-card>
+
   <p-card>
     <div class="text-center">
       <span class="text-gray-400">placeholder card</span>

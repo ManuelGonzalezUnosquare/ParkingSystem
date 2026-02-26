@@ -1,0 +1,14 @@
+<section
+  class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6"
+>
+  <div class="flex flex-col gap-1">
+    <h1 class="text-slate-900 text-3xl font-black tracking-tight">
+      {{title()}}
+    </h1>
+    <p class="text-slate-500 text-base">{{subTitle()}}</p>
+
+    @if(paragraph(); as par){
+    <p class="text-slate-400 text-sm">{{par}}</p>
+    }
+  </div>
+</section>

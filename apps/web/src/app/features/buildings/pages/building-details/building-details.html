@@ -1,13 +1,9 @@
-<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-  <div class="flex flex-col gap-1">
-    <h1 class="text-slate-900 text-4xl font-black leading-tight tracking-tight">
-      {{ store.building()?.name }}
-    </h1>
-    <p class="text-slate-500 text-md">{{store.building()?.address}}</p>
-    <p class="text-slate-400 text-sm">
-      Manage parking allocations and resident data for this building.
-    </p>
-  </div>
+<header class="flex items-center justify-between">
+  @if(store.building(); as building){
+  <app-page-header
+    [title]="building.name"
+    subTitle="Manage parking allocations and resident data for this building."
+  />
   <p-button
     label="Trigger Raffle"
     icon="pi pi-bolt"
@@ -16,7 +12,8 @@
     [loading]="store.isLoading()"
     severity="primary"
   />
-</div>
+  }
+</header>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
   <app-total-resident-card class="h-full" [users]="store.usersEntities()" />
