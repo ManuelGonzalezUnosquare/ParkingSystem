@@ -1,5 +1,6 @@
 import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
 import { SearchBuildingDto } from '@common/dtos';
+import { CacheEvictInterceptor } from '@common/interceptors';
 import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
 import {
@@ -14,12 +15,16 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { RoleEnum } from '@parking-system/libs';
 import { UserEntityToModel } from '../mappers';
 import { UsersService } from '../services';
 
 @Controller('users')
+@ApiTags('users')
+@UseInterceptors(CacheEvictInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

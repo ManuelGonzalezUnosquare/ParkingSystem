@@ -55,7 +55,6 @@ import { RedisModule } from './redis.module';
         };
       },
     }),
-
     TypeOrmModule.forFeature([Building, Role, User]),
     ScheduleModule.forRoot(),
     AuthModule,

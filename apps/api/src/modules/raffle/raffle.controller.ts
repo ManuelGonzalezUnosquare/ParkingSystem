@@ -9,6 +9,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   RaffleExecutionResultModel,
@@ -19,9 +20,11 @@ import {
 import { RaffleResultToModel, RaffleToModel } from './mappers';
 import { RaffleService } from './services/raffle.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CacheEvictInterceptor } from '@common/interceptors';
 
 @ApiTags('raffle')
 @Controller('raffle')
+@UseInterceptors(CacheEvictInterceptor)
 export class RaffleController {
   constructor(private readonly raffleService: RaffleService) {}
 

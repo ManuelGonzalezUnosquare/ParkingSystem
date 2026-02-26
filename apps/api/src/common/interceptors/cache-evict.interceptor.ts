@@ -1,24 +1,22 @@
+import { CacheEvictOptions } from '@common/decorators';
+import { BuildingsCacheService } from '@modules/buildings/services';
+import { RafflesCacheService } from '@modules/raffle/services';
+import { UsersCacheService } from '@modules/users/services';
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { ModuleRef, Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { UsersCacheService } from '@modules/users/services/users-cache.service';
-import { BuildingsCacheService } from '@modules/buildings/services/buildings-cache.service';
-import { CacheEvictOptions } from '@common/decorators';
-import { RafflesCacheService } from '@modules/raffle/services';
 
 @Injectable()
 export class CacheEvictInterceptor implements NestInterceptor {
   constructor(
     private reflector: Reflector,
-    private usersCache: UsersCacheService,
-    private buildingsCache: BuildingsCacheService,
-    private rafflesCache: RafflesCacheService,
+    private moduleRef: ModuleRef,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -32,40 +30,44 @@ export class CacheEvictInterceptor implements NestInterceptor {
         if (!options) return;
 
         const request = context.switchToHttp().getRequest();
-        const id = request.params.publicId;
         const { entity, isKeySpecific } = options;
+        const id = request.params.id;
+        const buildingId = request.params.buildingId || request.body.buildingId;
 
-        const services = {
-          users: this.usersCache,
-          buildings: this.buildingsCache,
-          raffles: this.rafflesCache,
-        };
+        let cacheService: any;
 
-        if (entity === 'raffles') {
-          const buildingId =
-            request.params.buildingId || request.body.buildingId;
-
-          if (buildingId) {
-            await this.rafflesCache.invalidateRaffleData(buildingId);
-          } else {
-            await this.rafflesCache.invalidateRaffleData('raffles:*');
-          }
-        } else {
-          const targetService = services[entity];
-          if (!targetService) return;
-
-          await targetService.invalidateAllLists();
-
-          if (isKeySpecific && id) {
-            if (entity === 'users') await this.usersCache.invalidateUser(id);
-            if (entity === 'buildings')
-              await this.buildingsCache.invalidateBuilding(id);
-          }
+        try {
+          if (entity === 'users')
+            cacheService = this.moduleRef.get(UsersCacheService, {
+              strict: false,
+            });
+          if (entity === 'buildings')
+            cacheService = this.moduleRef.get(BuildingsCacheService, {
+              strict: false,
+            });
+          if (entity === 'raffles')
+            cacheService = this.moduleRef.get(RafflesCacheService, {
+              strict: false,
+            });
+        } catch (error) {
+          console.error(
+            `❌ CacheEvictInterceptor: No se pudo encontrar el servicio para ${entity}`,
+          );
+          return;
         }
 
-        console.log(
-          `♻️ Cache Evicted: ${entity} ${id ? `(ID: ${id})` : '(Lists only)'}`,
-        );
+        if (!cacheService) return;
+
+        if (entity === 'raffles' && buildingId) {
+          await cacheService.invalidateRaffleData(buildingId);
+        } else {
+          await cacheService.invalidateAllLists();
+          if (isKeySpecific && id) {
+            if (entity === 'users') await cacheService.invalidateUser(id);
+            if (entity === 'buildings')
+              await cacheService.invalidateBuilding(id);
+          }
+        }
       }),
     );
   }

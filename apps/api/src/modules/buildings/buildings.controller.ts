@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BuildingsService } from './services/buildings.service';
 import { RoleEnum } from '@parking-system/libs';
@@ -15,19 +16,22 @@ import {
   ApiOperation,
   ApiCreatedResponse,
   ApiConflictResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CreateBuildingDto } from './dtos/create-building.dto';
 import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
 import { SearchDto } from '@common/dtos';
 import { Building, User } from '@database/entities';
+import { CacheEvictInterceptor } from '@common/interceptors';
 
 @Controller('buildings')
+@ApiTags('buildings')
+@UseInterceptors(CacheEvictInterceptor)
 export class BuildingsController {
   constructor(private readonly buildingsService: BuildingsService) {}
 
   @Post()
   @Roles(RoleEnum.ROOT)
-  @CacheEvict({ entity: 'buildings' })
   @ApiOperation({ summary: 'Create a new building and generate its slots' })
   @ApiCreatedResponse({
     type: Building,
@@ -35,6 +39,7 @@ export class BuildingsController {
   @ApiConflictResponse({
     description: 'A building with this name already exists.',
   })
+  @CacheEvict({ entity: 'buildings' })
   create(
     @Body() createBuildingDto: CreateBuildingDto,
     @CurrentUser() user: User,

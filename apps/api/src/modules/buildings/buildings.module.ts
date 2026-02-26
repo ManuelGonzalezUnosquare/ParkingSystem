@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuildingsController } from './buildings.controller';
 import { BuildingsCacheService, BuildingsService } from './services';
-import { RedisModule } from 'src/app/redis.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Building])],
