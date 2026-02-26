@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   input,
   OnDestroy,
@@ -13,12 +12,13 @@ import {
   RunRaffle,
   TotalResidentCard,
   UserForm,
+  UsersTable,
   UtilizationCard,
   VehiclesCard,
 } from '@features/buildings/components';
 import { LastRaffleCard } from '@features/buildings/components/last-raffle-card/last-raffle-card';
 import { SearchBuildingUsers, UserModel } from '@parking-system/libs';
-import { PageHeader, RoleTag } from '@shared/ui';
+import { PageHeader } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -32,7 +32,6 @@ import { map, take } from 'rxjs';
   imports: [
     ButtonModule,
     TableModule,
-    RoleTag,
     CardModule,
     InputTextModule,
     PageHeader,
@@ -40,6 +39,7 @@ import { map, take } from 'rxjs';
     TotalResidentCard,
     VehiclesCard,
     LastRaffleCard,
+    UsersTable,
     UtilizationCard,
   ],
   templateUrl: './building-details.html',
@@ -72,9 +72,6 @@ export class BuildingDetails implements OnInit, OnDestroy {
   };
 
   id = input.required<string>();
-  protected readonly existsUsers = computed(() => {
-    return (this.store.usersPagination()?.total || 0) !== 0;
-  });
 
   ngOnInit(): void {
     if (!this.store.building()) {
@@ -87,13 +84,6 @@ export class BuildingDetails implements OnInit, OnDestroy {
     }
   }
 
-  addUser() {
-    this.openBuildingDialog('Create User');
-  }
-  update(user: UserModel) {
-    this.openBuildingDialog('Update User', user);
-  }
-
   async delete(user: UserModel) {
     this.confirmationService.confirm({
       message: `Are you sure you want to remove ${user.fullName} from this building?`,
@@ -102,21 +92,13 @@ export class BuildingDetails implements OnInit, OnDestroy {
       // accept: () => this.store.deleteUser(user.publicId),
     });
   }
-
-  onLazyLoad(event: TableLazyLoadEvent) {
-    this.searchParams = {
-      first: event.first ?? 0,
-      rows: event.rows ?? 10,
-      sortField: (event.sortField as string) ?? 'createdAt',
-      sortOrder: event.sortOrder ?? -1,
-      globalFilter: (event.globalFilter as string) ?? undefined,
+  search(filters: SearchBuildingUsers) {
+    this.store.loadUsers({
+      ...filters,
       buildingId: this.id(),
-    };
-
-    this.store.loadUsers(this.searchParams);
+    });
   }
-
-  private openBuildingDialog(header: string, user?: UserModel) {
+  openBuildingDialog(header: string, user?: UserModel) {
     this.dialogService.open(UserForm, {
       ...this.dialogConfig,
       header,
