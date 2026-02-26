@@ -9,7 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { BuildingsService } from './buildings.service';
+import { BuildingsService } from './services/buildings.service';
 import { RoleEnum } from '@parking-system/libs';
 import {
   ApiOperation,
@@ -17,7 +17,7 @@ import {
   ApiConflictResponse,
 } from '@nestjs/swagger';
 import { CreateBuildingDto } from './dtos/create-building.dto';
-import { CurrentUser, Roles } from '@common/decorators';
+import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
 import { SearchDto } from '@common/dtos';
 import { Building, User } from '@database/entities';
 
@@ -27,6 +27,7 @@ export class BuildingsController {
 
   @Post()
   @Roles(RoleEnum.ROOT)
+  @CacheEvict({ entity: 'buildings' })
   @ApiOperation({ summary: 'Create a new building and generate its slots' })
   @ApiCreatedResponse({
     type: Building,
@@ -61,6 +62,7 @@ export class BuildingsController {
   }
 
   @Patch(':publicId')
+  @CacheEvict({ entity: 'buildings', isKeySpecific: true })
   @Roles(RoleEnum.ROOT)
   update(
     @Param('publicId', new ParseUUIDPipe()) publicId: string,
@@ -70,6 +72,7 @@ export class BuildingsController {
   }
 
   @Delete(':publicId')
+  @CacheEvict({ entity: 'buildings', isKeySpecific: true })
   @Roles(RoleEnum.ROOT)
   remove(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.remove(publicId);

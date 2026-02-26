@@ -11,8 +11,8 @@ import { TransformInterceptor } from '@common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    // logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-    logger: ['error', 'log'],
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    // logger: ['error', 'log'],
   });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

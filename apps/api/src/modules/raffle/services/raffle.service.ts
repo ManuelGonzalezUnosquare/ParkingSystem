@@ -7,7 +7,7 @@ import {
   Vehicle,
 } from '@database/entities';
 import { UsersService } from '@modules/users/services';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   RoleEnum,
@@ -16,6 +16,8 @@ import {
 } from '@parking-system/libs';
 import { Between, DataSource, Equal, IsNull, Repository } from 'typeorm';
 import { endOfDay, startOfDay } from 'date-fns';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 interface ExecutionResult {
   executed: Raffle;
@@ -32,6 +34,7 @@ export class RaffleService {
     private readonly raffleResultRepository: Repository<RaffleResult>,
     private readonly dataSource: DataSource,
     private userService: UsersService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async findNext(user: User) {
@@ -124,6 +127,7 @@ export class RaffleService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      let buildingId = '';
       // 1. Fetch Raffle and Building context
       const raffle = await queryRunner.manager.findOne(Raffle, {
         where: { id: Equal(raffleId) },
@@ -133,6 +137,8 @@ export class RaffleService {
       if (!raffle) {
         throw new Error('Raffle not found or already executed');
       }
+
+      buildingId = raffle.building.publicId;
 
       const [candidates, slots] = await Promise.all([
         queryRunner.manager.find(User, {
@@ -253,6 +259,11 @@ export class RaffleService {
       const upcomingRaffle = await queryRunner.manager.save(nextRaffle);
 
       await queryRunner.commitTransaction();
+
+      //cache for building
+      await this.cacheManager.del(`building_${buildingId}_results`);
+      await this.cacheManager.del(`building_${buildingId}_dashboard`);
+
       return {
         executed: executedRaffle,
         upcoming: upcomingRaffle,
@@ -269,7 +280,6 @@ export class RaffleService {
     d.setMonth(d.getMonth() + 3);
     return d;
   }
-
   private runSelection(
     candidates: User[],
     slots: ParkingSlot[],

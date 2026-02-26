@@ -10,7 +10,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateBuildingDto } from './dtos/create-building.dto';
+import { CreateBuildingDto } from '../dtos/create-building.dto';
+import { BuildingsCacheService } from './buildings-cache.service';
 
 @Injectable()
 export class BuildingsService {
@@ -19,6 +20,7 @@ export class BuildingsService {
   constructor(
     @InjectRepository(Building)
     private readonly buildingRepository: Repository<Building>,
+    private readonly cacheService: BuildingsCacheService,
   ) {}
 
   async create(dto: CreateBuildingDto, creator: User): Promise<Building> {
@@ -37,9 +39,7 @@ export class BuildingsService {
         ...dto,
         createdBy: creator,
       });
-      const saved = await this.buildingRepository.save(newBuilding);
-      this.logger.log(`Building created: ${saved.publicId}`);
-      return saved;
+      return await this.buildingRepository.save(newBuilding);
     } catch (error) {
       this.logger.error(
         `Failed to create building: ${error.message}`,
@@ -68,6 +68,11 @@ export class BuildingsService {
   }
 
   async findAll(search: SearchDto): Promise<PaginatedResult<Building>> {
+    const cachedResults = await this.cacheService.getList(search);
+    if (cachedResults) {
+      return cachedResults as PaginatedResult<Building>;
+    }
+
     const { globalFilter } = search;
 
     const query = this.buildingRepository.createQueryBuilder('building');
@@ -81,7 +86,9 @@ export class BuildingsService {
       );
     }
 
-    return await paginateQuery(query, search);
+    const result = await paginateQuery(query, search);
+    await this.cacheService.setList(search, result);
+    return result;
   }
 
   async findOneByPublicId(publicId: string): Promise<Building> {

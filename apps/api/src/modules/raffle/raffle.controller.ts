@@ -1,4 +1,4 @@
-import { CurrentUser, Roles } from '@common/decorators';
+import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
 import { User } from '@database/entities';
 import {
   Controller,
@@ -17,7 +17,7 @@ import {
   RoleEnum,
 } from '@parking-system/libs';
 import { RaffleResultToModel, RaffleToModel } from './mappers';
-import { RaffleService } from './raffle.service';
+import { RaffleService } from './services/raffle.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('raffle')
@@ -55,6 +55,7 @@ export class RaffleController {
   }
 
   @Post('execute')
+  @CacheEvict({ entity: 'raffles' })
   @HttpCode(HttpStatus.OK)
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   @ApiOperation({ summary: 'Manually trigger the current pending raffle' })

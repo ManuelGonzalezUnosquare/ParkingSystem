@@ -1,4 +1,4 @@
-import { CurrentUser, Roles } from '@common/decorators';
+import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
 import { SearchBuildingDto } from '@common/dtos';
 import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
@@ -26,6 +26,7 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
+  @CacheEvict({ entity: 'users' })
   async create(
     @Body() createUserDto: CreateUserDto,
     @CurrentUser() user: User,
@@ -47,26 +48,33 @@ export class UsersController {
     };
   }
 
-  @Get(':id')
+  @Get(':publicId')
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.usersService.findOneByPublicId(id);
+  findOne(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
+    return this.usersService.findOneByPublicId(publicId);
   }
 
-  @Patch(':id')
+  @Patch(':publicId')
+  @CacheEvict({ entity: 'users', isKeySpecific: true })
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  update(
-    @Param('id', new ParseUUIDPipe()) id: string,
+  async update(
+    @Param('publicId', new ParseUUIDPipe()) publicId: string,
     @Body() updateUserDto: CreateUserDto,
     @CurrentUser() user: User,
   ) {
-    return this.usersService.update(id, updateUserDto, user);
+    const response = await this.usersService.update(
+      publicId,
+      updateUserDto,
+      user,
+    );
+    return UserEntityToModel(response);
   }
 
-  @Delete(':id')
+  @Delete(':publicId')
+  @CacheEvict({ entity: 'users', isKeySpecific: true })
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.usersService.remove(id);
+  remove(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
+    return this.usersService.remove(publicId);
   }
 }

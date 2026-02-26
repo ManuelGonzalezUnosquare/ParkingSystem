@@ -4,9 +4,9 @@ import {
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
-import { User } from '@database/entities';
+import { Building, User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
-import { BuildingsService } from '@modules/buildings/buildings.service';
+import { BuildingsService } from '@modules/buildings/services/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
 import {
   BadRequestException,
@@ -22,6 +22,7 @@ import { CryptoService } from '@utils/services';
 import { Brackets, Repository } from 'typeorm';
 import { RoleService } from './role.service';
 import { RoleEnum } from '@parking-system/libs';
+import { UsersCacheService } from './users-cache.service';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +36,7 @@ export class UsersService {
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
     private readonly cryptoService: CryptoService,
+    private readonly cacheService: UsersCacheService,
   ) {}
 
   async findAll(
@@ -42,6 +44,11 @@ export class UsersService {
     user: User,
   ): Promise<PaginatedResult<User>> {
     PermissionValidator.validateBuildingAccess(user, filters.buildingId);
+
+    const cachedResults = await this.cacheService.getList(filters);
+    if (cachedResults) {
+      return cachedResults as PaginatedResult<User>;
+    }
 
     const { buildingId, globalFilter } = filters;
 
@@ -77,7 +84,9 @@ export class UsersService {
       );
     }
 
-    return await paginateQuery(query, filters);
+    const result = await paginateQuery(query, filters);
+    await this.cacheService.setList(filters, result);
+    return result;
   }
   async create(dto: CreateUserDto, creator: User): Promise<User> {
     PermissionValidator.validateBuildingAccess(creator, dto.buildingId);
@@ -123,7 +132,11 @@ export class UsersService {
       await queryRunner.commitTransaction();
       this.logger.log(`User created successfully: ${savedUser.email}`);
       //TODO: send email with pass info
-      return this.findOneByPublicId(savedUser.publicId);
+      const result = await this.findOneByPublicId(savedUser.publicId);
+
+      this.cacheService.invalidateUser(result.publicId);
+      this.cacheService.setUser(result.publicId, result);
+      return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Failed to create user: ${error.message}`);
@@ -232,6 +245,9 @@ export class UsersService {
       await queryRunner.commitTransaction();
       this.logger.log(`User ${publicId} successfully updated with transaction`);
 
+      this.cacheService.invalidateUser(savedUser.publicId);
+      this.cacheService.setUser(savedUser.publicId, savedUser);
+
       return savedUser;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -255,6 +271,7 @@ export class UsersService {
 
     try {
       await this.userRepository.softDelete(user.id);
+      this.cacheService.invalidateUser(user.publicId);
       //delete vehicle if exists
       //if has a busy slot: make it available
 
@@ -274,12 +291,14 @@ export class UsersService {
       );
     }
 
-    // Merges the current state with the new partial data
     const updatedUser = this.userRepository.merge(user, data);
 
     this.logger.log(`Internal update executed for user: ${user.email}`);
     await this.userRepository.save(updatedUser);
-    return await this.findOneByPublicId(user.publicId);
+    const savedUser = await this.findOneByPublicId(user.publicId);
+    this.cacheService.invalidateUser(savedUser.publicId);
+    this.cacheService.setUser(savedUser.publicId, savedUser);
+    return savedUser;
   }
   async incrementPriority(userId: number): Promise<void> {
     this.logger.debug(`Incrementing priority score for user ID: ${userId}`);

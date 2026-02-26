@@ -1,13 +1,14 @@
+import { Building } from '@database/entities';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuildingsController } from './buildings.controller';
-import { BuildingsService } from './buildings.service';
-import { Building } from '@database/entities';
+import { BuildingsCacheService, BuildingsService } from './services';
+import { RedisModule } from 'src/app/redis.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Building])],
   controllers: [BuildingsController],
-  providers: [BuildingsService],
+  providers: [BuildingsService, BuildingsCacheService],
   exports: [BuildingsService],
 })
 export class BuildingsModule {}
