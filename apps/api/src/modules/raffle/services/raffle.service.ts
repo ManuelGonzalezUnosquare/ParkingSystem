@@ -37,12 +37,12 @@ export class RaffleService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async findNext(user: User) {
-    const buildingId = user.building.id;
+  async findNext(buildingId: string, user: User) {
+    PermissionValidator.validateBuildingAccess(user, buildingId);
     return await this.raffleRepository.findOne({
       where: {
         executedAt: IsNull(),
-        building: { id: buildingId },
+        building: { publicId: buildingId },
       },
       relations: { building: true },
     });
@@ -60,8 +60,8 @@ export class RaffleService {
       relations: { building: true },
     });
   }
-  async findHistory(user: User) {
-    const buildingId = user.building.id;
+  async findHistory(buildingId: string, user: User) {
+    PermissionValidator.validateBuildingAccess(user, buildingId);
     const _buildingId =
       user.role.name === RoleEnum.ROOT ? buildingId : user.building.publicId;
     const userId = user.id;
@@ -99,12 +99,11 @@ export class RaffleService {
     return await query.getMany();
   }
 
-  async executeRaffleManually(user: User): Promise<ExecutionResult> {
-    PermissionValidator.validateBuildingAccess(
-      user,
-      user.building?.publicId || '',
-      false,
-    );
+  async executeRaffleManually(
+    buildingId: string,
+    user: User,
+  ): Promise<ExecutionResult> {
+    PermissionValidator.validateBuildingAccess(user, buildingId, false);
 
     const raffle = await this.raffleRepository.findOne({
       where: { building: Equal(user.building.id), executedAt: IsNull() },

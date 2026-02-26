@@ -28,19 +28,25 @@ import { CacheEvictInterceptor } from '@common/interceptors';
 export class RaffleController {
   constructor(private readonly raffleService: RaffleService) {}
 
-  @Get('next')
+  @Get(':buildingId/next')
   @ApiOperation({
     summary: 'Get the next scheduled raffle for the user building',
   })
-  async findNext(@CurrentUser() user: User): Promise<RaffleModel> {
-    const raffle = await this.raffleService.findNext(user);
+  async findNext(
+    @Param('buildingId', new ParseUUIDPipe()) buildingId: string,
+    @CurrentUser() user: User,
+  ): Promise<RaffleModel> {
+    const raffle = await this.raffleService.findNext(buildingId, user);
     if (!raffle) throw new NotFoundException('No pending raffle found');
     return RaffleToModel(raffle);
   }
-  @Get('history')
+  @Get(':buildingId/history')
   @ApiOperation({ summary: 'Get raffle history for the current user' })
-  async findHistory(@CurrentUser() user: User): Promise<RaffleResultModel[]> {
-    const results = await this.raffleService.findHistory(user);
+  async findHistory(
+    @Param('buildingId', new ParseUUIDPipe()) buildingId: string,
+    @CurrentUser() user: User,
+  ): Promise<RaffleResultModel[]> {
+    const results = await this.raffleService.findHistory(buildingId, user);
     return results.map(RaffleResultToModel);
   }
 
@@ -57,14 +63,19 @@ export class RaffleController {
     return raffles.map(RaffleToModel);
   }
 
-  @Post('execute')
+  @Post(':buildingId/execute')
   @CacheEvict({ entity: 'raffles' })
   @HttpCode(HttpStatus.OK)
   @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
   @ApiOperation({ summary: 'Manually trigger the current pending raffle' })
-  async execute(@CurrentUser() user: User) {
-    const executionResult =
-      await this.raffleService.executeRaffleManually(user);
+  async execute(
+    @Param('buildingId', new ParseUUIDPipe()) buildingId: string,
+    @CurrentUser() user: User,
+  ) {
+    const executionResult = await this.raffleService.executeRaffleManually(
+      buildingId,
+      user,
+    );
 
     const result: RaffleExecutionResultModel = {
       executed: RaffleToModel(executionResult.executed),
