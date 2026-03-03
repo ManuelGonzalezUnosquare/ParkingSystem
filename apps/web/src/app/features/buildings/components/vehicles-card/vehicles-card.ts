@@ -16,6 +16,8 @@ import { CardModule } from 'primeng/card';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VehiclesCard {
+  // TODO: this card works with paginated data
+  // return this info from api to see all data
   users = input.required<UserModel[]>();
 
   private readonly vehicleStats = computed(() => {

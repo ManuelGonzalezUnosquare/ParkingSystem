@@ -22,7 +22,6 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   ApiPaginationMeta,
-  BuildingModel,
   ICreateUser,
   RoleEnum,
   SearchBuildingUsers,
@@ -40,7 +39,7 @@ type BuildingUsersState = {
   usersPagination: ApiPaginationMeta | undefined;
 };
 
-export function withBuildingUsers(building: Signal<BuildingModel | undefined>) {
+export function withBuildingUsers(buildingId: Signal<string | null>) {
   return signalStoreFeature(
     withEntities(config),
     withReset(),
@@ -90,7 +89,7 @@ export function withBuildingUsers(building: Signal<BuildingModel | undefined>) {
           const response = await lastValueFrom(
             store._usersService.create({
               ...dto,
-              buildingId: building()?.publicId,
+              buildingId: buildingId()!,
             }),
           );
           patchState(store, addEntity(response.data, config), {
@@ -115,7 +114,7 @@ export function withBuildingUsers(building: Signal<BuildingModel | undefined>) {
           const response = await lastValueFrom(
             store._usersService.update(id, {
               ...dto,
-              buildingId: building()?.publicId,
+              buildingId: buildingId()!,
             }),
           );
           patchState(

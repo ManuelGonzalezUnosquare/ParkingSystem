@@ -12,7 +12,7 @@
   </ng-template>
 
   <ng-template #content>
-    <div class="py-4" [attr.aria-labelledby]="'utilization-label'">
+    <div [attr.aria-labelledby]="'utilization-label'">
       <div class="flex justify-between items-end mb-2">
         <span class="text-3xl font-extrabold text-slate-800"
           >{{ progressValue() }}%</span
@@ -33,7 +33,7 @@
   </ng-template>
 
   <ng-template #footer>
-    <div class="flex gap-2 items-center pt-2 border-t border-slate-100">
+    <div class="flex gap-2 items-center border-t border-slate-100">
       <span class="text-slate-500 text-xs font-medium">
         <b class="text-slate-700">{{ assignedSlotsCount() }}</b> assigned of
         <b class="text-slate-700">{{ availableSpots() }}</b> total spots

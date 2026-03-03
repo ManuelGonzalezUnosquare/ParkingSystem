@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@database/entities';
-import { BuildingsService } from '@modules/buildings/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
 import {
   ConflictException,
@@ -13,6 +12,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CryptoService } from '@utils/services';
 import { RoleService } from './role.service';
 import { UsersService } from './users.service';
+import { BuildingsService } from '@modules/buildings/services';
+import { UsersCacheService } from './users-cache.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -35,6 +36,7 @@ describe('UsersService', () => {
     createdAt: '',
     updatedAt: '',
     deletedAt: '',
+    createdBy: {} as any,
   };
   const mockRole = {
     id: 1,
@@ -119,6 +121,13 @@ describe('UsersService', () => {
         {
           provide: CryptoService,
           useValue: { hash: jest.fn().mockResolvedValue('hashed') },
+        },
+        {
+          provide: UsersCacheService,
+          useValue: {
+            invalidateUser: jest.fn(),
+            setUser: jest.fn(),
+          },
         },
       ],
     }).compile();

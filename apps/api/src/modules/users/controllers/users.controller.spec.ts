@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from './users.controller';
-import { ParseUUIDPipe } from '@nestjs/common';
 import { UsersService } from '../services';
+import { UsersController } from './users.controller';
 
 describe('UsersController', () => {
   let controller: UsersController;

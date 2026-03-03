@@ -3,6 +3,7 @@ import { BuildingsService } from './buildings.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Building } from '@database/entities';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { BuildingsCacheService } from './buildings-cache.service';
 
 describe('BuildingsService', () => {
   let service: BuildingsService;
@@ -14,6 +15,15 @@ describe('BuildingsService', () => {
     publicId: 'b-1',
     name: 'Tower A',
     address: '123 St',
+  };
+
+  const mockUser: any = {
+    id: 1,
+    publicId: 'uuid-123',
+    email: 'test@test.com',
+    role: {
+      name: '',
+    },
   };
 
   beforeEach(async () => {
@@ -34,6 +44,10 @@ describe('BuildingsService', () => {
             })),
           },
         },
+        {
+          provide: BuildingsCacheService,
+          useValue: {},
+        },
       ],
     }).compile();
 
@@ -47,19 +61,22 @@ describe('BuildingsService', () => {
       repo.create.mockReturnValue(mockBuilding);
       repo.save.mockResolvedValue(mockBuilding);
 
-      const result = await service.create({
-        name: 'Tower A',
-        address: '123 St',
-        totalSlots: 10,
-      });
+      const result = await service.create(
+        {
+          name: 'Tower A',
+          address: '123 St',
+          totalSlots: 10,
+        },
+        mockUser,
+      );
       expect(result).toEqual(mockBuilding);
     });
 
     it('should throw ConflictException if name exists', async () => {
       repo.findOneBy.mockResolvedValue(mockBuilding);
-      await expect(service.create({ name: 'Tower A' } as any)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.create({ name: 'Tower A' } as any, mockUser),
+      ).rejects.toThrow(ConflictException);
     });
   });
 

@@ -12,6 +12,9 @@ export class RaffleResult extends BaseEntity {
   @JoinColumn({ name: 'raffle_id' })
   raffle: Raffle;
 
+  @Column()
+  raffle_id: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;

@@ -1,18 +1,18 @@
+import { GlobalExceptionFilter } from '@common/filters';
+import { TransformInterceptor } from '@common/interceptors';
 import {
   ClassSerializerInterceptor,
   Logger,
   ValidationPipe,
 } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { GlobalExceptionFilter } from '@common/filters';
-import { TransformInterceptor } from '@common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    // logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-    logger: ['error', 'log'],
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    // logger: ['error', 'log'],
   });
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

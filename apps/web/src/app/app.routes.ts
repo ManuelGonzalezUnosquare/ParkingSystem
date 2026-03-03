@@ -45,6 +45,15 @@ export const appRoutes: Route[] = [
             './features/buildings/pages/allocation-history/allocation-history'
           ).then((m) => m.AllocationHistory),
       },
+      {
+        path: 'history/:id/result',
+        canActivate: [roleGuard],
+        data: { roles: [RoleEnum.ROOT, RoleEnum.ADMIN] },
+        loadComponent: () =>
+          import(
+            './features/buildings/pages/raffle-result-page/raffle-result-page'
+          ).then((m) => m.RaffleResultPage),
+      },
     ],
   },
   {

@@ -9,6 +9,11 @@ describe('AllocationHistory', () => {
 
   const mockStore = {
     rafflesEntities: vi.fn(),
+    next: vi.fn(),
+    rafflesHistory: vi.fn(),
+    isLoading: vi.fn(),
+    rafflesPagination: vi.fn(),
+    loadHistory: vi.fn(),
   };
 
   beforeEach(async () => {
