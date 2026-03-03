@@ -23,17 +23,13 @@ import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { map, take } from 'rxjs';
 
 @Component({
   selector: 'app-building-details',
   imports: [
     ButtonModule,
-    TableModule,
     CardModule,
-    InputTextModule,
     PageHeader,
     //cards
     TotalResidentCard,

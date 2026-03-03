@@ -43,29 +43,30 @@ export const ProfileStore = signalStore(
     _authStore: inject(AuthStore),
   })),
   withMethods((store) => ({
-    loadHistory: rxMethod<void>(
-      pipe(
-        tap(() => patchState(store, { callState: 'loading' })),
-        switchMap(() =>
-          store._raffleService
-            .loadHistory(store._authStore.user()!.buildingId || '')
-            .pipe(
-              tapResponse({
-                next: (res: ApiResponse<RaffleResultModel[]>) =>
-                  patchState(store, {
-                    historyRaffle: res.data,
-                    callState: 'loaded',
-                  }),
-                error: (err: any) => {
-                  const errorMessage =
-                    err.error?.message || 'Load history failed';
-                  patchState(store, { callState: { error: errorMessage } });
-                },
-              }),
-            ),
-        ),
-      ),
-    ),
+    // TODO: pending to fix
+    // loadHistory: rxMethod<void>(
+    //   pipe(
+    //     tap(() => patchState(store, { callState: 'loading' })),
+    //     switchMap(() =>
+    //       store._raffleService
+    //         .loadHistory(store._authStore.user()!.buildingId || '')
+    //         .pipe(
+    //           tapResponse({
+    //             next: (res: ApiResponse<RaffleResultModel[]>) =>
+    //               patchState(store, {
+    //                 historyRaffle: res.data,
+    //                 callState: 'loaded',
+    //               }),
+    //             error: (err: any) => {
+    //               const errorMessage =
+    //                 err.error?.message || 'Load history failed';
+    //               patchState(store, { callState: { error: errorMessage } });
+    //             },
+    //           }),
+    //         ),
+    //     ),
+    //   ),
+    // ),
     loadNext: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { callState: 'loading' })),
@@ -99,7 +100,6 @@ export const ProfileStore = signalStore(
             store.resetState();
           } else {
             store.loadNext();
-            store.loadHistory();
           }
         });
       },

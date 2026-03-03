@@ -1,13 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RaffleController } from './raffle.controller';
-import { RaffleService } from './raffle.service';
+import { RaffleService } from '../services';
 
 describe('RaffleController', () => {
   let controller: RaffleController;
   let service: jest.Mocked<RaffleService>;
   let testingModule: TestingModule;
 
-  const mockUser: any = { id: 1, building: { id: 10, publicId: 'b-123' } };
+  const mockUser: any = {
+    id: 1,
+    publicId: 'uuid-123',
+    email: 'test@test.com',
+    role: {
+      name: '',
+    },
+  };
 
   beforeEach(async () => {
     testingModule = await Test.createTestingModule({
@@ -31,35 +38,31 @@ describe('RaffleController', () => {
 
   describe('execute', () => {
     it('should call executeRaffleManually', async () => {
-      service.executeRaffleManually.mockResolvedValue(undefined);
+      const raffleResult = {
+        executed: {} as any,
+        upcoming: {} as any,
+      };
+      service.executeRaffleManually.mockResolvedValue(raffleResult);
 
-      const result = await controller.execute(mockUser);
+      const result = await controller.execute('123', mockUser);
 
-      expect(service.executeRaffleManually).toHaveBeenCalledWith(mockUser);
-      expect(result.message).toContain('successfully');
+      expect(service.executeRaffleManually).toHaveBeenCalledWith(
+        '123',
+        mockUser,
+      );
+      expect(result.executed).not.toBeNull();
     });
   });
 
   describe('findNext', () => {
     it('should return a mapped raffle model', async () => {
-      const mockRaffle = { id: 1, building: { id: 10 } };
+      const mockRaffle = { id: 1, building: { id: 10, publicId: '123-a' } };
       service.findNext.mockResolvedValue(mockRaffle as any);
 
-      const result = await controller.findNext(mockUser);
+      const result = await controller.findNext('123-1', mockUser);
 
-      expect(service.findNext).toHaveBeenCalledWith(mockUser);
+      expect(service.findNext).toHaveBeenCalledWith('123-1', mockUser);
       expect(result).toBeDefined();
-    });
-  });
-
-  describe('findByBuilding', () => {
-    it('should call findAll with buildingId from param', async () => {
-      const buildingId = 'uuid-building';
-      service.findAll.mockResolvedValue([]);
-
-      await controller.findByBuilding(buildingId, mockUser);
-
-      expect(service.findAll).toHaveBeenCalledWith(mockUser, buildingId);
     });
   });
 });

@@ -1,4 +1,6 @@
 import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
+import { SearchDto } from '@common/dtos';
+import { CacheEvictInterceptor } from '@common/interceptors';
 import { User } from '@database/entities';
 import {
   Controller,
@@ -9,18 +11,17 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   RaffleExecutionResultModel,
   RaffleModel,
-  RaffleResultModel,
   RoleEnum,
 } from '@parking-system/libs';
-import { RaffleResultToModel, RaffleToModel } from './mappers';
-import { RaffleService } from './services/raffle.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CacheEvictInterceptor } from '@common/interceptors';
+import { RaffleToModel } from '../mappers';
+import { RaffleService } from '../services';
 
 @ApiTags('raffle')
 @Controller('raffle')
@@ -45,22 +46,21 @@ export class RaffleController {
   async findHistory(
     @Param('buildingId', new ParseUUIDPipe()) buildingId: string,
     @CurrentUser() user: User,
-  ): Promise<RaffleResultModel[]> {
-    const results = await this.raffleService.findHistory(buildingId, user);
-    return results.map(RaffleResultToModel);
+    @Query() searchDto: SearchDto,
+  ) {
+    const results = await this.raffleService.findHistory(
+      buildingId,
+      user,
+      searchDto,
+    );
+    return results;
   }
 
-  @Get('/:buildingId')
-  @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
-  @ApiOperation({
-    summary: 'Get all raffles associated with a specific building',
-  })
-  async findByBuilding(
-    @Param('buildingId', new ParseUUIDPipe()) buildingId: string,
-    @CurrentUser() user: User,
-  ): Promise<RaffleModel[]> {
-    const raffles = await this.raffleService.findAll(user, buildingId);
-    return raffles.map(RaffleToModel);
+  @Get(':raffleId')
+  async findById(@Param('raffleId', new ParseUUIDPipe()) raffleId: string) {
+    const raffle = await this.raffleService.findByPublicId(raffleId);
+    if (!raffle) throw new NotFoundException('No raffle found');
+    return RaffleToModel(raffle);
   }
 
   @Post(':buildingId/execute')

@@ -4,7 +4,7 @@ import {
   paginateQuery,
   PermissionValidator,
 } from '@common/utils';
-import { Building, User } from '@database/entities';
+import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
 import { BuildingsService } from '@modules/buildings/services/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
@@ -18,10 +18,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RoleEnum } from '@parking-system/libs';
 import { CryptoService } from '@utils/services';
 import { Brackets, Repository } from 'typeorm';
 import { RoleService } from './role.service';
-import { RoleEnum } from '@parking-system/libs';
 import { UsersCacheService } from './users-cache.service';
 
 @Injectable()

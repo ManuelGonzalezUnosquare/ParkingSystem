@@ -1,0 +1,57 @@
+<p-table
+  #dt
+  [value]="raffles()"
+  [lazy]="true"
+  [rows]="10"
+  [totalRecords]="pagination()?.total || 0"
+  (onLazyLoad)="onLazyLoad($event)"
+  [loading]="isLoading()"
+  [paginator]="true"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+  [rowsPerPageOptions]="[10, 20, 50]"
+  paginatorStyleClass="mt-10"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p></p>
+      <p-button label="Export" disabled icon="pi pi-plus" text />
+    </div>
+  </ng-template>
+
+  <ng-template #header>
+    <tr>
+      <th class="text-center">Planned date</th>
+      <th class="text-center">Total Participants</th>
+      <th class="text-center">Status</th>
+      <th class="text-center">Ran Manually</th>
+      <th class="text-center">Actions</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-raffle>
+    <tr>
+      <td class="text-center">{{ raffle.executedDate | date }}</td>
+      <td class="text-center">{{raffle.totalParticipants}}</td>
+      <td class="text-center">
+        @let sev = raffle.status === raffleStatus.COMPLETED ? 'success' :
+        (raffle.status === raffleStatus.PLANNED ? 'info':'danger');
+        <p-tag [value]="raffle.status" [severity]="sev" />
+      </td>
+      <td class="text-center">
+        <p-toggleswitch [(ngModel)]="raffle.isManual" readonly="true" />
+      </td>
+      <td class="text-center">
+        <p-button
+          pButton
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          label="View Details"
+          [text]="true"
+          severity="info"
+          pTooltip="View Details"
+          [routerLink]="['/app/history',raffle.publicId,'result']"
+        ></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

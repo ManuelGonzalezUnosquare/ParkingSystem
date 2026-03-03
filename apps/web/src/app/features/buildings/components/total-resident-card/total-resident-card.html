@@ -1,4 +1,4 @@
-<p-card class="h-full">
+<p-card>
   <ng-template #title>
     <div class="flex justify-between items-start">
       <p
@@ -11,7 +11,7 @@
     </div>
   </ng-template>
 
-  <ng-template #subtitle>
+  <ng-template #content>
     <div class="flex flex-col" [attr.aria-labelledby]="'card-label'">
       <p
         class="text-[#0d141c] tracking-tight text-4xl font-extrabold leading-tight"
@@ -23,10 +23,7 @@
   </ng-template>
 
   <ng-template #footer>
-    <div
-      class="flex gap-2 items-center pt-2 border-t border-slate-100"
-      role="note"
-    >
+    <div class="flex gap-2 items-center 100" role="note">
       <span
         class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
       >

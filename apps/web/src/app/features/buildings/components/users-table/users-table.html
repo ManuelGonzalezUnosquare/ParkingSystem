@@ -2,7 +2,6 @@
   #dt
   [value]="users()"
   [lazy]="true"
-  [lazyLoadOnInit]="false"
   (onLazyLoad)="onLazyLoad($event)"
   [paginator]="existsUsers()"
   [rows]="10"
@@ -11,10 +10,10 @@
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} residents"
   [rowsPerPageOptions]="[10, 20, 50]"
+  paginatorStyleClass="mt-10"
 >
   <ng-template pTemplate="caption">
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-      <h3 class="text-lg font-bold text-slate-800">Resident List</h3>
+    <div class="flex flex-col sm:flex-row justify-end items-center gap-4">
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <span class="p-input-icon-left w-full sm:w-64">
           <input

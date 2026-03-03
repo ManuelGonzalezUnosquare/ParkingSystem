@@ -1,9 +1,9 @@
+import { Raffle } from '@database/entities';
 import { Test, TestingModule } from '@nestjs/testing';
-import { RaffleService } from './raffle.service';
-import { Raffle, RaffleResult } from '@database/entities';
 import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UsersService } from '@modules/users/services';
+import { RafflesCacheService } from './raffle-cache.service';
+import { RaffleService } from './raffle.service';
 
 export const mockDataSource = {
   getRepository: jest.fn().mockReturnValue({
@@ -23,20 +23,12 @@ describe('RaffleService', () => {
           useValue: {},
         },
         {
-          provide: getRepositoryToken(RaffleResult),
-          useValue: {},
-        },
-        {
           provide: getDataSourceToken(),
           useValue: mockDataSource,
         },
         {
-          provide: UsersService,
-          useValue: {
-            findOneByEmail: jest.fn(),
-            internalUpdate: jest.fn(),
-            findByResetCode: jest.fn(),
-          },
+          provide: RafflesCacheService,
+          useValue: {},
         },
       ],
     }).compile();

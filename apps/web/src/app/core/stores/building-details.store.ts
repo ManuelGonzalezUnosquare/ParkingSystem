@@ -22,12 +22,15 @@ import { BuildingService } from '../../features/buildings/services/building.serv
 import { AuthStore } from './auth.store';
 import { withBuildingRaffles } from './building-raffle.store';
 import { withBuildingUsers } from './building-users.store';
+import { AUTH_CONSTANTS } from '@core/constants';
 
 interface BuildingDetailState {
+  buildingId: string | null;
   building: BuildingModel | undefined;
 }
 
 const initialState: BuildingDetailState = {
+  buildingId: localStorage.getItem(AUTH_CONSTANTS.BUILDING),
   building: undefined,
 };
 
@@ -59,11 +62,17 @@ export const BuildingDetailStore = signalStore(
         switchMap((id) =>
           store._buildingService.getById(id).pipe(
             tapResponse({
-              next: (res) =>
+              next: (res) => {
                 patchState(store, {
                   building: res.data,
+                  buildingId: res.data.publicId,
                   callState: 'loaded',
-                }),
+                });
+                localStorage.setItem(
+                  AUTH_CONSTANTS.BUILDING,
+                  res.data.publicId,
+                );
+              },
               error: (err: any) =>
                 patchState(store, {
                   callState: {
@@ -78,8 +87,8 @@ export const BuildingDetailStore = signalStore(
     clearContext: () =>
       patchState(store, { building: undefined, callState: 'loaded' }),
   })),
-  withFeature(({ building }) => withBuildingUsers(building)),
-  withFeature(({ building }) => withBuildingRaffles(building)),
+  withFeature(({ buildingId }) => withBuildingUsers(buildingId)),
+  withFeature(({ buildingId }) => withBuildingRaffles(buildingId)),
 
   withHooks((store) => {
     const authStore = inject(AuthStore);
@@ -93,14 +102,15 @@ export const BuildingDetailStore = signalStore(
         });
 
         effect(() => {
-          const building = store.building();
-          if (building) {
-            store.loadRaffles();
-            store.loadUsers({
-              first: 0,
-              rows: 10,
-              buildingId: building.publicId,
-            });
+          const buildingId = store.buildingId();
+          const isLoggedIn = authStore.isAuthenticated();
+          if (isLoggedIn) {
+            if (buildingId && !store.next()) {
+              store.loadNext();
+            }
+            if (buildingId && !store.building()) {
+              store.loadById(buildingId);
+            }
           }
         });
       },

@@ -3,9 +3,13 @@ import { UsersModule } from '@modules/users/users.module';
 import { VehiclesModule } from '@modules/vehicles/vehicles.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RaffleController } from './raffle.controller';
+import { RaffleController, RaffleResultsController } from './controllers';
 import { RaffleCron } from './raffle.cron';
-import { RafflesCacheService, RaffleService } from './services';
+import {
+  RaffleResultsService,
+  RafflesCacheService,
+  RaffleService,
+} from './services';
 
 @Module({
   imports: [
@@ -13,7 +17,12 @@ import { RafflesCacheService, RaffleService } from './services';
     UsersModule,
     VehiclesModule,
   ],
-  controllers: [RaffleController],
-  providers: [RaffleService, RafflesCacheService, RaffleCron],
+  controllers: [RaffleController, RaffleResultsController],
+  providers: [
+    RaffleService,
+    RafflesCacheService,
+    RaffleCron,
+    RaffleResultsService,
+  ],
 })
 export class RaffleModule {}

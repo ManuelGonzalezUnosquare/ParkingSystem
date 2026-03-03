@@ -3,8 +3,11 @@ import { RequestService } from '@core/services';
 import {
   ApiResponse,
   RaffleExecutionResultModel,
+  RaffleHistoryModel,
   RaffleModel,
   RaffleResultModel,
+  Search,
+  SearchRaffleResults,
 } from '@parking-system/libs';
 import { Observable } from 'rxjs/internal/Observable';
 
@@ -15,20 +18,22 @@ export class RaffleService {
   private readonly request = inject(RequestService);
   private readonly endpoint = '/api/raffle';
 
-  loadAllRaffles(buildingId: string): Observable<ApiResponse<RaffleModel[]>> {
-    return this.request.get<RaffleModel[]>(`${this.endpoint}/${buildingId}`);
-  }
-
   loadHistory(
     buildingId: string,
-  ): Observable<ApiResponse<RaffleResultModel[]>> {
-    return this.request.get<RaffleResultModel[]>(
+    dto: Search,
+  ): Observable<ApiResponse<RaffleHistoryModel[]>> {
+    return this.request.get<RaffleHistoryModel[]>(
       `${this.endpoint}/${buildingId}/history`,
+      dto,
     );
   }
 
   loadNext(buildingId: string): Observable<ApiResponse<RaffleModel>> {
     return this.request.get<RaffleModel>(`${this.endpoint}/${buildingId}/next`);
+  }
+
+  loadById(raffleId: string): Observable<ApiResponse<RaffleModel>> {
+    return this.request.get<RaffleModel>(`${this.endpoint}/${raffleId}`);
   }
 
   executeRaffle(
@@ -38,5 +43,9 @@ export class RaffleService {
       `${this.endpoint}/${buildingId}/execute`,
       {},
     );
+  }
+
+  loadResults(filters: SearchRaffleResults) {
+    return this.request.get<RaffleResultModel[]>(`api/results`, filters);
   }
 }

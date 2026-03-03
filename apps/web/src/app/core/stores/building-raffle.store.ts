@@ -1,72 +1,117 @@
 import { withCallState, withReset } from '@angular-architects/ngrx-toolkit';
-import { computed, inject, Signal } from '@angular/core';
+import { inject, Signal } from '@angular/core';
 import { FeedbackService } from '@core/services';
 import { RaffleService } from '@features/buildings/services';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStoreFeature,
-  type,
-  withComputed,
   withMethods,
   withProps,
   withState,
 } from '@ngrx/signals';
-import {
-  addEntity,
-  entityConfig,
-  setAllEntities,
-  updateEntity,
-  withEntities,
-} from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import {
   ApiPaginationMeta,
-  BuildingModel,
+  RaffleHistoryModel,
   RaffleModel,
+  RaffleResultModel,
+  Search,
+  SearchRaffleResults,
 } from '@parking-system/libs';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 
-const config = entityConfig({
-  entity: type<RaffleModel>(),
-  collection: 'raffles',
-  selectId: (raffle: RaffleModel) => raffle.publicId,
-});
-
-type BuildingUsersState = {
-  rafflesPagination: ApiPaginationMeta | undefined;
+type RaffleResultsView = {
+  data: RaffleResultModel[];
+  pagination: ApiPaginationMeta | undefined;
+  filters: Search;
 };
 
-export function withBuildingRaffles(
-  building: Signal<BuildingModel | undefined>,
-) {
+type BuildingUsersState = {
+  next: RaffleModel | undefined;
+  rafflesHistory: RaffleHistoryModel[];
+  rafflesPagination: ApiPaginationMeta | undefined;
+  //
+  selectedRaffleId: string | null;
+  selectedRaffle: RaffleModel | undefined;
+  resultsView: RaffleResultsView | undefined;
+};
+
+export function withBuildingRaffles(buildingId: Signal<string | null>) {
   return signalStoreFeature(
-    withEntities(config),
     withReset(),
     withState<BuildingUsersState>({
+      next: undefined,
+      rafflesHistory: [],
       rafflesPagination: undefined,
+      selectedRaffleId: null,
+      resultsView: undefined,
+      selectedRaffle: undefined,
     }),
     withCallState(),
     withProps(() => ({
       _raffleService: inject(RaffleService),
       _feedbackService: inject(FeedbackService),
     })),
-    withComputed((store) => ({
-      liveRaffle: computed(() => {
-        return store.rafflesEntities().find((f) => !f.executedAt);
-      }),
-    })),
-
     withMethods((store) => ({
-      loadRaffles: rxMethod<void>(
+      loadNext: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { callState: 'loading' })),
           switchMap(() =>
-            store._raffleService.loadAllRaffles(building()!.publicId).pipe(
+            store._raffleService.loadNext(buildingId()!).pipe(
               tapResponse({
                 next: (response) =>
-                  patchState(store, setAllEntities(response.data, config), {
+                  patchState(store, {
                     callState: 'loaded',
+                    next: response.data,
+                  }),
+
+                error: (err: any) =>
+                  patchState(store, {
+                    callState: {
+                      error: err.error?.message || 'Load raffles failed',
+                    },
+                  }),
+              }),
+            ),
+          ),
+        ),
+      ),
+      loadSelected: rxMethod<string>(
+        pipe(
+          tap(() => patchState(store, { callState: 'loading' })),
+          switchMap((id) =>
+            store._raffleService.loadById(id).pipe(
+              tapResponse({
+                next: (response) =>
+                  patchState(store, {
+                    callState: 'loaded',
+                    selectedRaffle: response.data,
+                  }),
+
+                error: (err: any) =>
+                  patchState(store, {
+                    callState: {
+                      error:
+                        err.error?.message || 'Load selected raffle failed',
+                    },
+                  }),
+              }),
+            ),
+          ),
+        ),
+      ),
+      loadHistory: rxMethod<Search>(
+        pipe(
+          tap(() => patchState(store, { callState: 'loading' })),
+          switchMap((dto) =>
+            store._raffleService.loadHistory(buildingId()!, dto).pipe(
+              tapResponse({
+                next: (response) =>
+                  patchState(store, {
+                    callState: 'loaded',
+                    rafflesHistory: response.data,
+                    rafflesPagination: response.meta,
                   }),
                 error: (err: any) =>
                   patchState(store, {
@@ -79,21 +124,43 @@ export function withBuildingRaffles(
           ),
         ),
       ),
+      loadResults: rxMethod<SearchRaffleResults>(
+        pipe(
+          tap(() => patchState(store, { callState: 'loading' })),
+          switchMap((dto) =>
+            store._raffleService.loadResults(dto).pipe(
+              tapResponse({
+                next: (response) => {
+                  patchState(store, {
+                    selectedRaffleId: dto.raffleId,
+                    resultsView: {
+                      data: response.data,
+                      pagination: response.meta,
+                      filters: dto,
+                    },
+                    callState: 'loaded',
+                  });
+                },
+                error: (err: any) =>
+                  patchState(store, {
+                    callState: {
+                      error: err.error?.message || 'Load results failed',
+                    },
+                  }),
+              }),
+            ),
+          ),
+        ),
+      ),
       runRaffle: async (): Promise<boolean> => {
         patchState(store, { callState: 'loading' });
         try {
           const response = await lastValueFrom(
-            store._raffleService.executeRaffle(building()!.publicId),
+            store._raffleService.executeRaffle(buildingId()!),
           );
           const { executed, upcoming } = response.data;
-          patchState(
-            store,
-            updateEntity({ id: executed.publicId, changes: executed }, config),
-            addEntity(upcoming, config),
-            {
-              callState: 'loaded',
-            },
-          );
+          patchState(store, { callState: 'loaded', next: upcoming });
+
           store._feedbackService.showSuccess(
             'Raffle Completed',
             'All parking spots have been assigned and history records updated.',

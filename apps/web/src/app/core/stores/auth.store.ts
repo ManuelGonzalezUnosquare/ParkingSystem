@@ -158,7 +158,6 @@ export const AuthStore = signalStore(
           return false;
         }
       },
-
       initializeAuth: rxMethod<void>(
         pipe(
           tap(() => patchState(store, { callState: 'loading' })),

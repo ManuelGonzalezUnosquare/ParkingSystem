@@ -1,4 +1,4 @@
-<p-card class="h-full">
+<p-card>
   <ng-template #title>
     <div class="flex justify-between items-start">
       <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
@@ -7,7 +7,7 @@
       <i class="pi pi-car text-blue-500" aria-hidden="true"></i>
     </div>
   </ng-template>
-  <ng-template #subtitle>
+  <ng-template #content>
     <div class="flex flex-col" [attr.aria-labelledby]="'vehicle-card-label'">
       <p
         class="text-[#0d141c] tracking-tight text-4xl font-extrabold leading-tight"
@@ -18,7 +18,7 @@
     </div>
   </ng-template>
   <ng-template #footer>
-    <div class="flex gap-2 items-center pt-2 border-t border-slate-100">
+    <div class="flex gap-2 items-center">
       <span
         class="inline-flex items-center rounded-md bg-cyan-50 px-2 py-1 text-xs font-bold text-cyan-700 ring-1 ring-inset ring-cyan-600/20"
       >

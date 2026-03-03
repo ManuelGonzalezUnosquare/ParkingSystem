@@ -1,4 +1,5 @@
 import { BaseCacheService, CACHE_KEYS } from '@common/cache';
+import { PaginatedResult } from '@common/utils';
 import { Raffle, RaffleResult } from '@database/entities';
 import { Injectable } from '@nestjs/common';
 
@@ -38,7 +39,7 @@ export class RafflesCacheService extends BaseCacheService {
   async setBuildingList(
     buildingId: string,
     search: any,
-    data: any[],
+    data: PaginatedResult<Raffle>,
   ): Promise<void> {
     const key = CACHE_KEYS.RAFFLE_BUILDING_LIST(buildingId, search);
     await this.redisClient.set(key, JSON.stringify(data), 'EX', 300); // 5 min
