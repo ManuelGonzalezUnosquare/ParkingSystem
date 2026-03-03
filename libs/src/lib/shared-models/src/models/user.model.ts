@@ -18,4 +18,6 @@ export interface UserModel extends BaseModel {
   vehicleDescription?: string;
   vehiclePlate?: string;
   assignedSlotNumber?: string;
+
+  createdBy?: UserModel;
 }

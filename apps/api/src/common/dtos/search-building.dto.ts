@@ -1,12 +1,12 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 import { SearchDto } from './search.dto';
 
 import { SearchBuildingUsers } from '@parking-system/libs';
+
 export class SearchBuildingDto
   extends SearchDto
   implements SearchBuildingUsers
 {
-  @IsOptional()
   @IsString()
-  buildingId?: string;
+  buildingId: string;
 }

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { RaffleService } from './raffle.service';
+import { RaffleService } from './services/raffle.service';
 import { DataSource } from 'typeorm';
 import { User } from '@database/entities';
 import { RoleEnum } from '@parking-system/libs';

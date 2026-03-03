@@ -3,6 +3,7 @@ import { Building } from './building.entity';
 import { RaffleResult } from './raffle-result.entity';
 import { BaseEntity } from './_base.entity';
 import { User } from './user.entity';
+import { RaffleStatusEnum } from '@parking-system/libs';
 
 @Entity('raffles')
 export class Raffle extends BaseEntity {
@@ -25,4 +26,11 @@ export class Raffle extends BaseEntity {
   @ManyToOne(() => User, { nullable: true }) // Null null for Cron Job
   @JoinColumn({ name: 'executed_by_id' })
   executedBy: User;
+
+  @Column({
+    type: 'enum',
+    enum: RaffleStatusEnum,
+    default: RaffleStatusEnum.PLANNED,
+  })
+  status: string;
 }

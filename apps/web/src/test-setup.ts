@@ -1,5 +1,4 @@
 import 'jest-preset-angular/setup-jest';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const jest: any;
 
 Object.defineProperty(window, 'matchMedia', {

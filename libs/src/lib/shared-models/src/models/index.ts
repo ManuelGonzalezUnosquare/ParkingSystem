@@ -8,3 +8,5 @@ export * from './slot.model';
 
 export * from './raffle.model';
 export * from './raffle-result.model';
+export * from './raffle-execution.model';
+export * from './raffle-history.model';

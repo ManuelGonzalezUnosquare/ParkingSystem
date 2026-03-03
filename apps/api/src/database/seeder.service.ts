@@ -98,7 +98,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
       const rootUser = this.userRepo.create({
         firstName: 'System',
-        lastName: 'Root',
+        lastName: 'Owner',
         email: this.rootUserInfo.email,
         password: hashedPassword,
         role: rootRole,

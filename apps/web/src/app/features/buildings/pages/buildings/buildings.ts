@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BuildingsStore } from '@core/stores';
 import { BuildingForm } from '@features/buildings/components';
 import { BuildingModel, Search } from '@parking-system/libs';
+import { PageHeader } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -19,6 +20,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
     InputTextModule,
     ConfirmDialogModule,
     CardModule,
+    PageHeader,
   ],
   templateUrl: './buildings.html',
   styleUrl: './buildings.css',

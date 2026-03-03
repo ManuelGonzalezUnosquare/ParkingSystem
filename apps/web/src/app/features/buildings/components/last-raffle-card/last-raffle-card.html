@@ -1,4 +1,4 @@
-<p-card class="h-full">
+<p-card>
   <ng-template #title>
     <div class="flex justify-between items-start">
       <p class="text-[#4b739b] text-sm font-medium uppercase tracking-wider">
@@ -8,17 +8,25 @@
     </div>
   </ng-template>
 
-  <ng-template #subtitle>
+  <ng-template #content>
     <p class="text-[#0d141c] tracking-light text-3xl font-bold leading-tight">
       {{raffle()?.executionDate | date}}
+    </p>
+    <p class="text-slate-500 text-sm font-medium">
+      Lorem ipsum dolor sit amet...
     </p>
   </ng-template>
 
   <ng-template #footer>
-    <div class="flex gap-2 items-center text-sm font-bold">
-      <span class="text-slate-400 text-xs">
-        Lorem ipsum dolor sit amet...
+    <div class="flex gap-2 items-center 100" role="note">
+      <span
+        class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
+      >
+        some
       </span>
+      <span class="text-slate-400 text-xs font-medium"
+        >System administrators</span
+      >
     </div>
   </ng-template>
 </p-card>

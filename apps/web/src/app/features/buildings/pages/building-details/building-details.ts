@@ -3,37 +3,39 @@ import {
   Component,
   inject,
   input,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
+import { SessionService } from '@core/services';
 import { BuildingDetailStore } from '@core/stores';
 import {
+  RunRaffle,
   TotalResidentCard,
   UserForm,
+  UsersTable,
   UtilizationCard,
   VehiclesCard,
 } from '@features/buildings/components';
 import { LastRaffleCard } from '@features/buildings/components/last-raffle-card/last-raffle-card';
 import { SearchBuildingUsers, UserModel } from '@parking-system/libs';
-import { RoleTag } from '@shared/ui';
+import { PageHeader } from '@shared/ui';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { map, take } from 'rxjs';
 
 @Component({
   selector: 'app-building-details',
   imports: [
     ButtonModule,
-    TableModule,
-    RoleTag,
     CardModule,
-    InputTextModule,
+    PageHeader,
     //cards
     TotalResidentCard,
     VehiclesCard,
     LastRaffleCard,
+    UsersTable,
     UtilizationCard,
   ],
   templateUrl: './building-details.html',
@@ -42,9 +44,10 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
   providers: [DialogService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BuildingDetails implements OnInit {
+export class BuildingDetails implements OnInit, OnDestroy {
   readonly store = inject(BuildingDetailStore);
   readonly dialogService = inject(DialogService);
+  private readonly sessionService = inject(SessionService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly dialogConfig = {
     width: '50vw',
@@ -67,14 +70,14 @@ export class BuildingDetails implements OnInit {
   id = input.required<string>();
 
   ngOnInit(): void {
-    this.store.loadById(this.id());
+    if (!this.store.building()) {
+      this.store.loadById(this.id());
+    }
   }
-
-  addUser() {
-    this.openBuildingDialog('Create User');
-  }
-  update(user: UserModel) {
-    this.openBuildingDialog('Update User', user);
+  ngOnDestroy(): void {
+    if (!this.sessionService.isAdmin()) {
+      this.store.resetState();
+    }
   }
 
   async delete(user: UserModel) {
@@ -85,36 +88,40 @@ export class BuildingDetails implements OnInit {
       // accept: () => this.store.deleteUser(user.publicId),
     });
   }
-
-  onLazyLoad(event: TableLazyLoadEvent) {
-    this.searchParams = {
-      first: event.first ?? 0,
-      rows: event.rows ?? 10,
-      sortField: (event.sortField as string) ?? 'createdAt',
-      sortOrder: event.sortOrder ?? -1,
-      globalFilter: (event.globalFilter as string) ?? undefined,
+  search(filters: SearchBuildingUsers) {
+    this.store.loadUsers({
+      ...filters,
       buildingId: this.id(),
-    };
-
-    this.store.loadUsers(this.searchParams);
+    });
   }
-
-  private openBuildingDialog(header: string, user?: UserModel) {
+  openBuildingDialog(header: string, user?: UserModel) {
     this.dialogService.open(UserForm, {
       ...this.dialogConfig,
       header,
       data: { user },
     });
   }
-  async raffle() {
-    const success = await this.store.runRaffle();
-    if (success) {
-      this.store.loadUsers({
-        ...this.searchParams,
-        first: 0,
-        sortField: 'createdAt',
-        sortOrder: -1,
-      });
-    }
+  runRaffle() {
+    const ref = this.dialogService.open(RunRaffle, {
+      ...this.dialogConfig,
+      closable: false,
+      showHeader: false,
+    });
+    ref?.onClose
+      .pipe(
+        take(1),
+        map((res) => {
+          if (res) {
+            this.store.loadUsers({
+              ...this.searchParams,
+              first: 0,
+              sortField: 'createdAt',
+              sortOrder: -1,
+              buildingId: this.id(),
+            });
+          }
+        }),
+      )
+      .subscribe();
   }
 }

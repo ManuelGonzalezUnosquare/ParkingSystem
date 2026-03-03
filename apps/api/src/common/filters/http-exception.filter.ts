@@ -50,7 +50,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       data: null,
       message: Array.isArray(message) ? message.join(', ') : message,
       meta: undefined,
-      statusCode: response.statusCode,
+      statusCode: status,
     };
 
     response.status(status).json(errorResponse);

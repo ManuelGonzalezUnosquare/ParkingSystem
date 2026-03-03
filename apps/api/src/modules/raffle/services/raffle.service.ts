@@ -1,3 +1,4 @@
+import { SearchDto } from '@common/dtos';
 import { PermissionValidator } from '@common/utils';
 import {
   ParkingSlot,
@@ -6,16 +7,23 @@ import {
   User,
   Vehicle,
 } from '@database/entities';
-import { UsersService } from '@modules/users/services';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  RaffleHistoryModel,
+  RaffleStatusEnum,
   RoleEnum,
   UserRaffleResultEnum,
   UserStatusEnum,
 } from '@parking-system/libs';
-import { Between, DataSource, Equal, IsNull, Repository } from 'typeorm';
 import { endOfDay, startOfDay } from 'date-fns';
+import { Between, DataSource, Equal, IsNull, Repository } from 'typeorm';
+import { RafflesCacheService } from './raffle-cache.service';
+
+interface ExecutionResult {
+  executed: Raffle;
+  upcoming: Raffle;
+}
 
 @Injectable()
 export class RaffleService {
@@ -23,22 +31,138 @@ export class RaffleService {
   constructor(
     @InjectRepository(Raffle)
     private readonly raffleRepository: Repository<Raffle>,
-    @InjectRepository(RaffleResult)
-    private readonly raffleResultRepository: Repository<RaffleResult>,
     private readonly dataSource: DataSource,
-    private userService: UsersService,
+    private readonly cacheService: RafflesCacheService,
   ) {}
 
-  async findNext(user: User) {
-    const buildingId = user.building.id;
+  async findByPublicId(publicId: string) {
+    return this.raffleRepository.findOne({
+      where: {
+        publicId,
+      },
+      relations: ['building'],
+    });
+  }
+
+  async findNext(buildingId: string, user: User) {
+    PermissionValidator.validateBuildingAccess(user, buildingId);
     return await this.raffleRepository.findOne({
       where: {
         executedAt: IsNull(),
-        building: { id: buildingId },
+        building: { publicId: buildingId },
       },
       relations: { building: true },
     });
   }
+
+  async findHistory(buildingId: string, user: User, filters: SearchDto) {
+    PermissionValidator.validateBuildingAccess(user, buildingId);
+    const _buildingId =
+      user.role.name === RoleEnum.ROOT ? buildingId : user.building.publicId;
+
+    const first = filters.first || 0;
+    const rows = filters.rows || 10;
+
+    const userId = user.id;
+
+    const query = this.raffleRepository
+      .createQueryBuilder('raffles')
+      .select([
+        'raffles.publicId as publicId',
+        'raffles.executionDate as plannedDate',
+        'raffles.executedAt as executedDate',
+        'building.totalSlots as availableSpots',
+        'raffles.status as status',
+        'raffles.isManual as isManual',
+        'exBy.firstName as executedBy',
+      ])
+      .addSelect(
+        "CAST(SUM(CASE WHEN results.status = 'WINNER' THEN 1 ELSE 0 END) AS SIGNED)",
+        'winnersCount',
+      )
+      .addSelect(
+        "CAST(SUM(CASE WHEN results.status = 'LOSER' THEN 1 ELSE 0 END) AS SIGNED)",
+        'losersCount',
+      )
+      .addSelect(
+        "CAST(SUM(CASE WHEN results.status = 'EXCLUDED_NO_VEHICLE' THEN 1 ELSE 0 END) AS SIGNED)",
+        'excludedCount',
+      )
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT(res.id)')
+          .from('raffle_results', 'res')
+          .where(
+            'res.raffle_id = raffles.id AND res.status IN (:...pStatuses)',
+            {
+              pStatuses: ['WINNER', 'LOSER'],
+            },
+          );
+      }, 'totalParticipants')
+      .leftJoin('raffles.results', 'results')
+      .leftJoin('raffles.building', 'building')
+      .leftJoin('raffles.executedBy', 'exBy')
+      .where('building.publicId = :_buildingId', { _buildingId })
+      .andWhere('raffles.status != :_status', {
+        _status: RaffleStatusEnum.PLANNED,
+      })
+      .groupBy('raffles.id')
+      .orderBy('raffles.executedAt', 'DESC')
+      .limit(rows)
+      .offset(rows * first);
+
+    const total = await this.raffleRepository
+      .createQueryBuilder('raffles')
+      .leftJoin('raffles.building', 'building')
+      .where('building.publicId = :_buildingId', { _buildingId })
+      .getCount();
+
+    const rawResults = await query.getRawMany();
+
+    const data = rawResults.map<RaffleHistoryModel>((raw) => ({
+      publicId: raw.publicId,
+      plannedDate: raw.plannedDate,
+      executedDate: raw.executedDate,
+      availableSpots: raw.availableSpots,
+      status: raw.status,
+      isManual:
+        raw.isManual === 1 || raw.isManual === '1' || raw.isManual === true,
+      executedBy: raw.executedBy || '--',
+      winnersCount: parseInt(raw.winnersCount || '0', 10),
+      losersCount: parseInt(raw.losersCount || '0', 10),
+      excludedCount: parseInt(raw.excludedCount || '0', 10),
+      totalParticipants: parseInt(raw.totalParticipants || '0', 10),
+      createdAt: raw.createdAt,
+    }));
+
+    return {
+      data,
+      meta: {
+        total,
+        page: Math.floor(first / rows) + 1,
+        lastPage: Math.ceil(total / rows),
+        limit: rows,
+      },
+    };
+  }
+
+  async executeRaffleManually(
+    buildingId: string,
+    user: User,
+  ): Promise<ExecutionResult> {
+    PermissionValidator.validateBuildingAccess(user, buildingId, false);
+
+    const raffle = await this.raffleRepository.findOne({
+      where: { building: Equal(user.building.id), executedAt: IsNull() },
+    });
+
+    return await this.executeRaffle(user, true, raffle.id);
+  }
+
+  async executeRaffleAutomatically(user: User, raffleId: number) {
+    return this.executeRaffle(user, false, raffleId);
+  }
+
   async findRafflesToExecuteToday() {
     const today = new Date();
     const startOfToday = startOfDay(today);
@@ -52,63 +176,6 @@ export class RaffleService {
       relations: { building: true },
     });
   }
-  async findHistory(user: User) {
-    const buildingId = user.building.id;
-    const _buildingId =
-      user.role.name === RoleEnum.ROOT ? buildingId : user.building.publicId;
-    const userId = user.id;
-
-    const query = this.raffleResultRepository
-      .createQueryBuilder('results')
-      .leftJoinAndSelect('results.raffle', 'raffle')
-      .leftJoinAndSelect('results.user', 'users')
-      .leftJoinAndSelect('results.vehicle', 'vehicle')
-      .leftJoinAndSelect('results.slot', 'slot')
-      .leftJoinAndSelect('results.executedBy', 'exBy')
-      .leftJoin('raffle.building', 'building')
-      .where('building.publicId = :_buildingId', { _buildingId })
-      .andWhere('users.id = :userId', { userId })
-      .orderBy('results.createdAt', 'DESC');
-
-    return query.getMany();
-  }
-
-  async findAll(user: User, buildingId: string) {
-    PermissionValidator.validateBuildingAccess(user, buildingId);
-
-    const _buildingId =
-      user.role.name === RoleEnum.ROOT ? buildingId : user.building.publicId;
-
-    const query = this.raffleRepository
-      .createQueryBuilder('raffles')
-      .leftJoinAndSelect('raffles.results', 'results')
-      .leftJoinAndSelect('results.user', 'users')
-      .leftJoinAndSelect('results.vehicle', 'vehicle')
-      .leftJoinAndSelect('results.slot', 'slot')
-      .leftJoin('raffles.building', 'building')
-      .where('building.publicId = :_buildingId', { _buildingId });
-
-    return await query.getMany();
-  }
-
-  async executeRaffleManually(user: User) {
-    PermissionValidator.validateBuildingAccess(
-      user,
-      user.building?.publicId || '',
-      false,
-    );
-
-    const raffle = await this.raffleRepository.findOne({
-      where: { building: Equal(user.building.id), executedAt: IsNull() },
-      relations: ['building'],
-    });
-
-    return this.executeRaffle(user, true, raffle.id);
-  }
-
-  async executeRaffleAutomatically(user: User, raffleId: number) {
-    return this.executeRaffle(user, false, raffleId);
-  }
 
   private async executeRaffle(
     user: User,
@@ -120,6 +187,7 @@ export class RaffleService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      let buildingId = '';
       // 1. Fetch Raffle and Building context
       const raffle = await queryRunner.manager.findOne(Raffle, {
         where: { id: Equal(raffleId) },
@@ -129,6 +197,8 @@ export class RaffleService {
       if (!raffle) {
         throw new Error('Raffle not found or already executed');
       }
+
+      buildingId = raffle.building.publicId;
 
       const [candidates, slots] = await Promise.all([
         queryRunner.manager.find(User, {
@@ -235,21 +305,26 @@ export class RaffleService {
       }
 
       //create next
-      const updatedData = {
-        executedAt: new Date(),
-        isManual: isManuallyTriggered,
-        executedBy: isManuallyTriggered ? user : null,
-      };
-      await queryRunner.manager.update(Raffle, raffle.id, updatedData);
+
+      raffle.executedAt = new Date();
+      raffle.isManual = isManuallyTriggered;
+      raffle.executedBy = isManuallyTriggered ? user : null;
+      raffle.status = RaffleStatusEnum.COMPLETED;
+
+      const executedRaffle = await queryRunner.manager.save(Raffle, raffle);
 
       const nextRaffle = queryRunner.manager.create(Raffle, {
         building: raffle.building,
         executionDate: this.calculateNextRaffleDate(),
       });
-      await queryRunner.manager.save(nextRaffle);
+      const upcomingRaffle = await queryRunner.manager.save(nextRaffle);
 
       await queryRunner.commitTransaction();
-      return raffle;
+
+      return {
+        executed: executedRaffle,
+        upcoming: upcomingRaffle,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -262,7 +337,6 @@ export class RaffleService {
     d.setMonth(d.getMonth() + 3);
     return d;
   }
-
   private runSelection(
     candidates: User[],
     slots: ParkingSlot[],

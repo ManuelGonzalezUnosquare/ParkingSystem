@@ -6,7 +6,7 @@ import {
 } from '@common/utils';
 import { User } from '@database/entities';
 import { CreateUserDto } from '@modules/auth/dtos';
-import { BuildingsService } from '@modules/buildings/buildings.service';
+import { BuildingsService } from '@modules/buildings/services/buildings.service';
 import { VehiclesService } from '@modules/vehicles/vehicles.service';
 import {
   BadRequestException,
@@ -18,10 +18,11 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RoleEnum } from '@parking-system/libs';
 import { CryptoService } from '@utils/services';
 import { Brackets, Repository } from 'typeorm';
 import { RoleService } from './role.service';
-import { RoleEnum } from '@parking-system/libs';
+import { UsersCacheService } from './users-cache.service';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +36,7 @@ export class UsersService {
     private readonly roleService: RoleService,
     private readonly configService: ConfigService,
     private readonly cryptoService: CryptoService,
+    private readonly cacheService: UsersCacheService,
   ) {}
 
   async findAll(
@@ -42,6 +44,11 @@ export class UsersService {
     user: User,
   ): Promise<PaginatedResult<User>> {
     PermissionValidator.validateBuildingAccess(user, filters.buildingId);
+
+    const cachedResults = await this.cacheService.getList(filters);
+    if (cachedResults) {
+      return cachedResults as PaginatedResult<User>;
+    }
 
     const { buildingId, globalFilter } = filters;
 
@@ -55,7 +62,11 @@ export class UsersService {
       .leftJoin('users.building', 'building')
       .leftJoinAndSelect('users.vehicles', 'vehicles')
       .leftJoinAndSelect('vehicles.slot', 'slot')
-      .where('role.name != :rootRoleName', { rootRoleName: RoleEnum.ROOT });
+      .leftJoinAndSelect('users.createdBy', 'createdBy')
+      .where('role.name != :rootRoleName', { rootRoleName: RoleEnum.ROOT })
+      .andWhere('building.publicId = :buildingId', {
+        buildingId: filters.buildingId,
+      });
 
     if (globalFilter) {
       query.andWhere(
@@ -73,7 +84,9 @@ export class UsersService {
       );
     }
 
-    return await paginateQuery(query, filters);
+    const result = await paginateQuery(query, filters);
+    await this.cacheService.setList(filters, result);
+    return result;
   }
   async create(dto: CreateUserDto, creator: User): Promise<User> {
     PermissionValidator.validateBuildingAccess(creator, dto.buildingId);
@@ -104,6 +117,7 @@ export class UsersService {
         password: hashedPassword,
         role,
         building,
+        createdBy: creator,
       });
 
       const savedUser = await queryRunner.manager.save(newUser);
@@ -118,7 +132,11 @@ export class UsersService {
       await queryRunner.commitTransaction();
       this.logger.log(`User created successfully: ${savedUser.email}`);
       //TODO: send email with pass info
-      return this.findOneByPublicId(savedUser.publicId);
+      const result = await this.findOneByPublicId(savedUser.publicId);
+
+      this.cacheService.invalidateUser(result.publicId);
+      this.cacheService.setUser(result.publicId, result);
+      return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Failed to create user: ${error.message}`);
@@ -132,7 +150,7 @@ export class UsersService {
 
     const user = await this.userRepository.findOne({
       where: { publicId },
-      relations: ['role', 'building', 'vehicles', 'vehicles.slot'],
+      relations: ['role', 'building', 'vehicles', 'vehicles.slot', 'createdBy'],
     });
 
     if (!user) {
@@ -144,7 +162,7 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<User | null> {
     const result = await this.userRepository.findOne({
       where: { email },
-      relations: ['role', 'building', 'vehicles'],
+      relations: ['role', 'building', 'vehicles', 'vehicles.slot', 'createdBy'],
     });
     return result;
   }
@@ -227,6 +245,9 @@ export class UsersService {
       await queryRunner.commitTransaction();
       this.logger.log(`User ${publicId} successfully updated with transaction`);
 
+      this.cacheService.invalidateUser(savedUser.publicId);
+      this.cacheService.setUser(savedUser.publicId, savedUser);
+
       return savedUser;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -250,6 +271,7 @@ export class UsersService {
 
     try {
       await this.userRepository.softDelete(user.id);
+      this.cacheService.invalidateUser(user.publicId);
       //delete vehicle if exists
       //if has a busy slot: make it available
 
@@ -269,12 +291,14 @@ export class UsersService {
       );
     }
 
-    // Merges the current state with the new partial data
     const updatedUser = this.userRepository.merge(user, data);
 
     this.logger.log(`Internal update executed for user: ${user.email}`);
     await this.userRepository.save(updatedUser);
-    return await this.findOneByPublicId(user.publicId);
+    const savedUser = await this.findOneByPublicId(user.publicId);
+    this.cacheService.invalidateUser(savedUser.publicId);
+    this.cacheService.setUser(savedUser.publicId, savedUser);
+    return savedUser;
   }
   async incrementPriority(userId: number): Promise<void> {
     this.logger.debug(`Incrementing priority score for user ID: ${userId}`);

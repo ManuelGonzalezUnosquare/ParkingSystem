@@ -1,12 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BuildingsController } from './buildings.controller';
-import { BuildingsService } from './buildings.service';
 import { Building } from '@database/entities';
+import { BuildingsService } from './services';
 
 describe('BuildingsController', () => {
   let controller: BuildingsController;
   let service: jest.Mocked<BuildingsService>;
   let testingModule: TestingModule;
+
+  const mockUser: any = {
+    id: 1,
+    publicId: 'uuid-123',
+    email: 'test@test.com',
+    role: {
+      name: '',
+    },
+  };
 
   const mockBuildingEntity: any = {
     id: 1,
@@ -45,9 +54,9 @@ describe('BuildingsController', () => {
         address: mockBuildingEntity.address,
       } as Building);
 
-      const result = await controller.create(dto);
+      const result = await controller.create(dto, mockUser);
 
-      expect(service.create).toHaveBeenCalledWith(dto);
+      expect(service.create).toHaveBeenCalledWith(dto, mockUser);
       expect(result.publicId).toBe(mockBuildingEntity.publicId);
     });
   });

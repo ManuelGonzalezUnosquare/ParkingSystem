@@ -8,20 +8,25 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
-import { BuildingsService } from './buildings.service';
+import { BuildingsService } from './services/buildings.service';
 import { RoleEnum } from '@parking-system/libs';
 import {
   ApiOperation,
   ApiCreatedResponse,
   ApiConflictResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CreateBuildingDto } from './dtos/create-building.dto';
-import { Roles } from '@common/decorators';
+import { CacheEvict, CurrentUser, Roles } from '@common/decorators';
 import { SearchDto } from '@common/dtos';
-import { Building } from '@database/entities';
+import { Building, User } from '@database/entities';
+import { CacheEvictInterceptor } from '@common/interceptors';
 
 @Controller('buildings')
+@ApiTags('buildings')
+@UseInterceptors(CacheEvictInterceptor)
 export class BuildingsController {
   constructor(private readonly buildingsService: BuildingsService) {}
 
@@ -34,8 +39,12 @@ export class BuildingsController {
   @ApiConflictResponse({
     description: 'A building with this name already exists.',
   })
-  create(@Body() createBuildingDto: CreateBuildingDto) {
-    return this.buildingsService.create(createBuildingDto);
+  @CacheEvict({ entity: 'buildings' })
+  create(
+    @Body() createBuildingDto: CreateBuildingDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.buildingsService.create(createBuildingDto, user);
   }
 
   @Get()
@@ -58,6 +67,7 @@ export class BuildingsController {
   }
 
   @Patch(':publicId')
+  @CacheEvict({ entity: 'buildings', isKeySpecific: true })
   @Roles(RoleEnum.ROOT)
   update(
     @Param('publicId', new ParseUUIDPipe()) publicId: string,
@@ -67,6 +77,7 @@ export class BuildingsController {
   }
 
   @Delete(':publicId')
+  @CacheEvict({ entity: 'buildings', isKeySpecific: true })
   @Roles(RoleEnum.ROOT)
   remove(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.remove(publicId);

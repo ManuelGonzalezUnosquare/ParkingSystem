@@ -9,7 +9,7 @@ export function UserEntityToModel(user: User): UserModel {
     lastName: user.lastName,
     fullName: `${user.firstName} ${user.lastName}`,
     email: user.email,
-    role: user.role.name,
+    role: user.role?.name,
     requirePasswordChange: user.requirePasswordChange,
     buildingId: user.building?.publicId,
     buildingName: user.building?.name,
@@ -20,5 +20,6 @@ export function UserEntityToModel(user: User): UserModel {
     vehicleDescription: primaryVehicle?.description || 'No vehicle',
     vehiclePlate: primaryVehicle?.licensePlate || 'N/A',
     assignedSlotNumber: primaryVehicle?.slot?.slotNumber || 'None',
+    createdBy: user.createdBy ? UserEntityToModel(user.createdBy) : undefined,
   };
 }

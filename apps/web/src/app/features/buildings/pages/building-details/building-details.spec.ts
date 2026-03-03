@@ -17,6 +17,8 @@ describe('BuildingDetails', () => {
     isRaffling: vi.fn(() => false),
     liveRaffle: vi.fn(() => null),
     residentCount: vi.fn(() => 0),
+    resetState: vi.fn(),
+    next: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -30,14 +32,16 @@ describe('BuildingDetails', () => {
     fixture.componentRef.setInput('id', '123');
   });
 
-  it('should load building data on init', () => {
+  it('should load building data on init if not loaded', () => {
     fixture.detectChanges();
-    expect(mockStore.loadById).toHaveBeenCalledWith('123');
+    if (!mockStore.building()) {
+      expect(mockStore.loadById).toHaveBeenCalledWith('123');
+    }
   });
 
   it('should trigger store.loadUsers when table signals lazy load', () => {
     const event = { first: 0, rows: 10, globalFilter: 'John' };
-    component.onLazyLoad(event as any);
+    component.search(event as any);
 
     expect(mockStore.loadUsers).toHaveBeenCalledWith(
       expect.objectContaining({
