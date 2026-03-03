@@ -26,8 +26,8 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 export class UsersTable {
   // inputs
   readonly users = input.required<UserModel[]>();
-  readonly pagination = input<ApiPaginationMeta>();
   readonly isLoading = input.required<boolean>();
+  readonly pagination = input<ApiPaginationMeta>();
 
   //outputs
   add = output();

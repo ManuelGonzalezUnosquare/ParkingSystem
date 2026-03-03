@@ -1,5 +1,6 @@
 import { DatePipe, JsonPipe } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -36,6 +37,8 @@ import { Tag } from 'primeng/tag';
   ],
   templateUrl: './raffle-result-page.html',
   styleUrl: './raffle-result-page.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class RaffleResultPage {
   protected readonly store = inject(BuildingDetailStore);

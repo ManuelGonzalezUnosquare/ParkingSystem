@@ -28,7 +28,7 @@
 <p-card>
   <app-users-table
     [users]="store.usersEntities()"
-    [isLoading]="store.loading()"
+    [isLoading]="store.isLoading()"
     [pagination]="store.usersPagination()"
     (add)="openBuildingDialog('Create User')"
     (update)="openBuildingDialog('Update User',$event)"

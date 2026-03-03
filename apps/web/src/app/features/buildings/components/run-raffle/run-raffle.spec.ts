@@ -13,6 +13,7 @@ describe('RunRaffle', () => {
     liveRaffle: vi.fn(() => null),
     runRaffle: vi.fn(),
     loading: vi.fn(() => false),
+    next: vi.fn(),
   };
 
   beforeEach(async () => {

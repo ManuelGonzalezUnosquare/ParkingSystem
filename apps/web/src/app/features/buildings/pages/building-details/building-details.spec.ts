@@ -18,6 +18,7 @@ describe('BuildingDetails', () => {
     liveRaffle: vi.fn(() => null),
     residentCount: vi.fn(() => 0),
     resetState: vi.fn(),
+    next: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -40,7 +41,7 @@ describe('BuildingDetails', () => {
 
   it('should trigger store.loadUsers when table signals lazy load', () => {
     const event = { first: 0, rows: 10, globalFilter: 'John' };
-    component.onLazyLoad(event as any);
+    component.search(event as any);
 
     expect(mockStore.loadUsers).toHaveBeenCalledWith(
       expect.objectContaining({
