@@ -10,48 +10,41 @@
         text
         size="small"
         aria-label="Export history to PDF"
+        disabled
       />
     </div>
   </ng-template>
 
   <p-table
+    #dt
     [value]="history()"
-    [responsiveLayout]="'stack'"
-    breakpoint="960px"
-    aria-describedby="table-title"
-    styleClass="p-datatable-sm"
+    [lazy]="true"
+    (onLazyLoad)="onSearch($event)"
+    [paginator]="true"
+    [rows]="10"
+    [totalRecords]="pagination()?.total || 0"
+    [loading]="isLoading()"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} residents"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    paginatorStyleClass="mt-10"
   >
     <ng-template #header>
       <tr>
         <th scope="col">Date</th>
-        <th scope="col">Assigned Spot</th>
+        <th scope="col" class="w-40 text-center">Assigned Spot</th>
         <th scope="col">Outcome</th>
       </tr>
     </ng-template>
 
     <ng-template #body let-item>
       <tr>
+        <td class="text-sm">{{ item.assignedDate | date: 'short' }}</td>
         <td class="text-sm">
-          <span class="p-column-title font-bold">Date</span>
-          {{ item.assignedDate | date: 'dd/MM/yyyy' }}
+          <app-slot-assignation-tag [slot]="item.slotNumber" />
         </td>
         <td class="text-sm">
-          <span class="p-column-title font-bold">Assigned Spot</span>
-          <span class="font-medium text-primary">#{{ item.slotNumber }}</span>
-        </td>
-        <td class="text-sm">
-          <span class="p-column-title font-bold">Outcome</span>
-          @if (item.won) {
-          <span class="flex items-center gap-2 text-green-600 font-semibold">
-            <i class="pi pi-check-circle" aria-hidden="true"></i>
-            Won
-          </span>
-          } @else {
-          <span class="flex items-center gap-2 text-gray-500 italic">
-            <i class="pi pi-times-circle" aria-hidden="true"></i>
-            Not selected
-          </span>
-          }
+          <app-raffle-user-result-tag [status]="item.status" />
         </td>
       </tr>
     </ng-template>

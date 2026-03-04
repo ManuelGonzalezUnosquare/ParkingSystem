@@ -3,8 +3,13 @@ import { BuildingsModule } from '@modules/buildings/buildings.module';
 import { VehiclesModule } from '@modules/vehicles/vehicles.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersController } from './controllers';
-import { RoleService, UsersCacheService, UsersService } from './services';
+import { ProfileController, UsersController } from './controllers';
+import {
+  ProfileService,
+  RoleService,
+  UsersCacheService,
+  UsersService,
+} from './services';
 
 @Module({
   imports: [
@@ -12,8 +17,8 @@ import { RoleService, UsersCacheService, UsersService } from './services';
     BuildingsModule,
     VehiclesModule,
   ],
-  controllers: [UsersController],
-  providers: [UsersService, RoleService, UsersCacheService],
+  controllers: [UsersController, ProfileController],
+  providers: [UsersService, RoleService, UsersCacheService, ProfileService],
   exports: [UsersService],
 })
 export class UsersModule {}
