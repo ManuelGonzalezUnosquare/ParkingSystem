@@ -79,7 +79,9 @@
         <span class="text-slate-300 italic text-xs">No vehicle registered</span>
         }
       </td>
-      <td class="font-mono font-bold">{{ user.assignedSlotNumber || '-' }}</td>
+      <td class="font-mono font-bold">
+        <app-slot-assignation-tag [slot]="user.assignedSlotNumber" />
+      </td>
       <td class="text-slate-400">{{ user.createdBy?.fullName || '--' }}</td>
       <td>
         <div class="flex justify-center gap-1">

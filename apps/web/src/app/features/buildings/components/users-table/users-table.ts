@@ -10,14 +10,20 @@ import {
   SearchBuildingUsers,
   UserModel,
 } from '@parking-system/libs';
-import { RoleTag } from '@shared/ui';
+import { RoleTag, SlotAssignationTag } from '@shared/ui';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-users-table',
-  imports: [ButtonModule, TableModule, RoleTag, InputTextModule],
+  imports: [
+    ButtonModule,
+    TableModule,
+    RoleTag,
+    InputTextModule,
+    SlotAssignationTag,
+  ],
   templateUrl: './users-table.html',
   styleUrl: './users-table.css',
   standalone: true,

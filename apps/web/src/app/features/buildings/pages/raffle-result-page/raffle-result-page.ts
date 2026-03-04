@@ -1,4 +1,4 @@
-import { DatePipe, JsonPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,16 +11,18 @@ import {
 import { FormsModule } from '@angular/forms';
 import { BuildingDetailStore } from '@core/stores';
 import {
-  RaffleModel,
   SearchRaffleResults,
   UserRaffleResultEnum,
 } from '@parking-system/libs';
-import { PageHeader } from '@shared/ui';
+import {
+  PageHeader,
+  RaffleUserResultTag,
+  SlotAssignationTag,
+} from '@shared/ui';
 import { Card } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectChangeEvent, SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
 
 @Component({
   selector: 'app-raffle-result-page',
@@ -29,11 +31,11 @@ import { Tag } from 'primeng/tag';
     TableModule,
     PageHeader,
     DatePipe,
-    Tag,
     InputTextModule,
     SelectModule,
     FormsModule,
-    JsonPipe,
+    SlotAssignationTag,
+    RaffleUserResultTag,
   ],
   templateUrl: './raffle-result-page.html',
   styleUrl: './raffle-result-page.css',
@@ -42,7 +44,6 @@ import { Tag } from 'primeng/tag';
 })
 export class RaffleResultPage {
   protected readonly store = inject(BuildingDetailStore);
-  protected readonly userResultStatus = UserRaffleResultEnum;
   protected readonly userRaffleResultOptions = [
     { label: 'Winners', value: UserRaffleResultEnum.WINNER },
     { label: 'Losers', value: UserRaffleResultEnum.LOSER },
