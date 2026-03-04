@@ -5,7 +5,7 @@ import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RaffleResultToModel } from '../mappers';
 import { RaffleResultsService } from '../services';
-import { SearchRaffleResultsDto } from '@common/dtos';
+import { SearchDto, SearchRaffleResultsDto } from '@common/dtos';
 
 @ApiTags('results')
 @Controller('results')
@@ -17,7 +17,7 @@ export class RaffleResultsController {
   @ApiOperation({
     summary: 'Get results for the raffle',
   })
-  async findNext(
+  async getAllResults(
     @Query() filters: SearchRaffleResultsDto,
     @CurrentUser() user: User,
   ) {
@@ -27,9 +27,20 @@ export class RaffleResultsController {
       meta: result.meta,
       data: result.data.map((f) => RaffleResultToModel(f)),
     };
+  }
+  @Get('user')
+  @ApiOperation({
+    summary: 'Get results for the user',
+  })
+  async getResultsByUser(
+    @Query() filters: SearchDto,
+    @CurrentUser() user: User,
+  ) {
+    const result = await this.service.findResultsByUser(filters, user);
 
-    // const raffle = await this.raffleService.findNext(buildingId, user);
-    // if (!raffle) throw new NotFoundException('No pending raffle found');
-    // return RaffleToModel(raffle);
+    return {
+      meta: result.meta,
+      data: result.data.map((f) => RaffleResultToModel(f)),
+    };
   }
 }

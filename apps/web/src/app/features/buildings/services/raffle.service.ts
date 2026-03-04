@@ -48,4 +48,8 @@ export class RaffleService {
   loadResults(filters: SearchRaffleResults) {
     return this.request.get<RaffleResultModel[]>(`api/results`, filters);
   }
+
+  loadUserHistory(filters: Search) {
+    return this.request.get<RaffleResultModel[]>(`api/results/user`, filters);
+  }
 }

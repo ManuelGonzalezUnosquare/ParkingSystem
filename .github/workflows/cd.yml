@@ -59,7 +59,7 @@ jobs:
         with:
           tag_name: release-${{ github.run_number }}
           name: Release v1.0.${{ github.run_number }}
-          generate_release_notes: true # Crea el changelog basado en commits
+          generate_release_notes: true
           body: |
             **Fullstack Images Available at GHCR**
             - API: `${{ github.sha }}`

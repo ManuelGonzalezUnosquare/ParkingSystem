@@ -31,7 +31,8 @@
       </h3>
 
       <div class="mt-6 mb-2">
-        <p-tag [value]="user().assignedSlotNumber" severity="success" />
+        <app-slot-assignation-tag [slot]="user().assignedSlotNumber" />
+        <!-- <p-tag [value]="user().assignedSlotNumber" severity="success" /> -->
       </div>
     </div>
   </ng-template>

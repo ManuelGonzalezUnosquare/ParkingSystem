@@ -4,7 +4,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import { RaffleService } from './raffle.service';
-import { SearchRaffleResultsDto } from '@common/dtos';
+import { SearchDto, SearchRaffleResultsDto } from '@common/dtos';
 
 @Injectable()
 export class RaffleResultsService {
@@ -15,6 +15,22 @@ export class RaffleResultsService {
     private readonly raffleResultRepository: Repository<RaffleResult>,
     private readonly raffleService: RaffleService,
   ) {}
+
+  async findResultsByUser(filters: SearchDto, user: User) {
+    const query = this.raffleResultRepository
+      .createQueryBuilder('results')
+      .leftJoinAndSelect('results.user', 'user')
+      .leftJoinAndSelect('user.building', 'building')
+      .leftJoinAndSelect('results.vehicle', 'vehicle')
+      .leftJoinAndSelect('results.slot', 'slot')
+      .where('user.id = :userId', { userId: user.id })
+      .andWhere('building.id = :buildingId', { buildingId: user.building.id });
+
+    filters.sortOrder = -1;
+
+    const result = await paginateQuery(query, filters);
+    return result;
+  }
 
   async findResultsByRaffle(filters: SearchRaffleResultsDto, user: User) {
     const { raffleId, globalFilter } = filters;

@@ -2,7 +2,6 @@
   [title]="`${building()?.name} Allocation Results`"
   [subTitle]="`Executed on ${raffle()?.executionDate |date}`"
 />
-<pre>{{filters|json}}</pre>
 <p-card>
   <p-table
     #dt
@@ -61,12 +60,11 @@
         <td class="text-center">{{result.vehiclePlate || '--'}}</td>
         <td class="text-center">{{result.userScoreAtDraw}}</td>
         <td class="text-center">
-          @let stat = result.status === userResultStatus.WINNER ? 'success'
-          :(result.status === userResultStatus.LOSER ? 'warn':'secondary') ;
-
-          <p-tag [value]="result.status" [severity]="stat" />
+          <app-raffle-user-result-tag [status]="result.status" />
         </td>
-        <td>{{result.slotNumber}}</td>
+        <td>
+          <app-slot-assignation-tag [slot]="result.slotNumber" />
+        </td>
       </tr>
     </ng-template>
   </p-table>
