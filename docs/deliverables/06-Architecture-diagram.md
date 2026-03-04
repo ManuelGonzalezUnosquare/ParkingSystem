@@ -1,34 +1,49 @@
 # Architecture diagram.
 
-graph TD
-subgraph Client_Layer [Frontend - Angular 19]
-A[Browser User] --> B[PrimeNG 21 / Tailwind 4 Components]
-B --> C[SignalStore - State Management]
-end
+```mermaid
+flowchart TD
+    subgraph NX_Monorepo ["📦 NX Workspace (Unified Monorepo)"]
+        direction TB
 
-    subgraph Logic_Layer [NX Monorepo - NestJS API]
-        D[Auth & RBAC Guards]
-        E[Parking Module]
-        F[Raffle Engine]
-        G[Building Management]
+        subgraph FE ["💻 Frontend - Angular 21"]
+            A[PrimeNG 21 - Design System]
+            B[Tailwind CSS 4 - Utility First]
+            C[SignalStore - Reactive State]
+            A & B --> D[Standalone UI Components]
+            D --> C
+        end
 
-        C -->|REST / JSON| D
-        D --> E
-        D --> F
-        D --> G
+        subgraph BE ["⚙️ Backend - NestJS"]
+            E[Auth & RBAC Guards]
+            F[Raffle & Parking Logic]
+            G[TypeORM Persistence]
+            E --> F --> G
+        end
+
+        subgraph Shared_Libs ["📦 Shared Library"]
+            H[Domain Models]
+            I[Interfaces]
+        end
+
+        %% Cross-dependencies
+        D -.->|Consumes| H
+        F -.->|Implements| H
+        D -->|REST API| E
     end
 
-    subgraph Data_Layer [Persistence & Performance]
-        E & F & G --> H[(Redis Cache)]
-        E & F & G --> I[(TypeORM - PostgreSQL/MySQL)]
+    subgraph Data_Layer ["🗄️ Infrastructure"]
+        J[(Redis - Performance Cache)]
+        K[(MySQL - Database)]
+        F --> J
+        G --> K
     end
 
-    subgraph Dev_Ops [CI/CD Pipeline]
-        J[GitHub Actions] --> K[Docker Images - GHCR]
-        K --> L[Automated Releases]
-    end
+    %% Estilos de marca y claridad
+    style NX_Monorepo fill:#f8f9fa,stroke:#4f46e5,stroke-width:2px,color:#333
+    style FE fill:#eff6ff,stroke:#2563eb
+    style BE fill:#fdf2f8,stroke:#db2777
+    style Shared_Libs fill:#f0fdf4,stroke:#16a34a,stroke-dasharray: 5 5
 
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style I fill:#2a9d8f,color:#fff
-    style H fill:#e76f51,color:#fff
-    style F fill:#e9c46a
+
+
+```
