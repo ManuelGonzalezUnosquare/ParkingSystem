@@ -105,10 +105,10 @@ export const BuildingDetailStore = signalStore(
           const buildingId = store.buildingId();
           const isLoggedIn = authStore.isAuthenticated();
           if (isLoggedIn) {
-            if (buildingId && !store.next()) {
+            if (buildingId && !store.next() && !store.isLoading()) {
               store.loadNext();
             }
-            if (buildingId && !store.building()) {
+            if (buildingId && !store.building() && !store.isLoading()) {
               store.loadById(buildingId);
             }
           }

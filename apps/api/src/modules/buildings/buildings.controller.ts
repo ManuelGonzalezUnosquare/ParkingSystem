@@ -61,7 +61,7 @@ export class BuildingsController {
   }
 
   @Get(':publicId')
-  @Roles(RoleEnum.ROOT, RoleEnum.ADMIN)
+  @Roles(RoleEnum.ROOT, RoleEnum.ADMIN, RoleEnum.USER)
   findOne(@Param('publicId', new ParseUUIDPipe()) publicId: string) {
     return this.buildingsService.findOneByPublicId(publicId);
   }
