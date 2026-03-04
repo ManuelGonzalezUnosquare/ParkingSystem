@@ -40,9 +40,11 @@ erDiagram
         varchar name
         int totalSlots
         string address
+        number createdBy
     }
     Building ||--|{ User : "users"
     Building ||--|{ ParkingSlot : "slots"
+    Building }|--|| User : "createdBy"
     Role {
         int id
         uuid publicId
@@ -69,18 +71,21 @@ erDiagram
         enum status
         number role
         number building
+        number createdBy
     }
     User }|--|| Role : "role"
     User }|--|| Building : "building"
     User ||--|{ Vehicle : "vehicles"
+    User }|--|| User : "createdBy"
     RaffleResult {
         int id
         uuid publicId
         timestamp createdAt
         timestamp updatedAt
         timestamp deletedAt
+        number raffle_id
         int scoreAtDraw
-        number raffle
+        enum status
         number user
         number vehicle
         number slot
@@ -98,8 +103,11 @@ erDiagram
         datetime executionDate
         datetime executedAt
         boolean isManual
+        enum status
         number building
+        number executedBy
     }
     Raffle }|--|| Building : "building"
     Raffle ||--|{ RaffleResult : "results"
+    Raffle }|--|| User : "executedBy"
 ```
