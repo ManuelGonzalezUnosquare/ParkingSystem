@@ -45,3 +45,24 @@ jobs:
           tags: |
             ghcr.io/manuelgonzalezunosquare/parkingsystem/web:latest
             ghcr.io/manuelgonzalezunosquare/parkingsystem/web:${{ github.sha }}
+
+      - name: Health Check Images
+        run: |
+          docker run -d --name api-test ghcr.io/manuelgonzalezunosquare/parkingsystem/api:${{ github.sha }}
+          docker run -d --name web-test ghcr.io/manuelgonzalezunosquare/parkingsystem/web:${{ github.sha }}
+          sleep 10
+          if [ "$(docker inspect -f '{{.State.Running}}' api-test)" != "true" ]; then exit 1; fi
+          if [ "$(docker inspect -f '{{.State.Running}}' web-test)" != "true" ]; then exit 1; fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release-${{ github.run_number }}
+          name: Release v1.0.${{ github.run_number }}
+          generate_release_notes: true # Crea el changelog basado en commits
+          body: |
+            **Fullstack Images Available at GHCR**
+            - API: `${{ github.sha }}`
+            - Web: `${{ github.sha }}`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
