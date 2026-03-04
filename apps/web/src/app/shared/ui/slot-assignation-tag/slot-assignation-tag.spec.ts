@@ -11,6 +11,7 @@ describe('SlotAssignationTag', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(SlotAssignationTag);
+    fixture.componentRef.setInput('slot', 'None');
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

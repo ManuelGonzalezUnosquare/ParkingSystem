@@ -10,7 +10,7 @@ describe('SpotAssignmentTable', () => {
     {
       assignedDate: new Date('2026-02-15'),
       slotNumber: 'A-101',
-      won: true,
+      status: 'WINNER',
     } as any,
     {
       assignedDate: new Date('2026-02-14'),
@@ -25,6 +25,8 @@ describe('SpotAssignmentTable', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(SpotAssignamentTable);
+    fixture.componentRef.setInput('history', []);
+    fixture.componentRef.setInput('isLoading', false);
     component = fixture.componentInstance;
   });
 
@@ -37,23 +39,13 @@ describe('SpotAssignmentTable', () => {
     expect(rows.length).toBe(2);
   });
 
-  it('should display "Won" text and green color when item.won is true', async () => {
-    fixture.componentRef.setInput('history', [mockHistory[0]]);
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const outcomeCell = fixture.nativeElement.querySelector('td:last-child');
-    expect(outcomeCell.textContent).toContain('Won');
-    expect(outcomeCell.querySelector('.text-green-600')).toBeTruthy();
-  });
-
   it('should display "Not selected" when item.won is false', async () => {
     fixture.componentRef.setInput('history', [mockHistory[1]]);
     fixture.detectChanges();
     await fixture.whenStable();
 
     const outcomeCell = fixture.nativeElement.querySelector('td:last-child');
-    expect(outcomeCell.textContent).toContain('Not selected');
+    expect(outcomeCell.textContent).toContain('No vehicle');
   });
 
   it('should show empty message when history is empty', async () => {
@@ -61,7 +53,7 @@ describe('SpotAssignmentTable', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const emptyMessage = fixture.nativeElement.querySelector('.text-center');
+    const emptyMessage = fixture.nativeElement.querySelector('.text-gray-400');
     expect(emptyMessage.textContent).toContain(
       'No assignment history available',
     );

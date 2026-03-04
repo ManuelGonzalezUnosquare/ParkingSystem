@@ -11,6 +11,7 @@ describe('RaffleUserResultTag', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(RaffleUserResultTag);
+    fixture.componentRef.setInput('status', 'WINNER');
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
